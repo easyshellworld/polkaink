@@ -248,12 +248,12 @@ polkaink-contracts/
 
 ```typescript
 // hardhat.config.ts
-import { HardhatUserConfig } from "hardhat/config";
+// Reference: https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
+import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import "@parity/hardhat-polkadot";
 import "dotenv/config";
 
-const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -264,61 +264,15 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    // Local development (anvil-polkadot)
-    // Start with: npx hardhat node
-    hardhat: {
-      polkadot: true,
-      nodeConfig: {
-        useAnviL: true,
-        nodeBinaryPath: "./bin/anvil-polkadot",
-      },
-    },
-    // PAS — Polkadot Hub Testnet (Paseo Asset Hub) — PRIMARY DEV NETWORK
-    // Faucet: https://faucet.polkadot.io/?parachain=1111
-    // EVM Explorer: https://blockscout-passet-hub.parity-testnet.parity.io/
-    // Substrate Explorer: https://assethub-paseo.subscan.io/
-    polkadotHubTestnet: {
-      polkadot: true,
-      url: process.env.PAS_RPC_URL ||
-           "https://services.polkadothub-rpc.com/testnet",
-      chainId: 420420422,
+    // Polkadot Hub TestNet (PAS) — PRIMARY DEV NETWORK
+    // Docs: https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
+    // Faucet: https://faucet.polkadot.io/
+    // Explorer: https://polkadot.testnet.routescan.io/
+    polkadotTestnet: {
+      url: "https://services.polkadothub-rpc.com/testnet",
+      chainId: 420420417,
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
-    // Westend Asset Hub — Internal Parity Testnet (secondary)
-    // Faucet: https://faucet.polkadot.io/westend
-    // EVM Explorer: https://blockscout-asset-hub.parity-chains-scw.parity.io/
-    // Substrate Explorer: https://assethub-westend.subscan.io/
-    westendHub: {
-      polkadot: true,
-      url: process.env.WESTEND_HUB_RPC_URL ||
-           "https://westend-asset-hub-eth-rpc.polkadot.io",
-      chainId: 420420421,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-    },
-    // Kusama Asset Hub — Live Network (future production)
-    // EVM Explorer: https://blockscout-kusama-asset-hub.parity-chains-scw.parity.io/
-    // Substrate Explorer: https://assethub-kusama.subscan.io/
-    kusamaHub: {
-      polkadot: true,
-      url: "https://kusama-asset-hub-eth-rpc.polkadot.io",
-      chainId: 420420418,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-    },
-  },
-  etherscan: {
-    apiKey: {
-      polkadotHubTestnet: process.env.EXPLORER_API_KEY || "no-api-key",
-    },
-    customChains: [
-      {
-        network: "polkadotHubTestnet",
-        chainId: 420420422,
-        urls: {
-          apiURL: "https://blockscout-passet-hub.parity-testnet.parity.io/api",
-          browserURL: "https://blockscout-passet-hub.parity-testnet.parity.io",
-        },
-      },
-    ],
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS === "true",
@@ -329,11 +283,12 @@ const config: HardhatUserConfig = {
 export default config;
 ```
 
-> **📌 开发阶段默认使用 `polkadotHubTestnet`（PAS）网络。** 部署命令示例：
+> **📌 开发阶段默认使用 `polkadotTestnet`（PAS）网络。** 部署命令示例：
 > ```bash
-> npx hardhat run scripts/deploy.ts --network polkadotHubTestnet
+> npx hardhat run scripts/deploy.ts --network polkadotTestnet
 > ```
-> 获取测试代币：https://faucet.polkadot.io/?parachain=1111
+> 获取测试代币：https://faucet.polkadot.io/
+> 区块浏览器：https://polkadot.testnet.routescan.io/
 
 ---
 
@@ -1372,18 +1327,17 @@ pallet-revive（Polkadot Hub 上的合约托管 pallet）
 
 ### 4.3 链配置参数
 
-| 参数 | PAS（Polkadot Hub Testnet）🔧 开发用 | Westend Hub（内部测试网） | Kusama Hub（正式网络） |
-|------|------|------|------|
-| Chain ID | `420420422` | `420420421` | `420420418` |
-| 原生代币 | PAS（测试代币） | WND | KSM |
-| RPC（HTTP） | `https://services.polkadothub-rpc.com/testnet` | `https://westend-asset-hub-eth-rpc.polkadot.io` | `https://kusama-asset-hub-eth-rpc.polkadot.io` |
-| Faucet | https://faucet.polkadot.io/?parachain=1111 | https://faucet.polkadot.io/westend | N/A（需购买 KSM） |
-| EVM 区块浏览器 | [Blockscout PAS](https://blockscout-passet-hub.parity-testnet.parity.io/) | [Blockscout Westend](https://blockscout-asset-hub.parity-chains-scw.parity.io/) | [Blockscout Kusama](https://blockscout-kusama-asset-hub.parity-chains-scw.parity.io/) |
-| Substrate 浏览器 | [Subscan Paseo](https://assethub-paseo.subscan.io/) | [Subscan Westend](https://assethub-westend.subscan.io/) | [Subscan Kusama](https://assethub-kusama.subscan.io/) |
-| 钱包兼容 | MetaMask / Polkadot.js | 同左 | 同左 |
+| 参数 | PAS（Polkadot Hub Testnet）🔧 开发用 |
+|------|------|
+| Chain ID | `420420417` |
+| 原生代币 | PAS（测试代币） |
+| RPC（HTTP） | `https://services.polkadothub-rpc.com/testnet` |
+| Faucet | https://faucet.polkadot.io/ |
+| 区块浏览器 | [Routescan](https://polkadot.testnet.routescan.io/) |
+| 钱包兼容 | MetaMask |
 
-> **📌 开发阶段使用 PAS（Polkadot Hub Testnet / Paseo Asset Hub），Chain ID `420420422`。**
-> 来源：[paritytech/hardhat-polkadot 官方示例](https://github.com/paritytech/hardhat-polkadot/blob/main/examples/all-polkavm-networks/hardhat.config.ts)
+> **📌 开发阶段使用 PAS（Polkadot Hub TestNet），Chain ID `420420417`。**
+> 来源：[Polkadot 官方文档](https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/)
 
 ---
 
@@ -2444,39 +2398,17 @@ describe('Full Proposal Flow', () => {
 ### 13.1 部署顺序（有依赖关系）
 
 ```bash
-# Deploy to PAS (Polkadot Hub Testnet) — development phase
-# For local testing, replace --network polkadotHubTestnet with --network hardhat
+# Deploy to PAS (Polkadot Hub TestNet) — development phase (MVP: single contract)
+# Reference: https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
 
-# 1. Deploy ProxyAdmin (non-upgradeable)
-npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network polkadotHubTestnet
+npx hardhat run scripts/deploy.ts --network polkadotTestnet
 
-# 2. Deploy TimelockController (non-upgradeable, min delay 48h)
-npx hardhat run scripts/deploy/02_deploy_timelock.ts --network polkadotHubTestnet
-
-# 3. Deploy NFTReward (UUPS)
-npx hardhat run scripts/deploy/03_deploy_nft.ts --network polkadotHubTestnet
-
-# 4. Deploy VersionStore (UUPS)
-npx hardhat run scripts/deploy/04_deploy_version_store.ts --network polkadotHubTestnet
-
-# 5. Deploy PolkaInkRegistry (UUPS)
-npx hardhat run scripts/deploy/05_deploy_registry.ts --network polkadotHubTestnet
-
-# 6. Deploy ArchiveCouncil (UUPS)
-npx hardhat run scripts/deploy/06_deploy_council.ts --network polkadotHubTestnet
-
-# 7. Deploy GovernanceCore (UUPS)
-npx hardhat run scripts/deploy/07_deploy_governance.ts --network polkadotHubTestnet
-
-# 8. Deploy Treasury (UUPS)
-npx hardhat run scripts/deploy/08_deploy_treasury.ts --network polkadotHubTestnet
-
-# 9. Setup roles & permissions
-npx hardhat run scripts/deploy/09_setup_roles.ts --network polkadotHubTestnet
-
-# Verify contracts on Blockscout
-npx hardhat run scripts/verify.ts --network polkadotHubTestnet
+# For local testing:
+# npx hardhat run scripts/deploy.ts --network localhost
 ```
+
+> **📌 MVP 阶段使用单一合约 `PolkaInk.sol`。** 未来拆分为多合约部署时参考以下顺序：
+> ProxyAdmin → TimelockController → NFTReward → VersionStore → Registry → Council → Governance → Treasury → Setup Roles
 
 ### 13.2 初始化权限设置
 
