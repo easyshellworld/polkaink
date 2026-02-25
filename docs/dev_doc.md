@@ -86,18 +86,29 @@
 | 层级 | 选型 | 说明 |
 |------|------|------|
 | 区块链 | Polkadot Asset Hub（Polkadot Hub） | pallet-revive + REVM/PolkaVM |
-| 合约语言 | Solidity 0.8.24 | EVM 兼容，Hardhat 框架 |
+| 合约语言 | Solidity 0.8.28 | EVM 兼容，Hardhat + @parity/hardhat-polkadot |
 | 合约升级 | UUPS Proxy（OpenZeppelin） | DAO 投票 + TimelockController 授权 |
 | 前端框架 | React 18 + Vite 5 + TypeScript | SPA，Hash Router（兼容 IPFS） |
 | 样式 | Tailwind CSS v4 | Mobile-first，自定义 Polkadot Design Token |
 | 状态管理 | Zustand + React Query | 全局状态 + 链数据缓存 |
-| 国际化 | i18next + react-i18next | zh-CN / en / ja |
+| 国际化 | i18next + react-i18next | zh-CN / en / kr |
 | 钱包连接 | Polkadot.js Extension + wagmi + RainbowKit | 兼容 MetaMask Mobile |
 | Markdown | react-markdown + remark-gfm + shiki | 代码高亮 |
 | 链上索引 | Subsquid（或自建） | 事件索引，用于前端快速查询 |
 | 前端托管 | IPFS（主）+ GitHub Pages（镜像） | 去中心化，任何人可验证 |
 
-### 2.2 系统架构图
+### 2.2 开发规范
+
+> ⚠️ **All code, comments, variable names, and commit messages MUST be written in English throughout the entire development process.**
+
+| 规范 | 说明 |
+|------|------|
+| 代码语言 | 所有代码（合约 + 前端）必须使用 **英文**，包括注释、变量名、函数名、commit message |
+| 开发网络 | **PAS（Polkadot Hub Testnet / Paseo Asset Hub）** 作为主要开发测试网络 |
+| 交付结构 | 开发阶段围绕 **两个主文件** 展开：一个智能合约（Solidity）+ 一个前端应用（React） |
+| Hardhat 插件 | 使用 `@parity/hardhat-polkadot` 插件，确保 Polkadot Hub 兼容性 |
+
+### 2.3 系统架构图
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -106,7 +117,7 @@
 │                                                                           │
 │  ┌────────────────────────────────────────────────────────────────────┐  │
 │  │                  React + Vite Frontend (SPA)                        │  │
-│  │  i18n(zh/en/ja) │ Mobile-first │ IPFS 托管 │ GitHub Pages 镜像     │  │
+│  │  i18n(zh/en/kr) │ Mobile-first │ IPFS 托管 │ GitHub Pages 镜像     │  │
 │  └──────────────────────────────┬─────────────────────────────────────┘  │
 │                                 │ Wallet Sign                             │
 │                    Polkadot.js Extension / MetaMask / wagmi               │
@@ -161,6 +172,12 @@
 | `ProxyAdmin` | UUPS 代理管理入口 | **不可升级** | TimelockController |
 
 ### 3.2 Hardhat 项目结构
+
+> **📌 开发阶段简化说明：** 实际开发围绕 **两个主文件** 展开：
+> 1. **一个智能合约文件**（`contracts/PolkaInk.sol`）— 包含核心链上逻辑
+> 2. **一个前端应用文件**（`frontend/`）— React SPA，与合约交互
+>
+> 以下完整结构为长期架构设计参考，开发阶段按需逐步拆分。
 
 ```
 polkaink-contracts/
@@ -231,64 +248,92 @@ polkaink-contracts/
 
 ```typescript
 // hardhat.config.ts
-import { HardhatUserConfig } from 'hardhat/config';
-import '@nomicfoundation/hardhat-toolbox';
-import '@openzeppelin/hardhat-upgrades';
-import 'dotenv/config';
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@parity/hardhat-polkadot";
+import "dotenv/config";
+
+const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.24',
+    version: "0.8.28",
     settings: {
       optimizer: { enabled: true, runs: 200 },
       viaIR: true,
     },
   },
   networks: {
-    // Polkadot Hub 主网（EVM 兼容，pallet-revive / REVM）
-    polkadotHub: {
-      url: process.env.POLKADOT_HUB_RPC_URL ||
-           'https://asset-hub-polkadot-rpc.dwellir.com',
-      chainId: 420420421,  // Polkadot Hub EVM Chain ID
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
-      gasPrice: 'auto',
-      timeout: 60000,
-    },
-    // Westend Asset Hub 测试网
-    westendHub: {
-      url: process.env.WESTEND_HUB_RPC_URL ||
-           'https://westend-asset-hub-eth-rpc.polkadot.io',
-      chainId: 420420422,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
-    },
-    // 本地开发
+    // Local development (anvil-polkadot)
+    // Start with: npx hardhat node
     hardhat: {
-      chainId: 31337,
+      polkadot: true,
+      nodeConfig: {
+        useAnviL: true,
+        nodeBinaryPath: "./bin/anvil-polkadot",
+      },
+    },
+    // PAS — Polkadot Hub Testnet (Paseo Asset Hub) — PRIMARY DEV NETWORK
+    // Faucet: https://faucet.polkadot.io/?parachain=1111
+    // EVM Explorer: https://blockscout-passet-hub.parity-testnet.parity.io/
+    // Substrate Explorer: https://assethub-paseo.subscan.io/
+    polkadotHubTestnet: {
+      polkadot: true,
+      url: process.env.PAS_RPC_URL ||
+           "https://services.polkadothub-rpc.com/testnet",
+      chainId: 420420422,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    // Westend Asset Hub — Internal Parity Testnet (secondary)
+    // Faucet: https://faucet.polkadot.io/westend
+    // EVM Explorer: https://blockscout-asset-hub.parity-chains-scw.parity.io/
+    // Substrate Explorer: https://assethub-westend.subscan.io/
+    westendHub: {
+      polkadot: true,
+      url: process.env.WESTEND_HUB_RPC_URL ||
+           "https://westend-asset-hub-eth-rpc.polkadot.io",
+      chainId: 420420421,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    // Kusama Asset Hub — Live Network (future production)
+    // EVM Explorer: https://blockscout-kusama-asset-hub.parity-chains-scw.parity.io/
+    // Substrate Explorer: https://assethub-kusama.subscan.io/
+    kusamaHub: {
+      polkadot: true,
+      url: "https://kusama-asset-hub-eth-rpc.polkadot.io",
+      chainId: 420420418,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
   },
   etherscan: {
     apiKey: {
-      polkadotHub: process.env.EXPLORER_API_KEY || 'no-api-key',
+      polkadotHubTestnet: process.env.EXPLORER_API_KEY || "no-api-key",
     },
     customChains: [
       {
-        network: 'polkadotHub',
-        chainId: 420420421,
+        network: "polkadotHubTestnet",
+        chainId: 420420422,
         urls: {
-          apiURL: 'https://blockscout.assetHub.polkadot.network/api',
-          browserURL: 'https://blockscout.assetHub.polkadot.network',
+          apiURL: "https://blockscout-passet-hub.parity-testnet.parity.io/api",
+          browserURL: "https://blockscout-passet-hub.parity-testnet.parity.io",
         },
       },
     ],
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS === 'true',
-    currency: 'USD',
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
   },
 };
 
 export default config;
 ```
+
+> **📌 开发阶段默认使用 `polkadotHubTestnet`（PAS）网络。** 部署命令示例：
+> ```bash
+> npx hardhat run scripts/deploy.ts --network polkadotHubTestnet
+> ```
+> 获取测试代币：https://faucet.polkadot.io/?parachain=1111
 
 ---
 
@@ -298,7 +343,7 @@ export default config;
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title IPolkaInkRegistry
 /// @notice 核心文档注册表接口：管理文档生命周期和版本树
@@ -428,7 +473,7 @@ interface IPolkaInkRegistry {
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title IVersionStore
 /// @notice 文档版本存储接口：管理版本树与 calldata 索引
@@ -541,7 +586,7 @@ interface IVersionStore {
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title IGovernanceCore
 /// @notice 治理投票核心接口：管理提案生命周期与投票权重计算
@@ -765,7 +810,7 @@ interface IGovernanceCore {
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title IArchiveCouncil
 /// @notice Archive Council（7人伦理守护委员会）接口
@@ -926,7 +971,7 @@ interface IArchiveCouncil {
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title INFTReward
 /// @notice 双类型 NFT 系统接口：Author NFT（历史作者）+ Guardian NFT（委员会成员）
@@ -1038,7 +1083,7 @@ interface INFTReward {
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @title ITreasury
 /// @notice DAO 资金池接口：管理 DOT 资金的入账、分配与支出
@@ -1327,13 +1372,18 @@ pallet-revive（Polkadot Hub 上的合约托管 pallet）
 
 ### 4.3 链配置参数
 
-| 参数 | Polkadot Hub 主网 | Westend Hub 测试网 |
-|------|------|------|
-| Chain ID | `420420421` | `420420422` |
-| 原生代币 | DOT | WND |
-| RPC（HTTP） | `https://asset-hub-polkadot-rpc.dwellir.com` | `https://westend-asset-hub-eth-rpc.polkadot.io` |
-| 区块浏览器 | Blockscout（Asset Hub） | Westend Blockscout |
-| 钱包兼容 | MetaMask / Polkadot.js | 同左 |
+| 参数 | PAS（Polkadot Hub Testnet）🔧 开发用 | Westend Hub（内部测试网） | Kusama Hub（正式网络） |
+|------|------|------|------|
+| Chain ID | `420420422` | `420420421` | `420420418` |
+| 原生代币 | PAS（测试代币） | WND | KSM |
+| RPC（HTTP） | `https://services.polkadothub-rpc.com/testnet` | `https://westend-asset-hub-eth-rpc.polkadot.io` | `https://kusama-asset-hub-eth-rpc.polkadot.io` |
+| Faucet | https://faucet.polkadot.io/?parachain=1111 | https://faucet.polkadot.io/westend | N/A（需购买 KSM） |
+| EVM 区块浏览器 | [Blockscout PAS](https://blockscout-passet-hub.parity-testnet.parity.io/) | [Blockscout Westend](https://blockscout-asset-hub.parity-chains-scw.parity.io/) | [Blockscout Kusama](https://blockscout-kusama-asset-hub.parity-chains-scw.parity.io/) |
+| Substrate 浏览器 | [Subscan Paseo](https://assethub-paseo.subscan.io/) | [Subscan Westend](https://assethub-westend.subscan.io/) | [Subscan Kusama](https://assethub-kusama.subscan.io/) |
+| 钱包兼容 | MetaMask / Polkadot.js | 同左 | 同左 |
+
+> **📌 开发阶段使用 PAS（Polkadot Hub Testnet / Paseo Asset Hub），Chain ID `420420422`。**
+> 来源：[paritytech/hardhat-polkadot 官方示例](https://github.com/paritytech/hardhat-polkadot/blob/main/examples/all-polkavm-networks/hardhat.config.ts)
 
 ---
 
@@ -1398,9 +1448,9 @@ pallet-revive（Polkadot Hub 上的合约托管 pallet）
 所有数据均在链上，任何人可完整重建：
 
 ```bash
-# 示例：重建文档历史
+# Example: Rebuild document history from on-chain data
 polkaink-cli rebuild \
-  --rpc https://asset-hub-polkadot-rpc.dwellir.com \
+  --rpc https://services.polkadothub-rpc.com/testnet \
   --registry 0xRegistryAddr \
   --doc-id 42 \
   --output ./exported/doc_42/
@@ -1723,7 +1773,7 @@ polkaink-frontend/
 │   │   │   └── translation.json
 │   │   ├── zh-CN/
 │   │   │   └── translation.json
-│   │   └── ja/
+│   │   └── 抗日/
 │   │       └── translation.json
 │   └── favicon.svg                       # Polkadot ◎ 风格图标
 ├── src/
@@ -1841,7 +1891,7 @@ polkaink-frontend/
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  ◎ PolkaInk         [EN|ZH|JA]   [图书馆]  [治理]  [连接钱包]       │
+│  ◎ PolkaInk         [EN|ZH|kr]   [图书馆]  [治理]  [连接钱包]       │
 │  ──────────────────────────────────────────────────────────────────  │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                        │
@@ -2178,7 +2228,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    supportedLngs: ['en', 'zh-CN', 'ja'],
+    supportedLngs: ['en', 'zh-CN', 'kr'],
     fallbackLng: 'en',
     defaultNS: 'translation',
     backend: {
@@ -2257,7 +2307,7 @@ const LanguageSwitcher = () => {
   const langs = [
     { code: 'en', label: 'EN' },
     { code: 'zh-CN', label: '中文' },
-    { code: 'ja', label: '日本語' },
+    { code: 'kr', label: '日本語' },
   ];
   return (
     <div className="flex gap-1">
@@ -2394,35 +2444,38 @@ describe('Full Proposal Flow', () => {
 ### 13.1 部署顺序（有依赖关系）
 
 ```bash
-# 1. 部署 ProxyAdmin（不可升级）
-npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network polkadotHub
+# Deploy to PAS (Polkadot Hub Testnet) — development phase
+# For local testing, replace --network polkadotHubTestnet with --network hardhat
 
-# 2. 部署 TimelockController（不可升级，最短延时 48h）
-npx hardhat run scripts/deploy/02_deploy_timelock.ts --network polkadotHub
+# 1. Deploy ProxyAdmin (non-upgradeable)
+npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network polkadotHubTestnet
 
-# 3. 部署 NFTReward（UUPS）
-npx hardhat run scripts/deploy/03_deploy_nft.ts --network polkadotHub
+# 2. Deploy TimelockController (non-upgradeable, min delay 48h)
+npx hardhat run scripts/deploy/02_deploy_timelock.ts --network polkadotHubTestnet
 
-# 4. 部署 VersionStore（UUPS）
-npx hardhat run scripts/deploy/04_deploy_version_store.ts --network polkadotHub
+# 3. Deploy NFTReward (UUPS)
+npx hardhat run scripts/deploy/03_deploy_nft.ts --network polkadotHubTestnet
 
-# 5. 部署 PolkaInkRegistry（UUPS）
-npx hardhat run scripts/deploy/05_deploy_registry.ts --network polkadotHub
+# 4. Deploy VersionStore (UUPS)
+npx hardhat run scripts/deploy/04_deploy_version_store.ts --network polkadotHubTestnet
 
-# 6. 部署 ArchiveCouncil（UUPS）
-npx hardhat run scripts/deploy/06_deploy_council.ts --network polkadotHub
+# 5. Deploy PolkaInkRegistry (UUPS)
+npx hardhat run scripts/deploy/05_deploy_registry.ts --network polkadotHubTestnet
 
-# 7. 部署 GovernanceCore（UUPS）
-npx hardhat run scripts/deploy/07_deploy_governance.ts --network polkadotHub
+# 6. Deploy ArchiveCouncil (UUPS)
+npx hardhat run scripts/deploy/06_deploy_council.ts --network polkadotHubTestnet
 
-# 8. 部署 Treasury（UUPS）
-npx hardhat run scripts/deploy/08_deploy_treasury.ts --network polkadotHub
+# 7. Deploy GovernanceCore (UUPS)
+npx hardhat run scripts/deploy/07_deploy_governance.ts --network polkadotHubTestnet
 
-# 9. 初始化角色权限（设置合约间调用权限）
-npx hardhat run scripts/deploy/09_setup_roles.ts --network polkadotHub
+# 8. Deploy Treasury (UUPS)
+npx hardhat run scripts/deploy/08_deploy_treasury.ts --network polkadotHubTestnet
 
-# 验证合约
-npx hardhat run scripts/verify.ts --network polkadotHub
+# 9. Setup roles & permissions
+npx hardhat run scripts/deploy/09_setup_roles.ts --network polkadotHubTestnet
+
+# Verify contracts on Blockscout
+npx hardhat run scripts/verify.ts --network polkadotHubTestnet
 ```
 
 ### 13.2 初始化权限设置
@@ -2470,7 +2523,7 @@ npx w3 put dist/ --name polkaink-v1.0
 | 阶段 | 时间 | 里程碑 | 关键可交付 |
 |------|------|--------|-----------|
 | **Phase 0**<br>准备期 | M1 ~ M2 | 基础建设 | 合约架构最终确定；Hardhat 环境搭建；Westend Testnet 完整部署测试；申请 Polkadot Treasury Grant |
-| **Phase 1**<br>MVP | M3 ~ M5 | 核心上线 | 核心合约主网部署（Registry + VersionStore + 基础治理）；前端 Markdown 浏览器上线；calldata 上链机制验证；i18n 框架（zh/en/ja） |
+| **Phase 1**<br>MVP | M3 ~ M5 | 核心上线 | 核心合约主网部署（Registry + VersionStore + 基础治理）；前端 Markdown 浏览器上线；calldata 上链机制验证；i18n 框架（zh/en/kr） |
 | **Phase 2**<br>治理 | M6 ~ M8 | 完整 DAO | GovernanceCore + ArchiveCouncil 上线；NFT 奖励系统；邀请首批 100 位作者；Bug Bounty；正式主网运行 |
 | **Phase 3**<br>生态 | M9 ~ M12 | 生态扩展 | API 市场开放；移动端 PWA 优化；AI 摘要（链下辅助，链上存档）；Subscan / Polkassembly 数据互通；Subsquid 索引上线 |
 | **Phase 4**<br>多链 | M13+ | 多链扩展 | Kusama 历史支持；其他 Parachain 历史；探索 PolkaVM/PVM 原生合约迁移 |
