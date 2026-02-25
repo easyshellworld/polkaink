@@ -44,7 +44,6 @@
 - [15. 风险分析与缓解](#15-风险分析与缓解)
 - [16. 长期愿景](#16-长期愿景)
 - [附录 A：完整 ABI JSON](#附录-a完整-abi-json)
-- [附录 B：Polkadot Treasury Grant 申请要点](#附录-b-polkadot-treasury-grant-申请要点)
 
 ---
 
