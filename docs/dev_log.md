@@ -15,3 +15,6 @@
 * First version readme (all ai generated)
 ## 20260225 21:02(ET)
 * Add github ci
+
+## 20260026
+* 完善部分文档，继续执行路线图，计划调整目录结构。

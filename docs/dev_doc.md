@@ -1,7 +1,7 @@
 # ◎ PolkaInk — 项目设计书
 
 **On-Chain Polkadot History Preservation Protocol**
-*Version 1.0 · Draft · 2026-02*
+*Version 1.0.1· Draft · 2026-02*
 
 ---
 
@@ -11,19 +11,20 @@
 - [2. 技术架构总览](#2-技术架构总览)
 - [3. 智能合约架构](#3-智能合约架构)
   - [3.1 合约模块总览](#31-合约模块总览)
-  - [3.2 Hardhat 项目结构](#32-hardhat-项目结构)
-  - [3.3 Hardhat 配置](#33-hardhat-配置)
-  - [3.4 完整 ABI 接口定义](#34-完整-abi-接口定义)
-    - [3.4.1 IPolkaInkRegistry](#341-ipolkainkregistry)
-    - [3.4.2 IVersionStore](#342-iversionstore)
-    - [3.4.3 IGovernanceCore](#343-igovernancecore)
-    - [3.4.4 IArchiveCouncil](#344-iarchivecouncil)
-    - [3.4.5 INFTReward](#345-inftreward)
-    - [3.4.6 ITreasury](#346-itreasury)
-  - [3.5 合约间调用关系](#35-合约间调用关系)
-  - [3.6 DAO 共识升级流程](#36-dao-共识升级流程)
-  - [3.7 事件（Events）汇总](#37-事件events汇总)
-  - [3.8 错误码（Custom Errors）汇总](#38-错误码custom-errors汇总)
+  - [3.2 总目录结构](#32-总目录结构)
+  - [3.3 Hardhat 项目结构](#33-hardhat-项目结构)
+  - [3.4 Hardhat 配置](#34-hardhat-配置)
+  - [3.5 完整 ABI 接口定义](#35-完整-abi-接口定义)
+    - [3.5.1 IPolkaInkRegistry](#351-ipolkainkregistry)
+    - [3.5.2 IVersionStore](#352-iversionstore)
+    - [3.5.3 IGovernanceCore](#353-igovernancecore)
+    - [3.5.4 IArchiveCouncil](#354-iarchivecouncil)
+    - [3.5.5 INFTReward](#355-inftreward)
+    - [3.5.6 ITreasury](#356-itreasury)
+  - [3.6 合约间调用关系](#36-合约间调用关系)
+  - [3.7 DAO 共识升级流程](#37-dao-共识升级流程)
+  - [3.8 事件（Events）汇总](#38-事件events汇总)
+  - [3.9 错误码（Custom Errors）汇总](#39-错误码custom-errors汇总)
 - [4. Revive 执行环境说明](#4-revive-执行环境说明)
 - [5. Calldata 存储机制](#5-calldata-存储机制)
 - [6. 治理机制设计](#6-治理机制设计)
@@ -92,7 +93,8 @@
 | 样式 | Tailwind CSS v4 | Mobile-first，自定义 Polkadot Design Token |
 | 状态管理 | Zustand + React Query | 全局状态 + 链数据缓存 |
 | 国际化 | i18next + react-i18next | zh-CN / en / kr |
-| 钱包连接 | Polkadot.js Extension + wagmi + RainbowKit | 兼容 MetaMask Mobile |
+| 钱包连接 | Polkadot.js Extension + wagmi + RainbowKit | wagmi 负责钱包/hooks 层；兼容 MetaMask Mobile |
+| 合约交互 | viem 2.x | 底层 RPC 客户端，wagmi v2 依赖；直接用于合约读写与交易构造 |
 | Markdown | react-markdown + remark-gfm + shiki | 代码高亮 |
 | 链上索引 | Subsquid（或自建） | 事件索引，用于前端快速查询 |
 | 前端托管 | IPFS（主）+ GitHub Pages（镜像） | 去中心化，任何人可验证 |
@@ -105,7 +107,7 @@
 |------|------|
 | 代码语言 | 所有代码（合约 + 前端）必须使用 **英文**，包括注释、变量名、函数名、commit message |
 | 开发网络 | **PAS（Polkadot Hub Testnet / Paseo Asset Hub）** 作为主要开发测试网络 |
-| 交付结构 | 开发阶段围绕 **两个主文件** 展开：一个智能合约（Solidity）+ 一个前端应用（React） |
+| 交付结构 | 多合约架构：`contracts/`（Hardhat 工程，多合约模块化）+ `frontend/`（React SPA） |
 | Hardhat 插件 | 使用 `@parity/hardhat-polkadot` 插件，确保 Polkadot Hub 兼容性 |
 
 ### 2.3 系统架构图
@@ -131,7 +133,7 @@
 │  │  │  │  Hardhat 100% 兼容    │  │  resolc 编译（未来可选）      │ │  │  │
 │  │  │  └──────────┬────────────┘  └──────────────────────────────┘ │  │  │
 │  │  └─────────────┼────────────────────────────────────────────────┘  │  │
-│  │                │  Smart Contracts（Solidity 0.8.24）                │  │
+│  │                │  Smart Contracts（Solidity 0.8.28）                │  │
 │  │  ┌─────────────▼──────────────────────────────────────────────┐    │  │
 │  │  │                                                              │    │  │
 │  │  │  PolkaInkRegistry  ←───→  VersionStore                     │    │  │
@@ -166,21 +168,25 @@
 | `VersionStore` | calldata Markdown 版本存储与索引 | UUPS 可升级 | PolkaInkRegistry |
 | `GovernanceCore` | DOT/NFT 权重投票、提案生命周期 | UUPS 可升级 | ArchiveCouncil, TimelockController, NFTReward |
 | `ArchiveCouncil` | 7 人委员会 veto 逻辑与成员管理 | UUPS 可升级 | GovernanceCore, NFTReward |
-| `TimelockController` | 治理延时执行（48h），防治理攻击 | **不可升级**（安全锚） | GovernanceCore |
+| `TimelockController` | 治理延时执行（48h），防治理攻击；**自定义实现**（继承 OZ 接口，针对 Polkadot Hub 适配） | **不可升级**（安全锚） | GovernanceCore |
 | `NFTReward` | Author NFT + Guardian NFT（ERC-721） | UUPS 可升级 | PolkaInkRegistry, ArchiveCouncil |
 | `Treasury` | DAO 资金池管理、奖励分发 | UUPS 可升级 | GovernanceCore, NFTReward |
 | `ProxyAdmin` | UUPS 代理管理入口 | **不可升级** | TimelockController |
 
-### 3.2 Hardhat 项目结构
-
-> **📌 开发阶段简化说明：** 实际开发围绕 **两个主文件** 展开：
-> 1. **一个智能合约文件**（`contracts/PolkaInk.sol`）— 包含核心链上逻辑
-> 2. **一个前端应用文件**（`frontend/`）— React SPA，与合约交互
->
-> 以下完整结构为长期架构设计参考，开发阶段按需逐步拆分。
+### 3.2 总目录结构
 
 ```
-polkaink-contracts/
+polkaink/
+├── contracts/         # Hardhat 工程目录（合约、脚本、测试）
+└── frontend/          # React 前端工程目录
+```
+
+详细目录结构参见 [3.3 Hardhat 项目结构](#33-hardhat-项目结构) 与 [10.3 前端目录结构](#103-前端目录结构)。
+
+### 3.3 Hardhat 项目结构
+
+```
+contracts/
 ├── contracts/
 │   ├── core/
 │   │   ├── PolkaInkRegistry.sol          # 核心注册表（UUPS）
@@ -191,7 +197,7 @@ polkaink-contracts/
 │   ├── governance/
 │   │   ├── GovernanceCore.sol             # 投票治理（UUPS）
 │   │   ├── ArchiveCouncil.sol             # 7 人委员会（UUPS）
-│   │   ├── TimelockController.sol         # 延时控制器（不可升级）
+│   │   ├── TimelockController.sol         # 延时控制器（自定义实现，不可升级）
 │   │   └── interfaces/
 │   │       ├── IGovernanceCore.sol
 │   │       └── IArchiveCouncil.sol
@@ -244,7 +250,7 @@ polkaink-contracts/
 └── package.json
 ```
 
-### 3.3 Hardhat 配置
+### 3.4 Hardhat 配置
 
 ```typescript
 // hardhat.config.ts
@@ -276,7 +282,7 @@ const config: HardhatUserConfig = {
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS === "true",
-    currency: "USD",
+    currency: "USD", // 仅供参考，Polkadot Hub 实际以 DOT 计价；Gas 费用因 pallet-revive 不同于 EVM 主网
   },
 };
 
@@ -285,16 +291,16 @@ export default config;
 
 > **📌 开发阶段默认使用 `polkadotTestnet`（PAS）网络。** 部署命令示例：
 > ```bash
-> npx hardhat run scripts/deploy.ts --network polkadotTestnet
+> npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network polkadotTestnet
 > ```
 > 获取测试代币：https://faucet.polkadot.io/
 > 区块浏览器：https://polkadot.testnet.routescan.io/
 
 ---
 
-### 3.4 完整 ABI 接口定义
+### 3.5 完整 ABI 接口定义
 
-#### 3.4.1 IPolkaInkRegistry
+#### 3.5.1 IPolkaInkRegistry
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -424,7 +430,7 @@ interface IPolkaInkRegistry {
 }
 ```
 
-#### 3.4.2 IVersionStore
+#### 3.5.2 IVersionStore
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -537,7 +543,7 @@ interface IVersionStore {
 }
 ```
 
-#### 3.4.3 IGovernanceCore
+#### 3.5.3 IGovernanceCore
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -761,7 +767,7 @@ interface IGovernanceCore {
 }
 ```
 
-#### 3.4.4 IArchiveCouncil
+#### 3.5.4 IArchiveCouncil
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -922,7 +928,7 @@ interface IArchiveCouncil {
 }
 ```
 
-#### 3.4.5 INFTReward
+#### 3.5.5 INFTReward
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -1034,7 +1040,7 @@ interface INFTReward {
 }
 ```
 
-#### 3.4.6 ITreasury
+#### 3.5.6 ITreasury
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -1152,7 +1158,7 @@ interface ITreasury {
 
 ---
 
-### 3.5 合约间调用关系
+### 3.6 合约间调用关系
 
 ```
 调用关系图（→ 表示"可以调用"）：
@@ -1184,7 +1190,7 @@ TimelockController
  └─→ 唯一可以调用 GovernanceCore.updateParams()
 ```
 
-### 3.6 DAO 共识升级流程
+### 3.7 DAO 共识升级流程
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -1219,7 +1225,7 @@ TimelockController
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.7 事件（Events）汇总
+### 3.8 事件（Events）汇总
 
 | 合约 | 事件 | 触发条件 |
 |------|------|----------|
@@ -1242,7 +1248,7 @@ TimelockController
 | Treasury | `RewardDistributed` | 奖励分发 |
 | Treasury | `SpendExecuted` | DAO 支出执行 |
 
-### 3.8 错误码（Custom Errors）汇总
+### 3.9 错误码（Custom Errors）汇总
 
 ```solidity
 // 所有合约统一使用 Custom Errors（节省 Gas）
@@ -1663,14 +1669,14 @@ Treasury DOT 中 ≤ 20% 可部署到流动性协议：
 | React Query | 5.x | 链数据缓存与请求管理 |
 | React Router | 6.x | 路由（Hash Router，IPFS 兼容） |
 | i18next | 23.x | 国际化 |
-| wagmi | 2.x | 以太坊钱包连接（REVM 兼容） |
+| wagmi | 2.x | 钱包连接 + React hooks 层（底层使用 viem） |
 | RainbowKit | 2.x | 钱包连接 UI |
 | @polkadot/extension-dapp | 0.46.x | Polkadot.js Extension 支持 |
 | react-markdown | 9.x | Markdown 渲染 |
 | remark-gfm | 4.x | GFM 扩展 |
 | shiki | 1.x | 代码块高亮 |
 | Recharts | 2.x | 投票数据图表 |
-| ethers.js | 6.x | 合约交互 |
+| viem | 2.x | 底层 RPC 客户端 + 合约读写（wagmi v2 依赖，也可直接调用） |
 
 ### 10.2 配色方案
 
@@ -1720,14 +1726,14 @@ Treasury DOT 中 ≤ 20% 可部署到流动性协议：
 ### 10.3 前端目录结构
 
 ```
-polkaink-frontend/
+frontend/
 ├── public/
 │   ├── locales/
 │   │   ├── en/
 │   │   │   └── translation.json
 │   │   ├── zh-CN/
 │   │   │   └── translation.json
-│   │   └── 抗日/
+│   │   └── kr/
 │   │       └── translation.json
 │   └── favicon.svg                       # Polkadot ◎ 风格图标
 ├── src/
@@ -1804,7 +1810,7 @@ polkaink-frontend/
 │   │       ├── StatusBadge.tsx            # 提案状态徽章
 │   │       └── VotingPowerDisplay.tsx
 │   ├── hooks/
-│   │   ├── useContract.ts                 # 合约实例（ethers.js）
+│   │   ├── useContract.ts                 # 合约实例（viem）
 │   │   ├── useWallet.ts                   # 钱包状态（wagmi + polkadot.js）
 │   │   ├── useDocuments.ts                # 文档列表（React Query）
 │   │   ├── useDocument.ts                 # 单文档详情
@@ -2261,7 +2267,7 @@ const LanguageSwitcher = () => {
   const langs = [
     { code: 'en', label: 'EN' },
     { code: 'zh-CN', label: '中文' },
-    { code: 'kr', label: '日本語' },
+    { code: 'kr', label: '한국어' },
   ];
   return (
     <div className="flex gap-1">
@@ -2398,17 +2404,17 @@ describe('Full Proposal Flow', () => {
 ### 13.1 部署顺序（有依赖关系）
 
 ```bash
-# Deploy to PAS (Polkadot Hub TestNet) — development phase (MVP: single contract)
+# Deploy to PAS (Polkadot Hub TestNet)
 # Reference: https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
 
-npx hardhat run scripts/deploy.ts --network polkadotTestnet
+npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network polkadotTestnet
+# ... run scripts in order: 01 → 02 → ... → 09_setup_roles.ts
 
 # For local testing:
-# npx hardhat run scripts/deploy.ts --network localhost
+# npx hardhat run scripts/deploy/01_deploy_proxy_admin.ts --network localhost
 ```
 
-> **📌 MVP 阶段使用单一合约 `PolkaInk.sol`。** 未来拆分为多合约部署时参考以下顺序：
-> ProxyAdmin → TimelockController → NFTReward → VersionStore → Registry → Council → Governance → Treasury → Setup Roles
+部署顺序：ProxyAdmin → TimelockController → NFTReward → VersionStore → Registry → Council → Governance → Treasury → Setup Roles
 
 ### 13.2 初始化权限设置
 
@@ -2436,7 +2442,7 @@ TimelockController.grantRole(EXECUTOR_ROLE, address(0))  # 任何人可执行
 
 ```bash
 # 构建
-cd polkaink-frontend
+cd frontend
 npm run build          # 输出到 dist/
 
 # 部署到 IPFS（使用 Web3.Storage 或 Pinata）
@@ -2454,7 +2460,7 @@ npx w3 put dist/ --name polkaink-v1.0
 
 | 阶段 | 时间 | 里程碑 | 关键可交付 |
 |------|------|--------|-----------|
-| **Phase 0**<br>准备期 | M1 ~ M2 | 基础建设 | 合约架构最终确定；Hardhat 环境搭建；Westend Testnet 完整部署测试；申请 Polkadot Treasury Grant |
+| **Phase 0**<br>准备期 | M1 ~ M2 | 基础建设 | 合约架构最终确定；Hardhat 环境搭建；Paseo Asset Hub（PAS）完整部署测试；申请 Polkadot Treasury Grant |
 | **Phase 1**<br>MVP | M3 ~ M5 | 核心上线 | 核心合约主网部署（Registry + VersionStore + 基础治理）；前端 Markdown 浏览器上线；calldata 上链机制验证；i18n 框架（zh/en/kr） |
 | **Phase 2**<br>治理 | M6 ~ M8 | 完整 DAO | GovernanceCore + ArchiveCouncil 上线；NFT 奖励系统；邀请首批 100 位作者；Bug Bounty；正式主网运行 |
 | **Phase 3**<br>生态 | M9 ~ M12 | 生态扩展 | API 市场开放；移动端 PWA 优化；AI 摘要（链下辅助，链上存档）；Subscan / Polkassembly 数据互通；Subsquid 索引上线 |
@@ -2506,7 +2512,7 @@ PolkaInk 不仅仅是一个文档系统，它的终极目标是成为 **Web3 世
 
 ## 附录 A：完整 ABI JSON
 
-> ABI JSON 文件由 Hardhat 编译自动生成，存放于 `polkaink-frontend/src/lib/contracts/abis/`。
+> ABI JSON 文件由 Hardhat 编译自动生成，存放于 `frontend/src/lib/contracts/abis/`。
 > 以下展示 `PolkaInkRegistry.json` 的核心片段结构：
 
 ```json
