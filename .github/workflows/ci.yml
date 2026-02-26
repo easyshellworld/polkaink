@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev, firstVersion]
+  pull_request:
+    branches: [main]
+
+jobs:
+  contracts:
+    name: Contracts — compile & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run unit tests (Hardhat Network)
+        run: npx hardhat test
+
+  contracts-polkadot:
+    name: Contracts — test on Polkadot node
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download anvil-polkadot
+        run: bash scripts/setup-node.sh
+
+      - name: Run tests (anvil-polkadot)
+        run: npx hardhat test
+        env:
+          POLKADOT_NODE: "true"
+
+  frontend:
+    name: Frontend — lint & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Type check
+        run: npx tsc -b
+
+      - name: Build
+        run: npx vite build
