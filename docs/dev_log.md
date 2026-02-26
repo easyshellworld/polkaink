@@ -9,3 +9,5 @@
 * Deployed to PAS (Chain ID 420420417): [`0x401e00E5b9bAFc674EE804BaBfC18D6eeEE8e49E`](https://polkadot.testnet.routescan.io/address/0x401e00E5b9bAFc674EE804BaBfC18D6eeEE8e49E)
 * Frontend: `frontend/` — React + Vite + Tailwind + ethers.js, 7 pages, MetaMask integration
 * E2E verified — 2 docs created on-chain via frontend
+## 20260225 19:58(ET)
+* Unit tests expanded: 15 → 112 (comprehensive coverage)
