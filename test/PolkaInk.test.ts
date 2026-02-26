@@ -646,9 +646,9 @@ describe("PolkaInk", function () {
         const prop = await polkaInk.getProposal(1);
         expect(prop.status).to.equal(5); // Cancelled
 
-        // Stake returned (minus gas)
+        // Stake returned (minus gas — tolerance higher for Polkadot node gas)
         const balAfter = await ethers.provider.getBalance(author.address);
-        expect(balAfter).to.be.gt(balBefore - ethers.parseEther("0.001"));
+        expect(balAfter).to.be.gt(balBefore - ethers.parseEther("0.01"));
       });
 
       it("should reject cancel by non-proposer", async function () {

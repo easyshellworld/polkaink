@@ -9,6 +9,9 @@ typechain-types/
 frontend/dist/
 frontend/dist-ssr/
 
+# Local node binaries (downloaded by scripts/setup-node.sh)
+bin/
+
 # Environment & secrets
 .env
 .env.*
