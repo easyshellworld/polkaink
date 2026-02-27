@@ -1,35 +1,46 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════
-   Polkadot Design Tokens
+   Polkadot Design Tokens (per doc 10.2)
    ═══════════════════════════════════════════════════════ */
 :root {
+  /* Brand Primary */
   --color-primary: #E6007A;
   --color-primary-hover: #CC0068;
   --color-primary-10: #FCE4F1;
   --color-primary-20: #F9CADF;
+
+  /* Brand Secondary */
   --color-secondary: #552BBF;
   --color-secondary-10: #EDE8F9;
+
+  /* Semantic */
   --color-success: #56C568;
   --color-warning: #F5A623;
   --color-error: #FF4D4F;
   --color-info: #1890FF;
-  --color-bg: #FAFAFA;
+
+  /* Neutral (Light) */
+  --color-background: #FAFAFA;
   --color-surface: #FFFFFF;
   --color-surface-alt: #F5F5F5;
   --color-border: #E5E5E5;
-  --color-text: #1A1A1A;
+  --color-text-primary: #1A1A1A;
   --color-text-secondary: #6B6B6B;
   --color-text-disabled: #BFBFBF;
+
+  /* Aliases for backward compat */
+  --color-bg: var(--color-background);
+  --color-text: var(--color-text-primary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #0D0D0D;
+    --color-background: #0D0D0D;
     --color-surface: #1A1A1A;
     --color-surface-alt: #252525;
     --color-border: #333333;
-    --color-text: #F5F5F5;
+    --color-text-primary: #F5F5F5;
     --color-text-secondary: #999999;
   }
 }
@@ -40,8 +51,8 @@
 body {
   margin: 0;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
 }
 
