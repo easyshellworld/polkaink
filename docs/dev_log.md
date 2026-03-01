@@ -23,10 +23,11 @@
 ## 20260226 14:30(ET)
 * Frontend fully aligned with dev_doc §10.3 (all pages/components/hooks/lib/styles)
 * 64 contract tests, tsc + vite build + eslint clean
-## 20260301 17:52(ET)
+## 20260301 18:24(ET)
 * Multi-contract deployed to PAS: Registry, VersionStore, GovernanceCore, ArchiveCouncil, Timelock, NFTReward, Treasury, ProxyAdmin
 * Frontend updated with new ABIs and API signatures
 * Unified deploy script: scripts/deploy/deploy_all.ts
 * UI & i18n improvements (en/zh-CN/kr), README updated
 * Favicon redesigned → polkaink.svg
 * CTA wording refined: "New Document" / "新建文档" / "새 문서"
+* Add scripts for E2E Contract Test
