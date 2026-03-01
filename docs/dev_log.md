@@ -23,17 +23,10 @@
 ## 20260226 14:30(ET)
 * Frontend fully aligned with dev_doc §10.3 (all pages/components/hooks/lib/styles)
 * 64 contract tests, tsc + vite build + eslint clean
-## 20260226 15:22(ET)
+## 20260301 17:52(ET)
 * Multi-contract deployed to PAS: Registry, VersionStore, GovernanceCore, ArchiveCouncil, Timelock, NFTReward, Treasury, ProxyAdmin
-* Frontend updated: multi-contract ABIs + new API signatures
-* Added `GovernanceCore.setRegistry()` for circular deploy dependency
-* Unified deploy script: `scripts/deploy/deploy_all.ts`
-## 20260226 22:30(ET)
-* UI polish: compact stats bar, nav active states, animations, emoji cleanup, donate/footer links
-* Markdown preview on document pages (calldata decoding)
-* Agent Skill button in header + `skills/polkaink_agent_skill.md`
-* i18n refined (en/zh-CN/kr), readme updated
-## 20260226 23:00(ET)
-* Favicon redesigned (gradient quill + chain motif SVG) -> polkaink.svg
+* Frontend updated with new ABIs and API signatures
+* Unified deploy script: scripts/deploy/deploy_all.ts
+* UI & i18n improvements (en/zh-CN/kr), README updated
+* Favicon redesigned → polkaink.svg
 * CTA wording refined: "New Document" / "新建文档" / "새 문서"
-* README trilingual (en/zh-CN/kr)
