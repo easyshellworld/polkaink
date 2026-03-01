@@ -17,8 +17,8 @@ export function useVersion(versionId: number | undefined) {
   return useQuery({
     queryKey: ['version', versionId],
     queryFn: async () => {
-      const contract = getReadContract();
-      return (await contract.getVersion(versionId)) as VersionData;
+      const vs = getReadContract('VersionStore');
+      return (await vs.getVersion(versionId)) as VersionData;
     },
     enabled: versionId !== undefined,
     staleTime: 60_000,
@@ -29,8 +29,8 @@ export function useVersionHistory(docId: number | undefined) {
   return useQuery({
     queryKey: ['versionHistory', docId],
     queryFn: async () => {
-      const contract = getReadContract();
-      return (await contract.getVersionHistory(docId)) as bigint[];
+      const registry = getReadContract('PolkaInkRegistry');
+      return (await registry.getVersionHistory(docId)) as bigint[];
     },
     enabled: docId !== undefined,
     staleTime: 60_000,

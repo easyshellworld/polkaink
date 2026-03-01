@@ -2,7 +2,7 @@ import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './lib/i18n';
-import './index.css';
+import './styles/globals.css';
 import App from './App';
 
 const queryClient = new QueryClient({

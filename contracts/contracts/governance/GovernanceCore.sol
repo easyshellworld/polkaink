@@ -86,6 +86,12 @@ contract GovernanceCore is
         });
     }
 
+    /// @notice Set the registry address (needed for circular deploy dependency)
+    function setRegistry(address _registry) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_registry != address(0), "Governance__ZeroAddress");
+        registry = _registry;
+    }
+
     // ─── Write Operations ─────────────────────────────────────────────────
 
     /// @inheritdoc IGovernanceCore

@@ -15,8 +15,8 @@ const paddings: Record<string, string> = {
 export function Card({ children, hover, padding = 'md', className = '', ...props }: CardProps) {
   return (
     <div
-      className={`rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] ${paddings[padding]} ${
-        hover ? 'hover:border-[var(--color-primary)] transition-colors' : ''
+      className={`rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] ${paddings[padding]} transition-all duration-200 ${
+        hover ? 'hover:border-[var(--color-primary)] hover:shadow-md hover:shadow-[var(--color-primary)]/5' : ''
       } ${className}`}
       {...props}
     >

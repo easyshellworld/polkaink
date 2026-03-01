@@ -1,11 +1,12 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
-import toast from 'react-hot-toast';
 import { useProposal, useHasVoted } from '../../hooks/useProposals';
+import { useNotificationStore } from '../../store/notificationStore';
 import { useVote } from '../../hooks/useVote';
 import { useWalletStore } from '../../store/walletStore';
-import { getWriteContract, TX_OVERRIDES } from '../../lib/contracts';
+import { getWriteContract } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -21,22 +22,31 @@ export default function ProposalDetailPage() {
   const address = useWalletStore((s) => s.address);
   const signer = useWalletStore((s) => s.signer);
 
+  const { addNotification, updateNotification } = useNotificationStore();
   const { data: proposal, isLoading, refetch } = useProposal(proposalId);
   const { data: voted } = useHasVoted(proposalId, address);
   const { voting, castVote } = useVote(proposalId ?? 0);
 
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleExecute = async () => {
     if (!signer || !proposalId) return;
+    const nid = `exec-${Date.now()}`;
     try {
-      const contract = getWriteContract(signer);
-      toast.loading('Executing proposal...', { id: 'exec' });
-      const tx = await contract.executeProposal(proposalId, TX_OVERRIDES);
-      toast.loading('Waiting for confirmation...', { id: 'exec' });
+      const gov = getWriteContract(signer, 'GovernanceCore');
+      addNotification({ id: nid, type: 'pending', message: 'Executing proposal...' });
+      const tx = await gov.executeProposal(proposalId);
+      updateNotification(nid, { message: 'Waiting for confirmation...' });
       await tx.wait();
-      toast.success(t('governance.executed'), { id: 'exec' });
+      updateNotification(nid, { type: 'success', message: t('governance.executed') });
       refetch();
     } catch (err) {
-      toast.error('Execute failed: ' + (err as Error).message, { id: 'exec' });
+      updateNotification(nid, { type: 'error', message: 'Execute failed: ' + (err as Error).message });
     }
   };
 
@@ -61,7 +71,7 @@ export default function ProposalDetailPage() {
   const total = Number(p.yesVotes) + Number(p.noVotes);
   const yesPercent = total > 0 ? (Number(p.yesVotes) / total) * 100 : 0;
   const isActive = p.status === 1;
-  const isEnded = Number(p.endTime) <= Math.floor(Date.now() / 1000);
+  const isEnded = Number(p.endTime) <= now;
   const canExecute = isActive && isEnded;
   const canVote = isActive && !isEnded && !voted;
 

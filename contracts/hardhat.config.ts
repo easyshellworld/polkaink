@@ -1,5 +1,6 @@
 import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@openzeppelin/hardhat-upgrades";
 import "@parity/hardhat-polkadot";
 import "dotenv/config";
 import path from "path";
@@ -51,8 +52,15 @@ const config: HardhatUserConfig = {
     // Docs: https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
     // Faucet: https://faucet.polkadot.io/
     // Explorer: https://polkadot.testnet.routescan.io/
+    // PolkaVM mode (resolc compiler) — use for PolkaVM-targeted deployment
     polkadotTestnet: {
       polkadot: true,
+      url: "https://services.polkadothub-rpc.com/testnet",
+      chainId: 420420417,
+      accounts: getAccounts(),
+    },
+    // EVM mode (standard solc) — use for REVM deployment on Polkadot Hub
+    pasTestnet: {
       url: "https://services.polkadothub-rpc.com/testnet",
       chainId: 420420417,
       accounts: getAccounts(),

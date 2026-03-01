@@ -150,12 +150,11 @@ export async function deployFixture(): Promise<{ contracts: DeployedContracts; a
   await timelock.grantRole(PROPOSER_ROLE, await governanceCore.getAddress());
   await timelock.grantRole(CANCELLER_ROLE, await governanceCore.getAddress());
 
+  // Mint Guardian NFTs for initial council members (now that GUARDIAN_MINTER_ROLE is granted)
+  await archiveCouncil.activateGuardianNFTs();
+
   // Transfer ProxyAdmin ownership to timelock
   await proxyAdmin.transferOwnership(await timelock.getAddress());
-
-  // Update registry address in GovernanceCore (re-initialize not available, use admin role for test)
-  // In production this would be set properly; for tests we accept the ZeroAddress workaround
-  // and test registry directly.
 
   return {
     contracts: { registry, versionStore, governanceCore, archiveCouncil, timelock, nftReward, treasury, proxyAdmin },

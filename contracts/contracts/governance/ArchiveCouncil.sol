@@ -256,7 +256,13 @@ contract ArchiveCouncil is Initializable, AccessControlUpgradeable, UUPSUpgradea
 
     function _addMember(address addr) internal {
         uint256 termEnd = block.timestamp + TERM_LENGTH;
-        uint256 nftId   = nftReward.mintGuardianNFT(addr, termEnd);
+        uint256 nftId;
+        try nftReward.mintGuardianNFT(addr, termEnd) returns (uint256 id) {
+            nftId = id;
+        } catch {
+            // During initialize(), GUARDIAN_MINTER_ROLE may not yet be granted.
+            // Use activateGuardianNFTs() post-setup to mint pending NFTs.
+        }
         _members[addr] = CouncilMember({
             memberAddress: addr,
             guardianNFTId: nftId,
@@ -266,6 +272,16 @@ contract ArchiveCouncil is Initializable, AccessControlUpgradeable, UUPSUpgradea
             status:        CouncilMemberStatus.Active
         });
         _memberAddresses.push(addr);
+    }
+
+    /// @notice Mint Guardian NFTs for members that were registered without one (post-init role setup)
+    function activateGuardianNFTs() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        for (uint256 i = 0; i < _memberAddresses.length; i++) {
+            CouncilMember storage m = _members[_memberAddresses[i]];
+            if (m.guardianNFTId == 0 && m.status == CouncilMemberStatus.Active) {
+                m.guardianNFTId = nftReward.mintGuardianNFT(m.memberAddress, m.termEnd);
+            }
+        }
     }
 
     function _topCandidates(uint256 electionId, address[] memory candidates)

@@ -75,7 +75,7 @@ jobs:
 
       - name: Download / Prepare anvil-polkadot node
        
-        run: bash contracts/scripts/setup-node.sh
+        run: bash scripts/setup-node.sh
 
       - name: Run tests (anvil-polkadot)
         run: npx hardhat test --network localhost

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'primary';
+export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'primary';
 
 const variantStyles: Record<BadgeVariant, string> = {
   success: 'bg-green-100 text-green-700',

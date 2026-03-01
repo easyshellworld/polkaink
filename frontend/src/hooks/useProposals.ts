@@ -10,23 +10,28 @@ export interface ProposalData {
   stakeAmount: bigint;
   yesVotes: bigint;
   noVotes: bigint;
+  abstainVotes: bigint;
+  totalVotingPower: bigint;
+  snapshotBlock: bigint;
   startTime: bigint;
   endTime: bigint;
   status: number;
+  callData: string;
   description: string;
-  contentHash: string;
+  timelockId: string;
 }
 
 export function useProposals(page: number, perPage = 10) {
   return useQuery({
     queryKey: ['proposals', page, perPage],
     queryFn: async () => {
-      const contract = getReadContract();
-      const totalP = await contract.totalProposals();
+      const gov = getReadContract('GovernanceCore');
+      const totalP = await gov.totalProposals();
       const total = Number(totalP);
       if (total === 0) return { proposals: [] as ProposalData[], total: 0 };
       const offset = page * perPage;
-      const [list] = await contract.listProposals(offset, perPage);
+      // statusFilter 0 = all (Pending enum value, but we list all)
+      const [list] = await gov.listProposals(0, offset, perPage);
       return {
         proposals: [...list].reverse() as ProposalData[],
         total,
@@ -40,8 +45,8 @@ export function useProposal(id: number | undefined) {
   return useQuery({
     queryKey: ['proposal', id],
     queryFn: async () => {
-      const contract = getReadContract();
-      const p = await contract.getProposal(id);
+      const gov = getReadContract('GovernanceCore');
+      const p = await gov.getProposal(id);
       return p as ProposalData;
     },
     enabled: id !== undefined,
@@ -53,8 +58,9 @@ export function useHasVoted(proposalId: number | undefined, address: string | nu
   return useQuery({
     queryKey: ['hasVoted', proposalId, address],
     queryFn: async () => {
-      const contract = getReadContract();
-      return (await contract.hasVoted(proposalId, address)) as boolean;
+      const gov = getReadContract('GovernanceCore');
+      const record = await gov.getVoteRecord(proposalId, address);
+      return record.hasVoted as boolean;
     },
     enabled: proposalId !== undefined && !!address,
   });
@@ -64,13 +70,13 @@ export function useRecentProposals(count = 5) {
   return useQuery({
     queryKey: ['recentProposals', count],
     queryFn: async () => {
-      const contract = getReadContract();
-      const totalP = await contract.totalProposals();
+      const gov = getReadContract('GovernanceCore');
+      const totalP = await gov.totalProposals();
       const total = Number(totalP);
       if (total === 0) return [];
       const limit = Math.min(total, count);
       const offset = Math.max(0, total - limit);
-      const [list] = await contract.listProposals(offset, limit);
+      const [list] = await gov.listProposals(0, offset, limit);
       return [...list].reverse() as ProposalData[];
     },
     staleTime: 15_000,

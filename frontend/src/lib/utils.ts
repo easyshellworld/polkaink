@@ -2,7 +2,7 @@ export function shortenAddress(addr: string): string {
   return addr.slice(0, 6) + '...' + addr.slice(-4);
 }
 
-export function formatDate(timestamp: bigint): string {
+export function formatDate(timestamp: bigint | number): string {
   return new Date(Number(timestamp) * 1000).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',

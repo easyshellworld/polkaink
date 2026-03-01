@@ -5,19 +5,71 @@
     "type": "constructor"
   },
   {
+    "inputs": [],
+    "name": "AccessControlBadConfirmation",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
-        "name": "voter",
+        "name": "account",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "neededRole",
+        "type": "bytes32"
       }
     ],
-    "name": "AlreadyVoted",
+    "name": "AccessControlUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "ERC1967InvalidImplementation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ERC1967NonPayable",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FailedCall",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidInitialization",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotInitializing",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
     "type": "error"
   },
   {
@@ -28,7 +80,7 @@
         "type": "uint256"
       }
     ],
-    "name": "DocumentIsArchived",
+    "name": "Registry__DocumentArchived",
     "type": "error"
   },
   {
@@ -39,7 +91,7 @@
         "type": "uint256"
       }
     ],
-    "name": "DocumentNotFound",
+    "name": "Registry__DocumentNotFound",
     "type": "error"
   },
   {
@@ -55,7 +107,7 @@
         "type": "uint256"
       }
     ],
-    "name": "InsufficientStake",
+    "name": "Registry__InsufficientStake",
     "type": "error"
   },
   {
@@ -66,55 +118,12 @@
         "type": "uint256"
       }
     ],
-    "name": "InvalidParentVersion",
+    "name": "Registry__InvalidParentVersion",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "InvalidTitle",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "caller",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "proposer",
-        "type": "address"
-      }
-    ],
-    "name": "NotProposer",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "OnlyOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalNotActive",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalNotFound",
+    "name": "Registry__InvalidTitle",
     "type": "error"
   },
   {
@@ -125,34 +134,28 @@
         "type": "uint256"
       }
     ],
-    "name": "TooManyTags",
+    "name": "Registry__TooManyTags",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "TransferFailed",
+    "name": "Registry__Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UUPSUnauthorizedCallContext",
     "type": "error"
   },
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "slot",
+        "type": "bytes32"
       }
     ],
-    "name": "VotingEnded",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "VotingNotEnded",
+    "name": "UUPSUnsupportedProxiableUUID",
     "type": "error"
   },
   {
@@ -216,24 +219,12 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "minStake",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "votingPeriod",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "passingThreshold",
-        "type": "uint256"
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
       }
     ],
-    "name": "GovernanceParamsUpdated",
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -241,18 +232,24 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
       },
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "cancelledBy",
-        "type": "address"
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "previousAdminRole",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "newAdminRole",
+        "type": "bytes32"
       }
     ],
-    "name": "ProposalCancelled",
+    "name": "RoleAdminChanged",
     "type": "event"
   },
   {
@@ -260,117 +257,49 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "proposer",
+        "name": "account",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum PolkaInk.ProposalType",
-        "name": "proposalType",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "stakeAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "endTime",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalExecuted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "yesVotes",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "noVotes",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProposalRejected",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "proposer",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
         "type": "address"
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "slashedAmount",
-        "type": "uint256"
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
       }
     ],
-    "name": "StakeSlashed",
+    "name": "RoleRevoked",
     "type": "event"
   },
   {
@@ -403,42 +332,12 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "parentVersionId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
         "internalType": "address",
-        "name": "author",
+        "name": "implementation",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "contentHash",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "blockNumber",
-        "type": "uint256"
       }
     ],
-    "name": "VersionStored",
+    "name": "Upgraded",
     "type": "event"
   },
   {
@@ -452,15 +351,21 @@
       },
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "voter",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "newVersionId",
+        "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "bool",
-        "name": "support",
-        "type": "bool"
+        "internalType": "address",
+        "name": "author",
+        "type": "address"
       },
       {
         "indexed": false,
@@ -469,8 +374,116 @@
         "type": "uint256"
       }
     ],
-    "name": "VoteCast",
+    "name": "VersionMerged",
     "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "parentVersionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contentHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stakeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "VersionProposed",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GOVERNANCE_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MINTER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPGRADER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPGRADE_INTERFACE_VERSION",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -488,19 +501,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "cancelProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string",
         "name": "title",
         "type": "string"
@@ -509,21 +509,6 @@
         "internalType": "string[]",
         "name": "tags",
         "type": "string[]"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "contentHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "enum PolkaInk.CompressionType",
-        "name": "compression",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint32",
-        "name": "contentLength",
-        "type": "uint32"
       }
     ],
     "name": "createDocument",
@@ -534,19 +519,6 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "executeProposal",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -593,7 +565,7 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum PolkaInk.DocumentStatus",
+            "internalType": "enum IPolkaInkRegistry.DocumentStatus",
             "name": "status",
             "type": "uint8"
           },
@@ -603,7 +575,7 @@
             "type": "string[]"
           }
         ],
-        "internalType": "struct PolkaInk.Document",
+        "internalType": "struct IPolkaInkRegistry.Document",
         "name": "",
         "type": "tuple"
       }
@@ -614,169 +586,17 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
       }
     ],
-    "name": "getProposal",
+    "name": "getRoleAdmin",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum PolkaInk.ProposalType",
-            "name": "proposalType",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "proposer",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "docId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "targetVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "stakeAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "yesVotes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "noVotes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum PolkaInk.ProposalStatus",
-            "name": "status",
-            "type": "uint8"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "contentHash",
-            "type": "bytes32"
-          }
-        ],
-        "internalType": "struct PolkaInk.Proposal",
+        "internalType": "bytes32",
         "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getVersion",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "docId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "parentVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "author",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "contentHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "blockNumber",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum PolkaInk.CompressionType",
-            "name": "compression",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint32",
-            "name": "contentLength",
-            "type": "uint32"
-          }
-        ],
-        "internalType": "struct PolkaInk.Version",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getVersionChildren",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -802,28 +622,54 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "governanceCore",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "voter",
+        "internalType": "contract IGovernanceCore",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "getVoteChoice",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "grantRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "hasRole",
     "outputs": [
       {
         "internalType": "bool",
-        "name": "voted",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "support",
+        "name": "",
         "type": "bool"
       }
     ],
@@ -833,25 +679,34 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
       },
       {
         "internalType": "address",
-        "name": "voter",
+        "name": "_versionStore",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_governanceCore",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nftReward",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_treasury",
         "type": "address"
       }
     ],
-    "name": "hasVoted",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -902,7 +757,7 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum PolkaInk.DocumentStatus",
+            "internalType": "enum IPolkaInkRegistry.DocumentStatus",
             "name": "status",
             "type": "uint8"
           },
@@ -912,7 +767,83 @@
             "type": "string[]"
           }
         ],
-        "internalType": "struct PolkaInk.Document[]",
+        "internalType": "struct IPolkaInkRegistry.Document[]",
+        "name": "docs",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "total",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "tag",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offset",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "limit",
+        "type": "uint256"
+      }
+    ],
+    "name": "listDocumentsByTag",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "author",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "updatedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum IPolkaInkRegistry.DocumentStatus",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "tags",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct IPolkaInkRegistry.Document[]",
         "name": "docs",
         "type": "tuple[]"
       },
@@ -929,139 +860,23 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "offset",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "limit",
+        "name": "proposalId",
         "type": "uint256"
       }
     ],
-    "name": "listProposals",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum PolkaInk.ProposalType",
-            "name": "proposalType",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "proposer",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "docId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "targetVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "stakeAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "yesVotes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "noVotes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum PolkaInk.ProposalStatus",
-            "name": "status",
-            "type": "uint8"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "contentHash",
-            "type": "bytes32"
-          }
-        ],
-        "internalType": "struct PolkaInk.Proposal[]",
-        "name": "proposals",
-        "type": "tuple[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "total",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "mergeProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "owner",
+    "name": "nftReward",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract INFTReward",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "params",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "minStake",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "votingPeriod",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "passingThreshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "slashRatioNormal",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "maxTagsPerDoc",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1085,19 +900,9 @@
         "type": "bytes32"
       },
       {
-        "internalType": "enum PolkaInk.CompressionType",
-        "name": "compression",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint32",
-        "name": "contentLength",
-        "type": "uint32"
-      },
-      {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
+        "internalType": "bytes",
+        "name": "markdownCalldata",
+        "type": "bytes"
       }
     ],
     "name": "proposeVersion",
@@ -1109,6 +914,74 @@
       }
     ],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "callerConfirmation",
+        "type": "address"
+      }
+    ],
+    "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1126,74 +999,15 @@
   },
   {
     "inputs": [],
-    "name": "totalProposals",
+    "name": "treasury",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "contract ITreasury",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalVersions",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner",
         "type": "address"
       }
     ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "minStake",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "votingPeriod",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "passingThreshold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "slashRatioNormal",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "maxTagsPerDoc",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateGovernanceParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1217,36 +1031,32 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
       },
       {
-        "internalType": "bool",
-        "name": "support",
-        "type": "bool"
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
       }
     ],
-    "name": "vote",
+    "name": "upgradeToAndCall",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "versionStore",
+    "outputs": [
       {
-        "internalType": "address payable",
-        "name": "to",
+        "internalType": "contract IVersionStore",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "withdrawSlashedStakes",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]
