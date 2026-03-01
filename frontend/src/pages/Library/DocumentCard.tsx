@@ -13,17 +13,22 @@ const STATUS_VARIANTS: Record<number, 'success' | 'neutral' | 'error'> = {
 
 export function DocumentCard({ doc }: { doc: DocumentData }) {
   const { t } = useTranslation();
+  const hasVersion = Number(doc.currentVersionId) > 0;
 
   return (
     <Link to={`/document/${Number(doc.id)}`}>
-      <Card hover>
+      <Card hover className="hover-lift">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-semibold">{doc.title}</h3>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               <span>{t('library.by')} {shortenAddress(doc.author)}</span>
-              <span>·</span>
-              <span>{t('library.version')} #{Number(doc.currentVersionId)}</span>
+              {hasVersion && (
+                <>
+                  <span>·</span>
+                  <span>{t('library.version')} #{Number(doc.currentVersionId)}</span>
+                </>
+              )}
               <span>·</span>
               <span>{formatDate(doc.updatedAt)}</span>
             </div>

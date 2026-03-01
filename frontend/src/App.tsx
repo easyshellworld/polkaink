@@ -1,8 +1,8 @@
 import { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
 import { Header } from './components/layout/Header';
 import { MobileNav } from './components/layout/MobileNav';
+import { Toaster } from './components/ui/Toast';
 import { Skeleton } from './components/ui/Skeleton';
 
 const HomePage = lazy(() => import('./pages/Home'));
@@ -12,6 +12,9 @@ const CreatePage = lazy(() => import('./pages/Create'));
 const ProposePage = lazy(() => import('./pages/Propose'));
 const GovernancePage = lazy(() => import('./pages/Governance'));
 const ProposalDetailPage = lazy(() => import('./pages/Governance/ProposalDetail'));
+const ProfilePage = lazy(() => import('./pages/Profile'));
+const CouncilPage = lazy(() => import('./pages/Council'));
+const TreasuryPage = lazy(() => import('./pages/Treasury'));
 
 function PageFallback() {
   return (
@@ -36,20 +39,14 @@ function AppContent() {
             <Route path="/propose/:docId" element={<ProposePage />} />
             <Route path="/governance" element={<GovernancePage />} />
             <Route path="/governance/:id" element={<ProposalDetailPage />} />
+            <Route path="/profile/:address" element={<ProfilePage />} />
+            <Route path="/council" element={<CouncilPage />} />
+            <Route path="/treasury" element={<TreasuryPage />} />
           </Routes>
         </Suspense>
       </main>
       <MobileNav />
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: 'var(--color-surface)',
-            color: 'var(--color-text)',
-            border: '1px solid var(--color-border)',
-          },
-        }}
-      />
+      <Toaster />
     </div>
   );
 }

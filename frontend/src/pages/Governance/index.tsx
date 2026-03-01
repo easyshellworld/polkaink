@@ -29,7 +29,6 @@ export default function GovernancePage() {
         <Skeleton count={3} />
       ) : proposals.length === 0 ? (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
-          <div className="text-4xl mb-4">🗳️</div>
           <h2 className="text-lg font-semibold mb-2">{t('governance.empty_title')}</h2>
           <p className="text-[var(--color-text-secondary)]">{t('governance.empty_desc')}</p>
         </div>

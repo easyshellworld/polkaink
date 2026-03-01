@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { ethers } from 'ethers';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useWalletStore } from '../store/walletStore';
+import { useNotificationStore } from '../store/notificationStore';
 import { PAS_NETWORK } from '../lib/contracts/addresses';
 import { switchToPAS } from '../lib/contracts';
 
@@ -10,10 +10,11 @@ export function useWallet() {
   const { t } = useTranslation();
   const { address, signer, balance, isConnecting, setWallet, clearWallet, setConnecting } =
     useWalletStore();
+  const { addNotification } = useNotificationStore();
 
   const connect = useCallback(async () => {
     if (!window.ethereum) {
-      toast.error(t('wallet.install_metamask'));
+      addNotification({ id: 'wallet', type: 'error', message: t('wallet.install_metamask') });
       return;
     }
     setConnecting(true);
@@ -24,12 +25,12 @@ export function useWallet() {
       const addr = await s.getAddress();
       const bal = await provider.getBalance(addr);
       setWallet(addr, s, ethers.formatEther(bal), PAS_NETWORK.chainId);
-      toast.success(t('wallet.connected'));
+      addNotification({ id: 'wallet', type: 'success', message: t('wallet.connected') });
     } catch (err) {
-      toast.error(t('wallet.connection_failed', { error: (err as Error).message }));
+      addNotification({ id: 'wallet', type: 'error', message: t('wallet.connection_failed', { error: (err as Error).message }) });
       setConnecting(false);
     }
-  }, [t, setWallet, setConnecting]);
+  }, [t, setWallet, setConnecting, addNotification]);
 
   const disconnect = useCallback(() => {
     clearWallet();

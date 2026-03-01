@@ -1,10 +1,22 @@
 import { ethers } from 'ethers';
-import PolkaInkABI from './PolkaInkABI.json';
+import RegistryABI from './abis/PolkaInkRegistry.json';
+import GovernanceABI from './abis/GovernanceCore.json';
+import CouncilABI from './abis/ArchiveCouncil.json';
+import NftABI from './abis/NFTReward.json';
+import TreasuryABI from './abis/Treasury.json';
+import VersionStoreABI from './abis/VersionStore.json';
 import { PAS_NETWORK, getContractAddress } from './addresses';
 
-export const POLKAINK_ADDRESS = getContractAddress('PolkaInk');
-
 export { PAS_NETWORK, getContractAddress };
+
+const ABIS: Record<string, ethers.InterfaceAbi> = {
+  PolkaInkRegistry: RegistryABI,
+  GovernanceCore: GovernanceABI,
+  ArchiveCouncil: CouncilABI,
+  NFTReward: NftABI,
+  Treasury: TreasuryABI,
+  VersionStore: VersionStoreABI,
+};
 
 export function getProvider(): ethers.JsonRpcProvider {
   return new ethers.JsonRpcProvider(PAS_NETWORK.rpcUrl, {
@@ -13,17 +25,21 @@ export function getProvider(): ethers.JsonRpcProvider {
   });
 }
 
-export function getReadContract(): ethers.Contract {
-  return new ethers.Contract(POLKAINK_ADDRESS, PolkaInkABI, getProvider());
+export function getReadContract(name = 'PolkaInkRegistry'): ethers.Contract {
+  const abi = ABIS[name];
+  if (!abi) throw new Error(`Unknown contract: ${name}`);
+  return new ethers.Contract(getContractAddress(name), abi, getProvider());
+}
+
+export function getWriteContract(signer: ethers.Signer, name = 'PolkaInkRegistry'): ethers.Contract {
+  const abi = ABIS[name];
+  if (!abi) throw new Error(`Unknown contract: ${name}`);
+  return new ethers.Contract(getContractAddress(name), abi, signer);
 }
 
 export const TX_OVERRIDES = {
   gasLimit: 500_000n,
 };
-
-export function getWriteContract(signer: ethers.Signer): ethers.Contract {
-  return new ethers.Contract(POLKAINK_ADDRESS, PolkaInkABI, signer);
-}
 
 export async function switchToPAS(): Promise<void> {
   if (!window.ethereum) throw new Error('MetaMask not found');
@@ -82,5 +98,3 @@ export async function switchToPAS(): Promise<void> {
     );
   }
 }
-
-export { PolkaInkABI };

@@ -7,11 +7,13 @@ export function StatsBar() {
   const { data, isLoading } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      const contract = getReadContract();
+      const registry = getReadContract('PolkaInkRegistry');
+      const versionStore = getReadContract('VersionStore');
+      const governance = getReadContract('GovernanceCore');
       const [docs, versions, proposals] = await Promise.all([
-        contract.totalDocuments(),
-        contract.totalVersions(),
-        contract.totalProposals(),
+        registry.totalDocuments(),
+        versionStore.totalVersions(),
+        governance.totalProposals(),
       ]);
       return {
         totalDocs: Number(docs),
@@ -23,23 +25,27 @@ export function StatsBar() {
   });
 
   const items = [
-    { label: t('home.stats_documents'), value: data?.totalDocs ?? 0, icon: '📄' },
-    { label: t('home.stats_versions'), value: data?.totalVersions ?? 0, icon: '🔀' },
-    { label: t('home.stats_proposals'), value: data?.totalProposals ?? 0, icon: '🗳️' },
+    { label: t('home.stats_documents'), value: data?.totalDocs ?? 0 },
+    { label: t('home.stats_versions'), value: data?.totalVersions ?? 0 },
+    { label: t('home.stats_proposals'), value: data?.totalProposals ?? 0 },
   ];
 
   return (
-    <section className="mx-auto grid max-w-4xl grid-cols-3 gap-4 px-4 pb-12">
-      {items.map((s) => (
-        <div
-          key={s.label}
-          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-center"
-        >
-          <div className="text-2xl">{s.icon}</div>
-          <div className="mt-1 text-2xl font-bold">{isLoading ? '—' : s.value}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">{s.label}</div>
-        </div>
-      ))}
+    <section className="mx-auto max-w-4xl px-4 pb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
+      <div className="flex items-center justify-center gap-0 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] divide-x divide-[var(--color-border)]">
+        {items.map((s) => (
+          <div key={s.label} className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4">
+            <span className="text-xl font-bold tabular-nums">
+              {isLoading ? (
+                <span className="inline-block w-6 h-5 rounded bg-[var(--color-surface-alt)] animate-shimmer" />
+              ) : (
+                s.value
+              )}
+            </span>
+            <span className="text-xs text-[var(--color-text-secondary)]">{s.label}</span>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

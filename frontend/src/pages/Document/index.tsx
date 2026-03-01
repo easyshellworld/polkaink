@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useDocument } from '../../hooks/useDocuments';
 import { useVersion, useVersionHistory } from '../../hooks/useVersionStore';
+import { useMarkdownContent } from '../../hooks/useMarkdownContent';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -12,6 +13,12 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { shortenAddress, formatDate } from '../../lib/utils';
 import { PAS_NETWORK, getContractAddress } from '../../lib/contracts/addresses';
 
+const STATUS_MAP: Record<number, { label: string; variant: 'success' | 'neutral' | 'warning' }> = {
+  0: { label: 'active', variant: 'success' },
+  1: { label: 'archived', variant: 'neutral' },
+  2: { label: 'disputed', variant: 'warning' },
+};
+
 export default function DocumentPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -19,9 +26,10 @@ export default function DocumentPage() {
   const docId = id ? Number(id) : undefined;
 
   const { data: doc, isLoading: docLoading } = useDocument(docId);
-  const versionId = doc ? Number(doc.currentVersionId) : undefined;
+  const versionId = doc && Number(doc.currentVersionId) > 0 ? Number(doc.currentVersionId) : undefined;
   const { data: version } = useVersion(versionId);
   const { data: versionIds } = useVersionHistory(docId);
+  const { data: markdown, isLoading: mdLoading } = useMarkdownContent(docId);
 
   if (docLoading) {
     return (
@@ -44,19 +52,22 @@ export default function DocumentPage() {
     );
   }
 
-  const contractAddr = getContractAddress('PolkaInk');
+  const contractAddr = getContractAddress('PolkaInkRegistry');
+  const statusInfo = STATUS_MAP[doc.status] ?? STATUS_MAP[0];
+  const hasVersion = versionId !== undefined && versionId > 0;
+  const versionCount = versionIds?.length ?? 0;
 
   return (
     <PageWrapper>
-      <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
-        <Link to="/library" className="hover:text-[var(--color-text)]">
+      <div className="mb-4 text-sm text-[var(--color-text-secondary)] animate-fade-in">
+        <Link to="/library" className="hover:text-[var(--color-text)] transition-colors">
           {t('document.breadcrumb_library')}
         </Link>
         <span className="mx-2">/</span>
         <span>{doc.title}</span>
       </div>
 
-      <Card padding="lg" className="mb-6">
+      <Card padding="lg" className="mb-6 animate-slide-up">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold">{doc.title}</h1>
@@ -64,15 +75,16 @@ export default function DocumentPage() {
               <span>{t('document.author')}: {shortenAddress(doc.author)}</span>
               <span>·</span>
               <span>{t('document.created')}: {formatDate(doc.createdAt)}</span>
-              <span>·</span>
-              <span>{t('document.updated')}: {formatDate(doc.updatedAt)}</span>
+              {Number(doc.updatedAt) !== Number(doc.createdAt) && (
+                <>
+                  <span>·</span>
+                  <span>{t('document.updated')}: {formatDate(doc.updatedAt)}</span>
+                </>
+              )}
             </div>
           </div>
-          <Badge
-            variant={doc.status === 0 ? 'success' : 'neutral'}
-            pill
-          >
-            {t(`status.${doc.status === 0 ? 'active' : doc.status === 1 ? 'archived' : 'disputed'}`)}
+          <Badge variant={statusInfo.variant} pill>
+            {t(`status.${statusInfo.label}`)}
           </Badge>
         </div>
 
@@ -98,8 +110,8 @@ export default function DocumentPage() {
         </div>
       </Card>
 
-      {version && (
-        <Card className="mb-6">
+      {hasVersion && version && (
+        <Card className="mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
           <h2 className="text-sm font-semibold mb-2">{t('document.version_info')}</h2>
           <div className="grid grid-cols-2 gap-2 text-sm md:grid-cols-4">
             <div>
@@ -116,7 +128,7 @@ export default function DocumentPage() {
             </div>
             <div>
               <span className="text-[var(--color-text-secondary)]">{t('document.versions')}:</span>{' '}
-              {versionIds?.length ?? 0}
+              {versionCount}
             </div>
           </div>
           <div className="mt-2 text-xs text-[var(--color-text-secondary)] break-all">
@@ -125,16 +137,37 @@ export default function DocumentPage() {
         </Card>
       )}
 
-      <Card padding="lg">
-        <div className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {`> **Note:** ${t('document.calldata_note', { block: version ? Number(version.blockNumber) : '?' })}
-
-${t('document.version_count', { count: versionIds?.length ?? 0 })}
-
-Content hash: \`${version?.contentHash || 'loading...'}\``}
-          </ReactMarkdown>
-        </div>
+      {/* Markdown Content */}
+      <Card padding="lg" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+        {mdLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        ) : markdown ? (
+          <div className="markdown-body">
+            {!hasVersion && (
+              <div className="mb-4 rounded-lg bg-[var(--color-primary-10)] border border-[var(--color-primary-20)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                {t('document.pending_governance', 'This content is from a pending proposal and has not been merged through governance yet.')}
+              </div>
+            )}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-[var(--color-text-secondary)]">
+            <p className="text-sm">{t('document.no_content', 'No content has been proposed for this document yet.')}</p>
+            <Button
+              variant="primary"
+              className="mt-4"
+              onClick={() => navigate(`/propose/${Number(doc.id)}`)}
+            >
+              {t('document.propose_first', 'Propose First Version')}
+            </Button>
+          </div>
+        )}
       </Card>
     </PageWrapper>
   );

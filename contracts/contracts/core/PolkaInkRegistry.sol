@@ -75,7 +75,7 @@ contract PolkaInkRegistry is
         versionStore   = IVersionStore(_versionStore);
         governanceCore = IGovernanceCore(_governanceCore);
         nftReward      = INFTReward(_nftReward);
-        treasury       = ITreasury(_treasury);
+        treasury       = ITreasury(payable(_treasury));
     }
 
     // ─── Write Operations ─────────────────────────────────────────────────

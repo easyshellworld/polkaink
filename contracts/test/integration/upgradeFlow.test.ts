@@ -43,8 +43,8 @@ describe("Upgrade Flow", () => {
       // TimelockQueued
       expect(proposal.timelockId).to.not.equal(ethers.ZeroHash);
 
-      // Step 6: Advance past timelock delay
-      await time.increase(61);
+      // Step 6: Advance past timelock delay (GovernanceCore default: 48h)
+      await time.increase(48 * 3600 + 1);
 
       const isReady = await timelock.isOperationReady(proposal.timelockId);
       expect(isReady).to.be.true;

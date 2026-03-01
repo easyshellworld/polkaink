@@ -1,141 +1,161 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { useWalletStore } from '../../store/walletStore';
+import { useNotificationStore } from '../../store/notificationStore';
 import { getWriteContract, TX_OVERRIDES } from '../../lib/contracts';
-import { encodeMarkdown } from '../../lib/calldata';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 
 export default function CreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const signer = useWalletStore((s) => s.signer);
+  const { addNotification, updateNotification } = useNotificationStore();
 
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState('');
-  const [content, setContent] = useState(
-    '# Your Document Title\n\nWrite your Polkadot history in Markdown...\n'
-  );
-  const [preview, setPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [createdDocId, setCreatedDocId] = useState<number | null>(null);
 
   const handleSubmit = async () => {
     if (!signer) {
-      toast.error(t('create.error_wallet'));
+      addNotification({ id: 'create-err', type: 'error', message: t('create.error_wallet') });
       return;
     }
     if (!title.trim()) {
-      toast.error(t('create.error_title'));
-      return;
-    }
-    if (!content.trim()) {
-      toast.error(t('create.error_content'));
+      addNotification({ id: 'create-err', type: 'error', message: t('create.error_title') });
       return;
     }
 
     setSubmitting(true);
+    const nid = `create-${Date.now()}`;
     try {
       const contract = getWriteContract(signer);
-      const { contentHash, contentLength } = encodeMarkdown(content);
       const tagArray = tags
         .split(',')
-        .map((t) => t.trim())
+        .map((tag) => tag.trim())
         .filter(Boolean);
 
-      toast.loading(t('create.tx_submitting'), { id: 'create' });
-      const tx = await contract.createDocument(
-        title.trim(),
-        tagArray,
-        contentHash,
-        0,
-        contentLength,
-        TX_OVERRIDES
-      );
-      toast.loading(t('create.tx_confirming'), { id: 'create' });
+      addNotification({ id: nid, type: 'pending', message: t('create.tx_submitting') });
+      const tx = await contract.createDocument(title.trim(), tagArray, TX_OVERRIDES);
+      updateNotification(nid, { message: t('create.tx_confirming') });
       const receipt = await tx.wait();
-      toast.success(t('create.tx_success', { hash: receipt.hash.slice(0, 10) }), { id: 'create' });
-      navigate('/library');
+
+      const iface = contract.interface;
+      const log = receipt.logs.find((l: { topics: string[] }) =>
+        l.topics[0] === iface.getEvent('DocumentCreated')?.topicHash
+      );
+      let docId: number | null = null;
+      if (log) {
+        const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
+        docId = Number(parsed?.args?.[0]);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+
+      if (docId) {
+        setCreatedDocId(docId);
+        updateNotification(nid, { type: 'success', message: t('create.tx_success_doc', { id: docId }) });
+      } else {
+        updateNotification(nid, { type: 'success', message: t('create.tx_success_generic') });
+        navigate('/library');
+      }
     } catch (err) {
-      toast.error('Failed: ' + (err as Error).message, { id: 'create' });
+      updateNotification(nid, { type: 'error', message: 'Failed: ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (createdDocId) {
+    return (
+      <PageWrapper>
+        <Card padding="lg" className="text-center animate-scale-in">
+          <div className="py-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--color-success)]/10 mb-4">
+              <svg className="w-6 h-6 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">{t('create.success_title')}</h2>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-6">
+              {t('create.success_desc')}
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="primary"
+                onClick={() => navigate(`/propose/${createdDocId}`)}
+              >
+                {t('create.write_content')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/document/${createdDocId}`)}
+              >
+                {t('create.view_doc')}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </PageWrapper>
+    );
+  }
+
   return (
     <PageWrapper>
-      <h1 className="text-2xl font-bold mb-6">{t('create.title')}</h1>
+      <h1 className="text-2xl font-bold mb-2">{t('create.title')}</h1>
+      <p className="text-sm text-[var(--color-text-secondary)] mb-6">{t('create.subtitle')}</p>
 
-      <div className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium">{t('create.field_title')}</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t('create.field_title_placeholder')}
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none"
-            maxLength={200}
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            {t('create.field_tags')}{' '}
-            <span className="text-[var(--color-text-secondary)] font-normal">
-              {t('create.field_tags_hint')}
-            </span>
-          </label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder={t('create.field_tags_placeholder')}
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <div className="mb-1 flex items-center justify-between">
-            <label className="text-sm font-medium">{t('create.field_content')}</label>
-            <button
-              onClick={() => setPreview(!preview)}
-              className="text-xs text-[var(--color-primary)] hover:underline"
-            >
-              {preview ? t('create.edit') : t('create.preview')}
-            </button>
-          </div>
-          {preview ? (
-            <div className="min-h-[300px] rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <div className="markdown-body">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-              </div>
-            </div>
-          ) : (
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={15}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 font-mono text-sm focus:border-[var(--color-primary)] focus:outline-none resize-y"
+      <Card padding="lg">
+        <div className="space-y-5">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium">{t('create.field_title')}</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t('create.field_title_placeholder')}
+              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+              maxLength={200}
             />
-          )}
-        </div>
+          </div>
 
-        <div className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <div className="text-sm text-[var(--color-text-secondary)]">{t('create.calldata_info')}</div>
-          <Button
-            onClick={handleSubmit}
-            disabled={submitting || !signer}
-            loading={submitting}
-          >
-            {!signer ? t('create.connect_first') : t('create.submit')}
-          </Button>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium">
+              {t('create.field_tags')}{' '}
+              <span className="text-[var(--color-text-secondary)] font-normal">
+                {t('create.field_tags_hint')}
+              </span>
+            </label>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder={t('create.field_tags_placeholder')}
+              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            />
+          </div>
+
+          <div className="rounded-lg bg-[var(--color-surface-alt)] p-4 text-sm text-[var(--color-text-secondary)]">
+            {t('create.flow_hint')}
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleSubmit}
+              disabled={submitting || !signer || !title.trim()}
+              loading={submitting}
+            >
+              {!signer ? t('create.connect_first') : t('create.submit')}
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
     </PageWrapper>
   );
 }

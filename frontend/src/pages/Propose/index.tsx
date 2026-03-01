@@ -3,12 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
 import { useDocument } from '../../hooks/useDocuments';
 import { useWalletStore } from '../../store/walletStore';
+import { useNotificationStore } from '../../store/notificationStore';
 import { getWriteContract } from '../../lib/contracts';
-import { encodeMarkdown } from '../../lib/calldata';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
 
@@ -17,6 +16,7 @@ export default function ProposePage() {
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
   const signer = useWalletStore((s) => s.signer);
+  const { addNotification, updateNotification } = useNotificationStore();
   const numDocId = docId ? Number(docId) : undefined;
   const { data: doc } = useDocument(numDocId);
 
@@ -28,40 +28,40 @@ export default function ProposePage() {
 
   const handleSubmit = async () => {
     if (!signer || !doc) {
-      toast.error(t('propose.error_wallet'));
+      addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_wallet') });
       return;
     }
     if (!content.trim()) {
-      toast.error(t('propose.error_content'));
+      addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_content') });
       return;
     }
     if (!description.trim()) {
-      toast.error(t('propose.error_description'));
+      addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_description') });
       return;
     }
 
     setSubmitting(true);
+    const nid = `propose-${Date.now()}`;
     try {
       const contract = getWriteContract(signer);
-      const { contentHash, contentLength } = encodeMarkdown(content);
+      const contentHash = ethers.keccak256(new TextEncoder().encode(content));
       const stakeWei = ethers.parseEther(stake);
 
-      toast.loading(t('propose.tx_submitting'), { id: 'propose' });
+      addNotification({ id: nid, type: 'pending', message: t('propose.tx_submitting') });
+      const markdownBytes = new TextEncoder().encode(content);
       const tx = await contract.proposeVersion(
         Number(doc.id),
         Number(doc.currentVersionId),
         contentHash,
-        0,
-        contentLength,
-        description.trim(),
-        { value: stakeWei, gasLimit: 600_000n }
+        markdownBytes,
+        { value: stakeWei, gasLimit: 1_000_000n }
       );
-      toast.loading(t('propose.tx_confirming'), { id: 'propose' });
+      updateNotification(nid, { message: t('propose.tx_confirming') });
       const receipt = await tx.wait();
-      toast.success(t('propose.tx_success', { hash: receipt.hash.slice(0, 10) }), { id: 'propose' });
+      updateNotification(nid, { type: 'success', message: t('propose.tx_success', { hash: receipt.hash.slice(0, 10) }) });
       navigate('/governance');
     } catch (err) {
-      toast.error('Failed: ' + (err as Error).message, { id: 'propose' });
+      updateNotification(nid, { type: 'error', message: 'Failed: ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }

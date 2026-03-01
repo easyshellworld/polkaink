@@ -19,7 +19,7 @@ import { deployFixture } from "../fixtures/deployFixture";
 describe("Full Proposal Flow", () => {
   const MIN_STAKE   = ethers.parseUnits("5", 12);
   const VOTING_PERIOD = 7 * 24 * 3600;
-  const TIMELOCK_DELAY = 60;
+  const TIMELOCK_DELAY = 48 * 3600; // GovernanceCore default: 48 hours
 
   it("should execute: create doc → propose version → vote → queue → execute → mint NFT", async () => {
     const { contracts, actors } = await loadFixture(deployFixture);

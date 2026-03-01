@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "./interfaces/INFTReward.sol";
 
 /// @title NFTReward
@@ -17,7 +17,7 @@ contract NFTReward is
     UUPSUpgradeable,
     INFTReward
 {
-    using StringsUpgradeable for uint256;
+    using Strings for uint256;
 
     bytes32 public constant AUTHOR_MINTER_ROLE   = keccak256("AUTHOR_MINTER_ROLE");
     bytes32 public constant GUARDIAN_MINTER_ROLE = keccak256("GUARDIAN_MINTER_ROLE");

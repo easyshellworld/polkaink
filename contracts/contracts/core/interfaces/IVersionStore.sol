@@ -45,6 +45,8 @@ interface IVersionStore {
         uint256 calldataTxHash
     ) external;
 
+    function setCurrentVersion(uint256 docId, uint256 versionId) external;
+
     function getVersion(uint256 versionId) external view returns (Version memory);
     function getShards(uint256 versionId) external view returns (Shard[] memory);
     function getAncestors(uint256 versionId) external view returns (uint256[] memory);
