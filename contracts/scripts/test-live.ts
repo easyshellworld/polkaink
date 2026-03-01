@@ -1,8 +1,12 @@
 /**
  * Live E2E test against deployed contracts on PAS TestNet.
  *
+ * Env vars:
+ *   PRIVATE_KEY_FOR_TESTING — mnemonic phrase (or falls back to PRIVATE_KEY hex)
+ *   DERIVATION_INDEX        — HD derivation index, default 0 (m/44'/60'/0'/0/{index})
+ *
  * Usage:
- *   PRIVATE_KEY_FOR_TESTING="<mnemonic>" npx hardhat run scripts/test-live.ts --network pasTestnet
+ *   npx hardhat run scripts/test-live.ts --network pasTestnet
  *
  * Tests:
  *   1. Read — Stats, governance params, council members
@@ -13,6 +17,11 @@
  */
 
 import { ethers } from "hardhat";
+import "dotenv/config";
+import * as dotenv from "dotenv";
+import * as path from "path";
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
 import RegistryABI from "../../frontend/src/lib/contracts/abis/PolkaInkRegistry.json";
 import GovernanceABI from "../../frontend/src/lib/contracts/abis/GovernanceCore.json";
 import VersionStoreABI from "../../frontend/src/lib/contracts/abis/VersionStore.json";
@@ -74,9 +83,14 @@ async function main() {
     "https://services.polkadothub-rpc.com/testnet",
     { chainId: 420420417, name: "PAS" },
   );
-  const wallet = key.includes(" ")
-    ? ethers.Wallet.fromPhrase(key, provider)
-    : new ethers.Wallet(key.startsWith("0x") ? key : `0x${key}`, provider);
+  let wallet: ethers.Wallet;
+  if (key.includes(" ")) {
+    const idx = process.env.DERIVATION_INDEX || "0";
+    const hd = ethers.HDNodeWallet.fromPhrase(key, "", `m/44'/60'/0'/0/${idx}`);
+    wallet = new ethers.Wallet(hd.privateKey, provider);
+  } else {
+    wallet = new ethers.Wallet(key.startsWith("0x") ? key : `0x${key}`, provider);
+  }
   const addr = wallet.address;
   const balance = await provider.getBalance(addr);
 

@@ -17,6 +17,9 @@ bin/
 .env.*
 !.env.example
 
+# Generated deployment output
+deployed-addresses.json
+
 # Logs
 *.log
 npm-debug.log*
