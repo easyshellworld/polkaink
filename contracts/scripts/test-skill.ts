@@ -4,13 +4,20 @@
  * This script follows the EXACT instructions from skills/polkaink_agent_skill.md
  * to prove an agent can interact with PolkaInk using only the skill file.
  *
+ * Env vars:
+ *   PRIVATE_KEY_FOR_TESTING — mnemonic phrase (or falls back to PRIVATE_KEY hex)
+ *   DERIVATION_INDEX        — HD derivation index, default 0 (m/44'/60'/0'/0/{index})
+ *
  * Usage:
- *   PRIVATE_KEY_FOR_TESTING="<mnemonic>" npx hardhat run scripts/test-skill.ts --network pasTestnet
+ *   npx hardhat run scripts/test-skill.ts --network pasTestnet
  */
 
 import { ethers } from "hardhat";
+import "dotenv/config";
+import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 let passed = 0;
 let failed = 0;
@@ -68,9 +75,14 @@ async function main() {
     "https://services.polkadothub-rpc.com/testnet",
     { chainId: 420420417, name: "PAS" },
   );
-  const wallet = key.includes(" ")
-    ? ethers.Wallet.fromPhrase(key, provider)
-    : new ethers.Wallet(key.startsWith("0x") ? key : `0x${key}`, provider);
+  let wallet: ethers.Wallet;
+  if (key.includes(" ")) {
+    const idx = process.env.DERIVATION_INDEX || "0";
+    const hd = ethers.HDNodeWallet.fromPhrase(key, "", `m/44'/60'/0'/0/${idx}`);
+    wallet = new ethers.Wallet(hd.privateKey, provider);
+  } else {
+    wallet = new ethers.Wallet(key.startsWith("0x") ? key : `0x${key}`, provider);
+  }
   ok("Provider connected", "chainId=420420417");
   ok("Wallet created", wallet.address);
 

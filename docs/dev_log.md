@@ -31,3 +31,5 @@
 * Favicon redesigned → polkaink.svg
 * CTA wording refined: "New Document" / "新建文档" / "새 문서"
 * Add scripts for E2E Contract Test
+## 20260301 18:38(ET)
+* Security check
