@@ -226,6 +226,7 @@
     "vetos_cast": "اعتراضات",
     "veto_in_progress": "اعتراض قيد التنفيذ",
     "no_veto": "لا يوجد اعتراض",
+    "veto_clear": "واضح",
     "confirm_veto": "تأكيد الاعتراض",
     "min_chars": "حد أدنى الأحرف",
     "election_id_placeholder": "معرّف الانتخاب",

@@ -153,18 +153,19 @@ export default function ProposalDetailPage() {
     <PageWrapper>
       <Link
         to="/governance"
-        className="mb-4 inline-block text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors group"
       >
-        &larr; {t('governance.back')}
+        <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        {t('governance.back')}
       </Link>
 
       {/* Header */}
-      <Card padding="lg" className="mb-4">
+      <Card padding="lg" className="mb-5 !border-[var(--color-primary)]/10">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-2">
               <StatusBadge status={p.status} />
-              <span className="text-sm text-[var(--color-text-secondary)]">
+              <span className="text-sm font-medium text-[var(--color-text-secondary)]">
                 #{Number(p.id)}
               </span>
               {p.proposalType === 1 && (
@@ -176,7 +177,7 @@ export default function ProposalDetailPage() {
         </div>
 
         {/* Metadata Grid */}
-        <div className="grid grid-cols-2 gap-4 rounded-lg bg-[var(--color-surface-alt)] p-4 text-sm md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 rounded-xl bg-[var(--color-primary-10)]/40 p-4 text-sm md:grid-cols-4">
           <div>
             <div className="text-[var(--color-text-secondary)]">{t('governance.proposer')}</div>
             <Link
@@ -208,12 +209,15 @@ export default function ProposalDetailPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-3">
         {/* Left: Voting Results & Actions */}
         <div className="md:col-span-2 space-y-4">
           {/* Vote Results */}
           <Card padding="lg">
-            <h2 className="text-sm font-semibold mb-3">{t('governance.voting_results')}</h2>
+            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
+              {t('governance.voting_results')}
+            </h2>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-[var(--color-success)] font-medium">
                 {t('governance.vote_yes')}: {Number(p.yesVotes)} ({yesPercent.toFixed(1)}%)
@@ -224,29 +228,32 @@ export default function ProposalDetailPage() {
             </div>
             <Progress yesPercent={total > 0 ? yesPercent : 0} showLabels={false} height="md" />
 
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="rounded bg-[var(--color-surface-alt)] p-2">
-                <div className="font-semibold">{totalWithAbstain}</div>
-                <div className="text-[var(--color-text-secondary)]">{t('governance.total_votes_label')}</div>
+            <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
+              <div className="rounded-xl bg-[var(--color-primary-10)] p-3">
+                <div className="text-lg font-bold text-[var(--color-primary)]">{totalWithAbstain}</div>
+                <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.total_votes_label')}</div>
               </div>
-              <div className="rounded bg-[var(--color-surface-alt)] p-2">
-                <div className="font-semibold">{Number(p.abstainVotes)}</div>
-                <div className="text-[var(--color-text-secondary)]">{t('governance.abstain')}</div>
+              <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
+                <div className="text-lg font-bold">{Number(p.abstainVotes)}</div>
+                <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.abstain')}</div>
               </div>
-              <div className="rounded bg-[var(--color-surface-alt)] p-2">
-                <div className="font-semibold">{t('governance.threshold')}</div>
-                <div className="text-[var(--color-text-secondary)]">&gt;60% + 5%</div>
+              <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
+                <div className="text-sm font-bold">{t('governance.threshold')}</div>
+                <div className="text-[var(--color-text-secondary)] mt-0.5">&gt;60% + 5%</div>
               </div>
             </div>
           </Card>
 
           {/* Voting Panel */}
           {canVote && (
-            <Card padding="lg">
-              <h2 className="text-sm font-semibold mb-3">{t('governance.cast_vote')}</h2>
+            <Card padding="lg" className="!border-[var(--color-primary)]/20">
+              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
+                {t('governance.cast_vote')}
+              </h2>
 
-              <div className="mb-4">
-                <label className="text-xs text-[var(--color-text-secondary)] mb-1 block">
+              <div className="mb-5">
+                <label className="text-xs font-medium text-[var(--color-text-secondary)] mb-2 block">
                   {t('governance.lock_period')}
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -254,13 +261,13 @@ export default function ProposalDetailPage() {
                     <button
                       key={opt.days}
                       onClick={() => setLockDays(opt.days)}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      className={`rounded-xl border px-4 py-2 text-xs font-medium transition-all duration-200 ${
                         lockDays === opt.days
-                          ? 'border-[var(--color-primary)] bg-[var(--color-primary-10)] text-[var(--color-primary)]'
-                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]'
+                          ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/20'
+                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-10)]'
                       }`}
                     >
-                      {opt.label} <span className="opacity-60">{opt.multiplier}</span>
+                      {opt.label} <span className={lockDays === opt.days ? 'opacity-80' : 'opacity-50'}>{opt.multiplier}</span>
                     </button>
                   ))}
                 </div>
@@ -271,7 +278,7 @@ export default function ProposalDetailPage() {
                   onClick={() => castVote(true, false, lockDays)}
                   disabled={voting}
                   loading={voting}
-                  className="flex-1 !rounded-lg !bg-[var(--color-success)]"
+                  className="flex-1 !rounded-xl !bg-[var(--color-success)] hover:!opacity-90 !shadow-md !shadow-green-200/30"
                 >
                   {t('governance.vote_yes')}
                 </Button>
@@ -280,7 +287,7 @@ export default function ProposalDetailPage() {
                   onClick={() => castVote(false, false, lockDays)}
                   disabled={voting}
                   loading={voting}
-                  className="flex-1 !rounded-lg"
+                  className="flex-1 !rounded-xl !shadow-md !shadow-red-200/30"
                 >
                   {t('governance.vote_no')}
                 </Button>
@@ -289,7 +296,7 @@ export default function ProposalDetailPage() {
                   onClick={() => castVote(false, true, lockDays)}
                   disabled={voting}
                   loading={voting}
-                  className="!rounded-lg"
+                  className="!rounded-xl hover:!border-[var(--color-primary)] hover:!text-[var(--color-primary)]"
                 >
                   {t('governance.abstain')}
                 </Button>
@@ -298,15 +305,18 @@ export default function ProposalDetailPage() {
           )}
 
           {voted && (
-            <Card className="text-center text-sm text-[var(--color-text-secondary)]">
-              ✓ {t('governance.already_voted')}
+            <Card className="text-center text-sm !bg-[var(--color-primary-10)] !border-[var(--color-primary)]/15">
+              <span className="text-[var(--color-primary)] font-medium">✓ {t('governance.already_voted')}</span>
             </Card>
           )}
 
           {/* Council Review Section */}
           {canCouncilReview && (
-            <Card padding="lg">
-              <h2 className="text-sm font-semibold mb-3">{t('council.review_title')}</h2>
+            <Card padding="lg" className="!border-amber-200">
+              <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-amber-400" />
+                {t('council.review_title')}
+              </h2>
               <p className="text-xs text-[var(--color-text-secondary)] mb-3">
                 {t('council.review_desc')}
               </p>
@@ -366,23 +376,25 @@ export default function ProposalDetailPage() {
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3">
-            {canQueue && (
-              <Button variant="secondary" onClick={handleQueue} className="flex-1 !rounded-lg">
-                {t('governance.queue_proposal')}
-              </Button>
-            )}
-            {canExecute && (
-              <Button variant="primary" onClick={handleExecute} className="flex-1 !rounded-lg">
-                {t('governance.execute')}
-              </Button>
-            )}
-            {canCancel && (
-              <Button variant="danger" onClick={handleCancel} className="flex-1 !rounded-lg">
-                {t('governance.cancel_proposal')}
-              </Button>
-            )}
-          </div>
+          {(canQueue || canExecute || canCancel) && (
+            <div className="flex flex-wrap gap-3">
+              {canQueue && (
+                <Button variant="secondary" onClick={handleQueue} className="flex-1 !rounded-xl">
+                  {t('governance.queue_proposal')}
+                </Button>
+              )}
+              {canExecute && (
+                <Button variant="primary" onClick={handleExecute} className="flex-1 !rounded-xl !shadow-md !shadow-[var(--color-primary)]/20">
+                  {t('governance.execute')}
+                </Button>
+              )}
+              {canCancel && (
+                <Button variant="danger" onClick={handleCancel} className="flex-1 !rounded-xl">
+                  {t('governance.cancel_proposal')}
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}
@@ -393,7 +405,10 @@ export default function ProposalDetailPage() {
           {/* Veto Status */}
           {vetoStatus && (
             <Card>
-              <h3 className="text-xs font-semibold mb-2">{t('council.veto_status')}</h3>
+              <h3 className="text-xs font-semibold mb-3 flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-amber-400" />
+                {t('council.veto_status')}
+              </h3>
               <div className="flex items-center justify-between">
                 <span className="text-sm">
                   {vetoStatus.vetoCount} / 4 {t('council.vetos_cast')}
@@ -403,37 +418,40 @@ export default function ProposalDetailPage() {
                 ) : vetoStatus.vetoCount > 0 ? (
                   <Badge variant="warning" pill>{t('council.veto_in_progress')}</Badge>
                 ) : (
-                  <Badge variant="success" pill>{t('council.no_veto')}</Badge>
+                  <Badge variant="success" pill>{t('council.veto_clear')}</Badge>
                 )}
               </div>
-              {vetoStatus.vetoCount > 0 && (
-                <div className="mt-2">
-                  <Progress
-                    yesPercent={(vetoStatus.vetoCount / 4) * 100}
-                    showLabels={false}
-                    height="sm"
-                  />
-                </div>
-              )}
+              <div className="mt-2">
+                <Progress
+                  yesPercent={(vetoStatus.vetoCount / 4) * 100}
+                  showLabels={false}
+                  height="sm"
+                />
+              </div>
             </Card>
           )}
 
           {/* Proposal Type Info */}
           <Card>
-            <h3 className="text-xs font-semibold mb-2">{t('governance.proposal_info')}</h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
+            <h3 className="text-xs font-semibold mb-3 flex items-center gap-2">
+              <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
+              {t('governance.proposal_info')}
+            </h3>
+            <div className="space-y-3 text-xs">
+              <div className="flex justify-between items-center">
                 <span className="text-[var(--color-text-secondary)]">{t('governance.type')}</span>
-                <span>{p.proposalType === 0 ? t('governance.type_version') : t('governance.type_upgrade')}</span>
+                <span className="font-medium rounded-full bg-[var(--color-primary-10)] px-2.5 py-0.5 text-[var(--color-primary)]">
+                  {p.proposalType === 0 ? t('governance.type_version') : t('governance.type_upgrade')}
+                </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-[var(--color-text-secondary)]">{t('governance.snapshot_block')}</span>
-                <span>#{Number(p.snapshotBlock)}</span>
+                <span className="font-mono font-medium">#{Number(p.snapshotBlock)}</span>
               </div>
               {Number(p.targetVersionId) > 0 && (
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-[var(--color-text-secondary)]">{t('governance.target_version')}</span>
-                  <span>v{Number(p.targetVersionId)}</span>
+                  <span className="font-medium">v{Number(p.targetVersionId)}</span>
                 </div>
               )}
             </div>

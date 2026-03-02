@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { keccak256, parseEther, toHex } from 'viem';
@@ -70,16 +70,17 @@ export default function ProposePage() {
     <PageWrapper>
       <h1 className="text-2xl font-bold mb-2">{t('propose.title')}</h1>
       {doc && (
-        <p
-          className="text-[var(--color-text-secondary)] mb-6"
-          dangerouslySetInnerHTML={{
-            __html: t('propose.for_doc', {
+        <p className="text-[var(--color-text-secondary)] mb-6">
+          <Trans
+            i18nKey="propose.for_doc"
+            values={{
               title: doc.title,
               docId: Number(doc.id),
               versionId: Number(doc.currentVersionId),
-            }),
-          }}
-        />
+            }}
+            components={{ strong: <strong /> }}
+          />
+        </p>
       )}
 
       <div className="space-y-4">

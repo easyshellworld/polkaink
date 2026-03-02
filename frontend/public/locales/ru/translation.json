@@ -226,6 +226,7 @@
     "vetos_cast": "вето",
     "veto_in_progress": "Вето в процессе",
     "no_veto": "Нет вето",
+    "veto_clear": "Чисто",
     "confirm_veto": "Подтвердить вето",
     "min_chars": "мин. символов",
     "election_id_placeholder": "ID выборов",

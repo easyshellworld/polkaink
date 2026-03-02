@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useElection, useElectionVotes, useVoteInElection, useExecuteElection } from '../../hooks/useCouncil';
 import { useWalletStore } from '../../store/walletStore';
@@ -6,6 +6,15 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Progress } from '../../components/ui/Progress';
 import { shortenAddress } from '../../lib/utils';
+
+function useNow(intervalMs = 30_000) {
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  useEffect(() => {
+    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
 
 export function ElectionPanel() {
   const { t } = useTranslation();
@@ -19,9 +28,9 @@ export function ElectionPanel() {
   const { submitting: voteSubmitting, vote } = useVoteInElection();
   const { submitting: execSubmitting, execute } = useExecuteElection();
 
-  const now = Math.floor(Date.now() / 1000);
-  const isActive = election && Number(election.startTime) <= now && Number(election.endTime) > now;
-  const isEnded = election && Number(election.endTime) <= now;
+  const now = useNow();
+  const isActive = election ? Number(election.startTime) <= now && Number(election.endTime) > now : false;
+  const isEnded = election ? Number(election.endTime) <= now : false;
   const canExecute = isEnded && !election?.executed;
   const maxVotes = votes ? Math.max(...votes.map((v) => v.votes), 1) : 1;
 

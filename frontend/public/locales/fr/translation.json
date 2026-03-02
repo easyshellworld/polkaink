@@ -226,6 +226,7 @@
     "vetos_cast": "vetos",
     "veto_in_progress": "Veto en cours",
     "no_veto": "Aucun veto",
+    "veto_clear": "Aucun",
     "confirm_veto": "Confirmer le veto",
     "min_chars": "caractères min",
     "election_id_placeholder": "ID d'élection",

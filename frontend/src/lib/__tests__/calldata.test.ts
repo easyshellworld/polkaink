@@ -1,6 +1,6 @@
 jest.mock('viem', () => ({
-  keccak256: (data: string) => '0x' + 'a'.repeat(64),
-  toHex: (data: Uint8Array) => '0x' + Buffer.from(data).toString('hex'),
+  keccak256: (_data: string) => '0x' + 'a'.repeat(64),
+  toHex: (_data: Uint8Array) => '0x' + Buffer.from(_data).toString('hex'),
 }));
 
 import { encodeMarkdown, decodeMarkdown, formatBytes } from '../calldata';

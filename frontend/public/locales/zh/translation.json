@@ -226,6 +226,7 @@
     "vetos_cast": "票否决",
     "veto_in_progress": "否决进行中",
     "no_veto": "无否决",
+    "veto_clear": "无异议",
     "confirm_veto": "确认否决",
     "min_chars": "最少字数",
     "election_id_placeholder": "选举 ID",
