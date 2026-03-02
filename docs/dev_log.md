@@ -33,3 +33,15 @@
 * Add scripts for E2E Contract Test
 ## 20260301 18:38(ET)
 * Security check
+
+## 20260302
+* 建议修订备忘录
+  * 目前整个前端系统治理系统模块全部缺失，需要完善整个治理提案修订模块，审核，投票，伦理守卫等模块
+  * 建议文档提案首页显示，按照时间修改倒序显示
+  * 建议将前端整个`ethers`包替换为`viem`包，修改全部函数
+  * 建议将i18n（国际化）改成联合国官方六大语言，`{"languages":{"en":"English","zh":"中文","fr":"Français","ru":"Русский","es":"Español","ar":"العربية"}}`
+  * 建议在`/frontend`文件夹中，增加前端部署的`dockerfile`文件
+  * 建议在`frontend`在前端增加`jest`利用模拟数据进行单元测试
+* 完成`netlify`初步部署
+* 修订简易`readme`
+* 增加`LICENSE`文件
