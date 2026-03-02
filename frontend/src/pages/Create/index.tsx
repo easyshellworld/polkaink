@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import { decodeEventLog } from 'viem';
 import { useWalletStore } from '../../store/walletStore';
 import { useNotificationStore } from '../../store/notificationStore';
-import { getWriteContract, TX_OVERRIDES } from '../../lib/contracts';
+import { writeContract, waitForTx, TX_GAS, getAbi } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -13,7 +14,7 @@ export default function CreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const signer = useWalletStore((s) => s.signer);
+  const walletClient = useWalletStore((s) => s.walletClient);
   const { addNotification, updateNotification } = useNotificationStore();
 
   const [title, setTitle] = useState('');
@@ -22,7 +23,7 @@ export default function CreatePage() {
   const [createdDocId, setCreatedDocId] = useState<number | null>(null);
 
   const handleSubmit = async () => {
-    if (!signer) {
+    if (!walletClient) {
       addNotification({ id: 'create-err', type: 'error', message: t('create.error_wallet') });
       return;
     }
@@ -34,25 +35,30 @@ export default function CreatePage() {
     setSubmitting(true);
     const nid = `create-${Date.now()}`;
     try {
-      const contract = getWriteContract(signer);
       const tagArray = tags
         .split(',')
         .map((tag) => tag.trim())
         .filter(Boolean);
 
       addNotification({ id: nid, type: 'pending', message: t('create.tx_submitting') });
-      const tx = await contract.createDocument(title.trim(), tagArray, TX_OVERRIDES);
+      const hash = await writeContract(walletClient, 'PolkaInkRegistry', 'createDocument', [
+        title.trim(), tagArray,
+      ], { gas: TX_GAS });
       updateNotification(nid, { message: t('create.tx_confirming') });
-      const receipt = await tx.wait();
+      const receipt = await waitForTx(hash);
 
-      const iface = contract.interface;
-      const log = receipt.logs.find((l: { topics: string[] }) =>
-        l.topics[0] === iface.getEvent('DocumentCreated')?.topicHash
-      );
       let docId: number | null = null;
-      if (log) {
-        const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
-        docId = Number(parsed?.args?.[0]);
+      const abi = getAbi('PolkaInkRegistry');
+      for (const log of receipt.logs) {
+        try {
+          const decoded = decodeEventLog({ abi, data: log.data, topics: log.topics });
+          if (decoded.eventName === 'DocumentCreated') {
+            docId = Number((decoded.args as unknown as { docId: bigint }).docId);
+            break;
+          }
+        } catch {
+          // skip non-matching logs
+        }
       }
 
       queryClient.invalidateQueries({ queryKey: ['documents'] });
@@ -148,10 +154,10 @@ export default function CreatePage() {
           <div className="flex justify-end">
             <Button
               onClick={handleSubmit}
-              disabled={submitting || !signer || !title.trim()}
+              disabled={submitting || !walletClient || !title.trim()}
               loading={submitting}
             >
-              {!signer ? t('create.connect_first') : t('create.submit')}
+              {!walletClient ? t('create.connect_first') : t('create.submit')}
             </Button>
           </div>
         </div>

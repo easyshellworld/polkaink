@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getReadContract } from '../lib/contracts';
+import { readContract } from '../lib/contracts';
 
 export interface ProposalData {
   id: bigint;
@@ -25,15 +25,16 @@ export function useProposals(page: number, perPage = 10) {
   return useQuery({
     queryKey: ['proposals', page, perPage],
     queryFn: async () => {
-      const gov = getReadContract('GovernanceCore');
-      const totalP = await gov.totalProposals();
-      const total = Number(totalP);
+      const totalP = await readContract('GovernanceCore', 'totalProposals');
+      const total = Number(totalP as bigint);
       if (total === 0) return { proposals: [] as ProposalData[], total: 0 };
       const offset = page * perPage;
-      // statusFilter 0 = all (Pending enum value, but we list all)
-      const [list] = await gov.listProposals(0, offset, perPage);
+      const result = await readContract('GovernanceCore', 'listProposals', [
+        0, BigInt(offset), BigInt(perPage),
+      ]);
+      const [list] = result as [ProposalData[], bigint];
       return {
-        proposals: [...list].reverse() as ProposalData[],
+        proposals: [...list].reverse(),
         total,
       };
     },
@@ -45,8 +46,7 @@ export function useProposal(id: number | undefined) {
   return useQuery({
     queryKey: ['proposal', id],
     queryFn: async () => {
-      const gov = getReadContract('GovernanceCore');
-      const p = await gov.getProposal(id);
+      const p = await readContract('GovernanceCore', 'getProposal', [BigInt(id!)]);
       return p as ProposalData;
     },
     enabled: id !== undefined,
@@ -58,9 +58,11 @@ export function useHasVoted(proposalId: number | undefined, address: string | nu
   return useQuery({
     queryKey: ['hasVoted', proposalId, address],
     queryFn: async () => {
-      const gov = getReadContract('GovernanceCore');
-      const record = await gov.getVoteRecord(proposalId, address);
-      return record.hasVoted as boolean;
+      const record = await readContract('GovernanceCore', 'getVoteRecord', [
+        BigInt(proposalId!),
+        address as `0x${string}`,
+      ]);
+      return (record as { hasVoted: boolean }).hasVoted;
     },
     enabled: proposalId !== undefined && !!address,
   });
@@ -70,14 +72,16 @@ export function useRecentProposals(count = 5) {
   return useQuery({
     queryKey: ['recentProposals', count],
     queryFn: async () => {
-      const gov = getReadContract('GovernanceCore');
-      const totalP = await gov.totalProposals();
-      const total = Number(totalP);
+      const totalP = await readContract('GovernanceCore', 'totalProposals');
+      const total = Number(totalP as bigint);
       if (total === 0) return [];
       const limit = Math.min(total, count);
       const offset = Math.max(0, total - limit);
-      const [list] = await gov.listProposals(0, offset, limit);
-      return [...list].reverse() as ProposalData[];
+      const result = await readContract('GovernanceCore', 'listProposals', [
+        0, BigInt(offset), BigInt(limit),
+      ]);
+      const [list] = result as [ProposalData[], bigint];
+      return [...list].reverse();
     },
     staleTime: 15_000,
   });

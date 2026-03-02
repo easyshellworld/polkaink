@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getReadContract } from '../lib/contracts';
+import { readContract } from '../lib/contracts';
 
 export interface VersionData {
   id: bigint;
@@ -17,8 +17,8 @@ export function useVersion(versionId: number | undefined) {
   return useQuery({
     queryKey: ['version', versionId],
     queryFn: async () => {
-      const vs = getReadContract('VersionStore');
-      return (await vs.getVersion(versionId)) as VersionData;
+      const v = await readContract('VersionStore', 'getVersion', [BigInt(versionId!)]);
+      return v as VersionData;
     },
     enabled: versionId !== undefined,
     staleTime: 60_000,
@@ -29,8 +29,8 @@ export function useVersionHistory(docId: number | undefined) {
   return useQuery({
     queryKey: ['versionHistory', docId],
     queryFn: async () => {
-      const registry = getReadContract('PolkaInkRegistry');
-      return (await registry.getVersionHistory(docId)) as bigint[];
+      const h = await readContract('PolkaInkRegistry', 'getVersionHistory', [BigInt(docId!)]);
+      return h as bigint[];
     },
     enabled: docId !== undefined,
     staleTime: 60_000,

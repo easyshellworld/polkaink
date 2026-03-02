@@ -8,7 +8,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    supportedLngs: ['en', 'zh-CN', 'kr'],
+    supportedLngs: ['en', 'zh', 'fr', 'ru', 'es', 'ar'],
     fallbackLng: 'en',
     defaultNS: 'translation',
     backend: {

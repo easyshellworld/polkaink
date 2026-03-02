@@ -1,14 +1,14 @@
 import { useCallback, useEffect } from 'react';
-import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
+import { formatEther } from 'viem';
 import { useWalletStore } from '../store/walletStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { PAS_NETWORK } from '../lib/contracts/addresses';
-import { switchToPAS } from '../lib/contracts';
+import { switchToPAS, getPublicClient, createBrowserWalletClient } from '../lib/contracts';
 
 export function useWallet() {
   const { t } = useTranslation();
-  const { address, signer, balance, isConnecting, setWallet, clearWallet, setConnecting } =
+  const { address, walletClient, balance, isConnecting, setWallet, clearWallet, setConnecting } =
     useWalletStore();
   const { addNotification } = useNotificationStore();
 
@@ -20,11 +20,14 @@ export function useWallet() {
     setConnecting(true);
     try {
       await switchToPAS();
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const s = await provider.getSigner();
-      const addr = await s.getAddress();
-      const bal = await provider.getBalance(addr);
-      setWallet(addr, s, ethers.formatEther(bal), PAS_NETWORK.chainId);
+      const accounts = (await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      })) as string[];
+      const addr = accounts[0];
+      const wc = createBrowserWalletClient();
+      const pc = getPublicClient();
+      const bal = await pc.getBalance({ address: addr as `0x${string}` });
+      setWallet(addr, wc, formatEther(bal), PAS_NETWORK.chainId);
       addNotification({ id: 'wallet', type: 'success', message: t('wallet.connected') });
     } catch (err) {
       addNotification({ id: 'wallet', type: 'error', message: t('wallet.connection_failed', { error: (err as Error).message }) });
@@ -47,5 +50,5 @@ export function useWallet() {
     };
   }, [clearWallet]);
 
-  return { address, signer, balance, isConnecting, connect, disconnect };
+  return { address, walletClient, balance, isConnecting, connect, disconnect };
 }

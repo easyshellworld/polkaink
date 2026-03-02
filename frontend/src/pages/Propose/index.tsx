@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ethers } from 'ethers';
+import { keccak256, parseEther, toHex } from 'viem';
 import { useDocument } from '../../hooks/useDocuments';
 import { useWalletStore } from '../../store/walletStore';
 import { useNotificationStore } from '../../store/notificationStore';
-import { getWriteContract } from '../../lib/contracts';
+import { writeContract, waitForTx } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
 
@@ -15,7 +15,7 @@ export default function ProposePage() {
   const { t } = useTranslation();
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
-  const signer = useWalletStore((s) => s.signer);
+  const walletClient = useWalletStore((s) => s.walletClient);
   const { addNotification, updateNotification } = useNotificationStore();
   const numDocId = docId ? Number(docId) : undefined;
   const { data: doc } = useDocument(numDocId);
@@ -27,7 +27,7 @@ export default function ProposePage() {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!signer || !doc) {
+    if (!walletClient || !doc) {
       addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_wallet') });
       return;
     }
@@ -43,22 +43,21 @@ export default function ProposePage() {
     setSubmitting(true);
     const nid = `propose-${Date.now()}`;
     try {
-      const contract = getWriteContract(signer);
-      const contentHash = ethers.keccak256(new TextEncoder().encode(content));
-      const stakeWei = ethers.parseEther(stake);
+      const contentBytes = new TextEncoder().encode(content);
+      const contentHash = keccak256(toHex(contentBytes));
+      const stakeWei = parseEther(stake);
 
       addNotification({ id: nid, type: 'pending', message: t('propose.tx_submitting') });
-      const markdownBytes = new TextEncoder().encode(content);
-      const tx = await contract.proposeVersion(
-        Number(doc.id),
-        Number(doc.currentVersionId),
+      const markdownHex = toHex(contentBytes);
+      const hash = await writeContract(walletClient, 'PolkaInkRegistry', 'proposeVersion', [
+        BigInt(Number(doc.id)),
+        BigInt(Number(doc.currentVersionId)),
         contentHash,
-        markdownBytes,
-        { value: stakeWei, gasLimit: 1_000_000n }
-      );
+        markdownHex,
+      ], { value: stakeWei, gas: 1_000_000n });
       updateNotification(nid, { message: t('propose.tx_confirming') });
-      const receipt = await tx.wait();
-      updateNotification(nid, { type: 'success', message: t('propose.tx_success', { hash: receipt.hash.slice(0, 10) }) });
+      const receipt = await waitForTx(hash);
+      updateNotification(nid, { type: 'success', message: t('propose.tx_success', { hash: receipt.transactionHash.slice(0, 10) }) });
       navigate('/governance');
     } catch (err) {
       updateNotification(nid, { type: 'error', message: 'Failed: ' + (err as Error).message });
@@ -139,10 +138,10 @@ export default function ProposePage() {
           <div className="text-sm text-[var(--color-text-secondary)]">{t('propose.voting_period')}</div>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || !signer}
+            disabled={submitting || !walletClient}
             loading={submitting}
           >
-            {!signer ? t('propose.connect_first') : t('propose.submit', { stake })}
+            {!walletClient ? t('propose.connect_first') : t('propose.submit', { stake })}
           </Button>
         </div>
       </div>

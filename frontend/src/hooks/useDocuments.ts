@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getReadContract } from '../lib/contracts';
+import { readContract } from '../lib/contracts';
 
 export interface DocumentData {
   id: bigint;
@@ -16,10 +16,13 @@ export function useDocuments(page: number, perPage = 10) {
   return useQuery({
     queryKey: ['documents', page, perPage],
     queryFn: async () => {
-      const contract = getReadContract();
-      const [docs, total] = await contract.listDocuments(page * perPage, perPage);
+      const result = await readContract('PolkaInkRegistry', 'listDocuments', [
+        BigInt(page * perPage),
+        BigInt(perPage),
+      ]);
+      const [docs, total] = result as [DocumentData[], bigint];
       return {
-        documents: docs as DocumentData[],
+        documents: docs,
         total: Number(total),
       };
     },
@@ -31,8 +34,7 @@ export function useDocument(id: number | undefined) {
   return useQuery({
     queryKey: ['document', id],
     queryFn: async () => {
-      const contract = getReadContract();
-      const doc = await contract.getDocument(id);
+      const doc = await readContract('PolkaInkRegistry', 'getDocument', [BigInt(id!)]);
       return doc as DocumentData;
     },
     enabled: id !== undefined,

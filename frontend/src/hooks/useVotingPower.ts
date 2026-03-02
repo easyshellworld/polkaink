@@ -1,20 +1,37 @@
 import { useQuery } from '@tanstack/react-query';
-import { ethers } from 'ethers';
-import { PAS_NETWORK } from '../lib/contracts/addresses';
+import { formatEther } from 'viem';
+import { readContract, getPublicClient } from '../lib/contracts';
 
-export function useVotingPower(address: string | null) {
+export function useVotingPower(address: string | null, proposalId?: number) {
   return useQuery({
-    queryKey: ['votingPower', address],
+    queryKey: ['votingPower', address, proposalId],
     queryFn: async () => {
-      if (!address) return { balance: '0', weight: 1 };
-      const provider = new ethers.JsonRpcProvider(PAS_NETWORK.rpcUrl, {
-        chainId: PAS_NETWORK.chainId,
-        name: PAS_NETWORK.name,
-      });
-      const balance = await provider.getBalance(address);
+      if (!address) return { balance: '0', weight: 0n, nftMultiplier: 1 };
+      const pc = getPublicClient();
+      const [balance, weight] = await Promise.all([
+        pc.getBalance({ address: address as `0x${string}` }),
+        readContract('GovernanceCore', 'getVotingPower', [
+          address as `0x${string}`,
+          BigInt(proposalId ?? 0),
+        ]).catch(() => 0n),
+      ]);
+
+      let nftMultiplier = 1;
+      try {
+        const [authorCount, hasGuardian] = await Promise.all([
+          readContract('NFTReward', 'authorNFTCount', [address as `0x${string}`]),
+          readContract('NFTReward', 'hasActiveGuardianNFT', [address as `0x${string}`]),
+        ]);
+        if (hasGuardian) nftMultiplier = 2;
+        else if (Number(authorCount as bigint) > 0) nftMultiplier = 1.5;
+      } catch {
+        /* NFT contract may not be accessible */
+      }
+
       return {
-        balance: ethers.formatEther(balance),
-        weight: 1,
+        balance: formatEther(balance),
+        weight: weight as bigint,
+        nftMultiplier,
       };
     },
     enabled: !!address,

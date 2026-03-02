@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ethers } from 'ethers';
+import { formatEther } from 'viem';
 import { Card } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/governance/StatusBadge';
 import { Progress } from '../../components/ui/Progress';
@@ -24,7 +24,7 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
             <p className="font-medium truncate">{p.description || 'Version Update Proposal'}</p>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[var(--color-text-secondary)]">
               <span>{t('governance.by')} {shortenAddress(p.proposer)}</span>
-              <span>{t('governance.stake')}: {ethers.formatEther(p.stakeAmount)} PAS</span>
+              <span>{t('governance.stake')}: {formatEther(p.stakeAmount)} PAS</span>
               <span>{t('governance.doc', { id: Number(p.docId) })}</span>
               {p.status === 1 && <span>{timeRemaining(p.endTime)}</span>}
             </div>

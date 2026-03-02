@@ -1,24 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { getReadContract } from '../../lib/contracts';
+import { readContract } from '../../lib/contracts';
 
 export function StatsBar() {
   const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      const registry = getReadContract('PolkaInkRegistry');
-      const versionStore = getReadContract('VersionStore');
-      const governance = getReadContract('GovernanceCore');
       const [docs, versions, proposals] = await Promise.all([
-        registry.totalDocuments(),
-        versionStore.totalVersions(),
-        governance.totalProposals(),
+        readContract('PolkaInkRegistry', 'totalDocuments'),
+        readContract('VersionStore', 'totalVersions'),
+        readContract('GovernanceCore', 'totalProposals'),
       ]);
       return {
-        totalDocs: Number(docs),
-        totalVersions: Number(versions),
-        totalProposals: Number(proposals),
+        totalDocs: Number(docs as bigint),
+        totalVersions: Number(versions as bigint),
+        totalProposals: Number(proposals as bigint),
       };
     },
     staleTime: 30_000,

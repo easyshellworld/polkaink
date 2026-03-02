@@ -1,39 +1,52 @@
 import { useQuery } from '@tanstack/react-query';
-import { ethers } from 'ethers';
-import { getProvider, getReadContract } from '../lib/contracts';
-import RegistryABI from '../lib/contracts/abis/PolkaInkRegistry.json';
+import { decodeFunctionData } from 'viem';
+import { getPublicClient, getContractAddress, getAbi } from '../lib/contracts';
 
-/**
- * Fetches Markdown content stored as calldata in proposeVersion transactions.
- * Queries VersionProposed events for the given docId, then decodes the tx input.
- */
 export function useMarkdownContent(docId: number | undefined) {
   return useQuery({
     queryKey: ['markdownContent', docId],
     queryFn: async () => {
       if (!docId) return null;
 
-      const provider = getProvider();
-      const registry = getReadContract('PolkaInkRegistry');
-      const registryAddr = await registry.getAddress();
+      const pc = getPublicClient();
+      const registryAddr = getContractAddress('PolkaInkRegistry') as `0x${string}`;
+      const abi = getAbi('PolkaInkRegistry');
 
-      const events = await registry.queryFilter('VersionProposed', 0);
-      const docEvents = events.filter(
-        (e) => Number((e as ethers.EventLog).args?.[1]) === docId
-      );
+      const logs = await pc.getLogs({
+        address: registryAddr,
+        event: {
+          type: 'event',
+          name: 'VersionProposed',
+          inputs: [
+            { type: 'uint256', name: 'proposalId', indexed: true },
+            { type: 'uint256', name: 'docId', indexed: true },
+            { type: 'address', name: 'proposer', indexed: true },
+            { type: 'uint256', name: 'parentVersionId' },
+            { type: 'bytes32', name: 'contentHash' },
+            { type: 'uint256', name: 'stakeAmount' },
+          ],
+        },
+        args: { docId: BigInt(docId) },
+        fromBlock: 0n,
+        toBlock: 'latest',
+      });
 
-      if (docEvents.length === 0) return null;
+      if (logs.length === 0) return null;
 
-      const latestEvent = docEvents[docEvents.length - 1];
-      const tx = await provider.getTransaction(latestEvent.transactionHash);
+      const latestLog = logs[logs.length - 1];
+      const tx = await pc.getTransaction({ hash: latestLog.transactionHash });
       if (!tx || tx.to?.toLowerCase() !== registryAddr.toLowerCase()) return null;
 
-      const iface = new ethers.Interface(RegistryABI);
-      const decoded = iface.parseTransaction({ data: tx.data, value: tx.value });
-      if (!decoded || decoded.name !== 'proposeVersion') return null;
+      const decoded = decodeFunctionData({ abi, data: tx.input });
+      if (decoded.functionName !== 'proposeVersion') return null;
 
-      const mdBytes = decoded.args[3];
-      return new TextDecoder().decode(ethers.getBytes(mdBytes));
+      const mdBytes = (decoded.args as unknown[])[3] as `0x${string}`;
+      const hex = mdBytes.slice(2);
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+      }
+      return new TextDecoder().decode(bytes);
     },
     enabled: docId !== undefined && docId > 0,
     staleTime: 5 * 60_000,

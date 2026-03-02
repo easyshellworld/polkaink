@@ -1,12 +1,12 @@
-import { ethers } from 'ethers';
+import { keccak256, toHex } from 'viem';
 
 export function encodeMarkdown(markdown: string): {
   contentBytes: Uint8Array;
-  contentHash: string;
+  contentHash: `0x${string}`;
   contentLength: number;
 } {
   const contentBytes = new TextEncoder().encode(markdown);
-  const contentHash = ethers.keccak256(contentBytes);
+  const contentHash = keccak256(toHex(contentBytes));
   return { contentBytes, contentHash, contentLength: contentBytes.length };
 }
 

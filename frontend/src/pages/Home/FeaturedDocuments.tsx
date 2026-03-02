@@ -7,8 +7,12 @@ import { formatDate } from '../../lib/utils';
 
 export function FeaturedDocuments() {
   const { t } = useTranslation();
-  const { data } = useDocuments(0, 4);
-  const documents = data?.documents ?? [];
+  const { data } = useDocuments(0, 20);
+  const allDocs = data?.documents ?? [];
+
+  const documents = [...allDocs]
+    .sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt))
+    .slice(0, 4);
 
   if (documents.length === 0) return null;
 
@@ -26,7 +30,7 @@ export function FeaturedDocuments() {
                 ))}
               </div>
               <div className="text-xs text-[var(--color-text-secondary)]">
-                {formatDate(doc.createdAt)}
+                {formatDate(doc.updatedAt)} · v{Number(doc.currentVersionId)}
               </div>
             </Card>
           </Link>

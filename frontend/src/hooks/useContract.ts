@@ -1,16 +1,4 @@
-import { useMemo } from 'react';
-import { ethers } from 'ethers';
-import { useWalletStore } from '../store/walletStore';
-import { getReadContract, getWriteContract, TX_OVERRIDES } from '../lib/contracts';
+import { readContract, writeContract, TX_GAS, type WalletClient } from '../lib/contracts';
 
-export function useReadContract() {
-  return useMemo(() => getReadContract(), []);
-}
-
-export function useWriteContract() {
-  const signer = useWalletStore((s) => s.signer);
-  return useMemo(() => (signer ? getWriteContract(signer) : null), [signer]);
-}
-
-export { TX_OVERRIDES };
-export type { ethers };
+export { readContract, writeContract, TX_GAS };
+export type { WalletClient };
