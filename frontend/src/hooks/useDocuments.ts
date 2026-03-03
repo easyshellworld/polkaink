@@ -21,8 +21,9 @@ export function useDocuments(page: number, perPage = 10) {
         BigInt(perPage),
       ]);
       const [docs, total] = result as [DocumentData[], bigint];
+      const sorted = [...docs].sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
       return {
-        documents: docs,
+        documents: sorted,
         total: Number(total),
       };
     },

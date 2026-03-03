@@ -115,5 +115,8 @@ jobs:
       - name: Type check
         run: npx tsc -b
 
+      - name: Unit tests
+        run: npx jest --ci --coverage
+
       - name: Build
         run: npx vite build

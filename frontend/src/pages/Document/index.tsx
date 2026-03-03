@@ -11,7 +11,8 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { shortenAddress, formatDate } from '../../lib/utils';
-import { PAS_NETWORK, getContractAddress } from '../../lib/contracts/addresses';
+import { PAS_NETWORK } from '../../lib/contracts/addresses';
+import { useDocCreationTx } from '../../hooks/useRealProposer';
 
 const STATUS_MAP: Record<number, { label: string; variant: 'success' | 'neutral' | 'warning' }> = {
   0: { label: 'active', variant: 'success' },
@@ -30,6 +31,7 @@ export default function DocumentPage() {
   const { data: version } = useVersion(versionId);
   const { data: versionIds } = useVersionHistory(docId);
   const { data: markdown, isLoading: mdLoading } = useMarkdownContent(docId);
+  const { data: creationTxHash } = useDocCreationTx(docId);
 
   if (docLoading) {
     return (
@@ -52,7 +54,9 @@ export default function DocumentPage() {
     );
   }
 
-  const contractAddr = getContractAddress('PolkaInkRegistry');
+  const explorerUrl = creationTxHash
+    ? `${PAS_NETWORK.explorer}/tx/${creationTxHash}`
+    : `${PAS_NETWORK.explorer}/address/${doc.author}`;
   const statusInfo = STATUS_MAP[doc.status] ?? STATUS_MAP[0];
   const hasVersion = versionId !== undefined && versionId > 0;
   const versionCount = versionIds?.length ?? 0;
@@ -101,7 +105,7 @@ export default function DocumentPage() {
             {t('document.propose_update')}
           </Button>
           <a
-            href={`${PAS_NETWORK.explorer}/address/${contractAddr}`}
+            href={explorerUrl}
             target="_blank"
             rel="noopener"
           >

@@ -109,9 +109,10 @@ export async function waitForTx(hash: Hash): Promise<TransactionReceipt> {
   return pc.waitForTransactionReceipt({ hash });
 }
 
-export function createBrowserWalletClient(): WalletClient {
+export function createBrowserWalletClient(account: `0x${string}`): WalletClient {
   if (!window.ethereum) throw new Error('MetaMask not found');
   return createWalletClient({
+    account,
     chain: pasChain,
     transport: custom(window.ethereum),
   });

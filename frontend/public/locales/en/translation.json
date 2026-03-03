@@ -7,6 +7,7 @@
     "create": "Create",
     "connect": "Connect Wallet",
     "disconnect": "Disconnect",
+    "profile": "Profile",
     "home": "Home"
   },
   "home": {

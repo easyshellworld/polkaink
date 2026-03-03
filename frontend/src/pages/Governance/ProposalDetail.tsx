@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatEther } from 'viem';
 import { useProposal, useHasVoted } from '../../hooks/useProposals';
+import { useDocument } from '../../hooks/useDocuments';
+import { useRealProposer } from '../../hooks/useRealProposer';
 import { useVetoStatus, useIsCouncilMember, useCastVeto, useCouncilApprove } from '../../hooks/useCouncil';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useVote } from '../../hooks/useVote';
@@ -34,6 +36,9 @@ export default function ProposalDetailPage() {
 
   const { addNotification, updateNotification } = useNotificationStore();
   const { data: proposal, isLoading, refetch } = useProposal(proposalId);
+  const docIdNum = proposal ? Number(proposal.docId) : undefined;
+  const { data: doc } = useDocument(docIdNum);
+  const { data: realInfo } = useRealProposer(proposalId);
   const { data: voted } = useHasVoted(proposalId, address);
   const { voting, castVote } = useVote(proposalId ?? 0);
   const { data: vetoStatus } = useVetoStatus(proposalId);
@@ -134,6 +139,7 @@ export default function ProposalDetailPage() {
   }
 
   const p = proposal;
+  const proposerAddr = realInfo?.proposer ?? p.proposer;
   const total = Number(p.yesVotes) + Number(p.noVotes);
   const totalWithAbstain = total + Number(p.abstainVotes);
   const yesPercent = total > 0 ? (Number(p.yesVotes) / total) * 100 : 0;
@@ -142,7 +148,7 @@ export default function ProposalDetailPage() {
   const isTimelockQueued = p.status === 3;
   const isPending = p.status === 0;
   const isEnded = Number(p.endTime) <= now;
-  const isProposer = address?.toLowerCase() === p.proposer.toLowerCase();
+  const isProposer = address?.toLowerCase() === proposerAddr.toLowerCase();
   const canExecute = isTimelockQueued;
   const canQueue = isPassed;
   const canVote = isActive && !isEnded && !voted;
@@ -172,7 +178,11 @@ export default function ProposalDetailPage() {
                 <Badge variant="warning" pill>{t('governance.type_upgrade')}</Badge>
               )}
             </div>
-            <h1 className="text-xl font-bold">{p.description || t('governance.version_update')}</h1>
+            <h1 className="text-xl font-bold">
+              {doc?.title
+                ? (p.description ? `${p.description} — ${doc.title}` : doc.title)
+                : (p.description || t('governance.version_update'))}
+            </h1>
           </div>
         </div>
 
@@ -181,10 +191,10 @@ export default function ProposalDetailPage() {
           <div>
             <div className="text-[var(--color-text-secondary)]">{t('governance.proposer')}</div>
             <Link
-              to={`/profile/${p.proposer}`}
+              to={`/profile/${proposerAddr}`}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
-              {shortenAddress(p.proposer)}
+              {shortenAddress(proposerAddr)}
             </Link>
           </div>
           <div>

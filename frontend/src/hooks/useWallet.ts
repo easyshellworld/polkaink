@@ -24,7 +24,7 @@ export function useWallet() {
         method: 'eth_requestAccounts',
       })) as string[];
       const addr = accounts[0];
-      const wc = createBrowserWalletClient();
+      const wc = createBrowserWalletClient(addr as `0x${string}`);
       const pc = getPublicClient();
       const bal = await pc.getBalance({ address: addr as `0x${string}` });
       setWallet(addr, wc, formatEther(bal), PAS_NETWORK.chainId);

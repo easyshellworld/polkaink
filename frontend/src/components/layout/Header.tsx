@@ -7,6 +7,8 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 const navItems = [
   { path: '/library', key: 'nav.library' },
   { path: '/governance', key: 'nav.governance' },
+  { path: '/council', key: 'nav.council' },
+  { path: '/treasury', key: 'nav.treasury' },
   { path: '/create', key: 'nav.create' },
 ];
 

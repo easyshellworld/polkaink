@@ -33,7 +33,6 @@
 * Add scripts for E2E Contract Test
 ## 20260301 18:38(ET)
 * Security check
-
 ## 20260302
 * 建议修订备忘录
   * 目前整个前端系统治理系统模块全部缺失，需要完善整个治理提案修订模块，审核，投票，伦理守卫等模块
@@ -45,3 +44,5 @@
 * 完成`netlify`初步部署
 * 修订简易`readme`
 * 增加`LICENSE`文件
+## 20260303 11:40(ET)
+* fixed multiple bugs mentioned in RFC_doc.md

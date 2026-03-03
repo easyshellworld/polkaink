@@ -28,15 +28,16 @@ export function useProposals(page: number, perPage = 10) {
       const totalP = await readContract('GovernanceCore', 'totalProposals');
       const total = Number(totalP as bigint);
       if (total === 0) return { proposals: [] as ProposalData[], total: 0 };
-      const offset = page * perPage;
-      const result = await readContract('GovernanceCore', 'listProposals', [
-        0, BigInt(offset), BigInt(perPage),
-      ]);
-      const [list] = result as [ProposalData[], bigint];
-      return {
-        proposals: [...list].reverse(),
-        total,
-      };
+      const start = Math.max(1, total - page * perPage - perPage + 1);
+      const end = Math.max(1, total - page * perPage);
+      const ids = [];
+      for (let i = end; i >= start; i--) ids.push(i);
+      const proposals = await Promise.all(
+        ids.map((id) =>
+          readContract('GovernanceCore', 'getProposal', [BigInt(id)]) as Promise<ProposalData>
+        )
+      );
+      return { proposals, total };
     },
     staleTime: 15_000,
   });
@@ -76,12 +77,15 @@ export function useRecentProposals(count = 5) {
       const total = Number(totalP as bigint);
       if (total === 0) return [];
       const limit = Math.min(total, count);
-      const offset = Math.max(0, total - limit);
-      const result = await readContract('GovernanceCore', 'listProposals', [
-        0, BigInt(offset), BigInt(limit),
-      ]);
-      const [list] = result as [ProposalData[], bigint];
-      return [...list].reverse();
+      const start = Math.max(1, total - limit + 1);
+      const ids = [];
+      for (let i = total; i >= start; i--) ids.push(i);
+      const proposals = await Promise.all(
+        ids.map((id) =>
+          readContract('GovernanceCore', 'getProposal', [BigInt(id)]) as Promise<ProposalData>
+        )
+      );
+      return proposals;
     },
     staleTime: 15_000,
   });
