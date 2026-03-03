@@ -7,11 +7,11 @@ import { formatDate } from '../../lib/utils';
 
 export function FeaturedDocuments() {
   const { t } = useTranslation();
-  const { data } = useDocuments(0, 20);
+  const { data } = useDocuments(0, 50);
   const allDocs = data?.documents ?? [];
 
-  const documents = [...allDocs]
-    .sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt))
+  const documents = allDocs
+    .filter((d) => Number(d.currentVersionId) > 0)
     .slice(0, 4);
 
   if (documents.length === 0) return null;

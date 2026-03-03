@@ -18,13 +18,13 @@ export function Progress({
     <div>
       {showLabels && (
         <div className="flex justify-between text-xs mb-1.5">
-          <span className="text-[var(--color-success)] font-medium">{yesLabel}</span>
-          <span className="text-[var(--color-error)] font-medium">{noLabel}</span>
+          <span className="text-[var(--color-text)] font-medium">{yesLabel}</span>
+          <span className="text-[var(--color-text-secondary)] font-medium">{noLabel}</span>
         </div>
       )}
-      <div className={`${h} w-full overflow-hidden rounded-full bg-[var(--color-primary-10)]`}>
+      <div className={`${h} w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800`}>
         <div
-          className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-gray-300 dark:bg-gray-500 transition-all duration-500 ease-out"
           style={{ width: `${Math.max(yesPercent, 0)}%` }}
         />
       </div>

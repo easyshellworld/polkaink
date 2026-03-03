@@ -12,6 +12,64 @@ const navItems = [
   { path: '/create', key: 'nav.create' },
 ];
 
+function LogoMenu() {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="group flex items-center gap-1.5 text-xl font-bold"
+      >
+        <span className="transition-colors group-hover:text-[var(--color-primary)]">
+          <span className="text-[var(--color-primary)]">Polka</span>Ink
+        </span>
+        <svg className={`w-3.5 h-3.5 text-[var(--color-text-secondary)] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-2 w-52 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] py-2 shadow-xl z-50 animate-slide-down">
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)] transition-colors"
+          >
+            {t('nav.home')}
+          </Link>
+          {navItems.map(({ path, key }) => (
+            <Link
+              key={path}
+              to={path}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)] transition-colors"
+            >
+              {t(key)}
+            </Link>
+          ))}
+          <div className="mx-3 my-1.5 border-t border-[var(--color-border)]" />
+          <Link
+            to="/polkaclaw"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[var(--color-surface-alt)] transition-colors"
+          >
+            <span className="text-[var(--color-text-secondary)]">About Team</span>
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AgentSkillButton() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -76,11 +134,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="group flex items-center gap-1.5 text-xl font-bold">
-          <span className="transition-colors group-hover:text-[var(--color-primary)]">
-            <span className="text-[var(--color-primary)]">Polka</span>Ink
-          </span>
-        </Link>
+        <LogoMenu />
 
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map(({ path, key }) => {

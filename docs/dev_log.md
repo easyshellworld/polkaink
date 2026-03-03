@@ -46,3 +46,5 @@
 * 增加`LICENSE`文件
 ## 20260303 11:40(ET)
 * fixed multiple bugs mentioned in RFC_doc.md
+## 20260303 15:38(ET)
+* polished ui

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PAS_NETWORK, getContractAddress } from '../../lib/contracts/addresses';
 
 const DONATE_ADDRESSES = [
@@ -11,6 +12,7 @@ const DONATE_ADDRESSES = [
 export function Footer() {
   const contractAddr = getContractAddress('PolkaInkRegistry');
   const [showDonate, setShowDonate] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
   const handleCopy = async (address: string) => {
@@ -33,7 +35,7 @@ export function Footer() {
             </p>
             <p className="mt-3 text-xs text-[var(--color-text-secondary)]">
               Built by{' '}
-              <span className="font-semibold text-[var(--color-primary)]">PolkaClaw</span>
+              <Link to="/polkaclaw" className="font-semibold text-[var(--color-primary)] hover:underline">PolkaClaw</Link>
             </p>
           </div>
 
@@ -66,12 +68,22 @@ export function Footer() {
               >
                 Registry Contract
               </a>
-              <a
-                href="mailto:mjlnsn@gmail.com"
-                className="hover:text-[var(--color-text)] transition-colors"
-              >
-                mjlnsn@gmail.com
-              </a>
+              {showEmail ? (
+                <a
+                  href="mailto:mjlnsn@gmail.com"
+                  className="hover:text-[var(--color-text)] transition-colors"
+                >
+                  mjlnsn@gmail.com
+                </a>
+              ) : (
+                <button
+                  onClick={() => setShowEmail(true)}
+                  className="inline-flex items-center gap-1 hover:text-[var(--color-text)] transition-colors text-left"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  Contact Email
+                </button>
+              )}
             </div>
           </div>
 
