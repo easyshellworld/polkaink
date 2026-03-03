@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>PolkaInk · 创世共识 · 翻页版</title>
+    <!-- 字体 & 基础样式 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* ----- 重置 & 基础变量 (PolkaInk 配色) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a14;  /* 深色底 */
+            font-family: "Noto Sans SC", "Inter", sans-serif;
+            color: #ffffff;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 幻灯片容器——翻页核心 */
+        .slide {
+            width: 100vw;
+            min-height: 100vh;
+            display: none;          /* 默认隐藏，js 显示当前 */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            background: radial-gradient(circle at 10% 20%, #1e1a2e, #0b0b16);
+            border-bottom: 1px solid rgba(230, 0, 122, 0.2);
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* 标题沿用原有粉色风格 + 增强 */
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #ffb3d9 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+            display: inline-block;
+            border-left: 8px solid #E6007A;
+            padding-left: 1.5rem;
+            text-align: left;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 1rem 0 0.8rem;
+            color: #E6007A;
+        }
+
+        .subhead {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #ddb3ff;
+            margin-bottom: 2rem;
+        }
+
+        p, li {
+            font-size: 1.25rem;
+            font-weight: 350;
+            margin-bottom: 1.2rem;
+            color: #e0e0f0;
+        }
+
+        .quote {
+            font-size: 2rem;
+            font-weight: 400;
+            font-style: italic;
+            background: rgba(230, 0, 122, 0.1);
+            border-left: 5px solid #E6007A;
+            padding: 2rem 2.5rem;
+            border-radius: 0 20px 20px 0;
+            margin: 2rem 0;
+        }
+
+        /* 卡片网格 (原有) */
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(20, 20, 40, 0.7);
+            backdrop-filter: blur(5px);
+            border: 1px solid #E6007A40;
+            border-radius: 32px;
+            padding: 2rem;
+            flex: 1 1 260px;
+            box-shadow: 0 20px 35px -10px #00000080;
+            text-align: left;
+        }
+
+        .card svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            fill: none;
+            stroke: #E6007A;
+            stroke-width: 2;
+        }
+
+        /* 比较表格 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1c1c2a;
+            border-radius: 28px;
+            overflow: hidden;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table th {
+            background: #E6007A;
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .comparison-table td {
+            border-bottom: 1px solid #33334c;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: #ffb3d9;
+        }
+
+        .check-yes { color: #3fe0a0; font-weight: 700; }
+        .check-warn { color: #f5a97f; }
+        .check-no { color: #ff7b8c; }
+
+        /* 视频占位符 */
+        .video-placeholder {
+            background: #12121e;
+            border-radius: 36px;
+            padding: 2.5rem;
+            border: 2px dashed #E6007A80;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            width: 100%;
+            min-height: 300px;
+        }
+
+        .play-icon {
+            width: 80px;
+            height: 80px;
+            background: #E6007A;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .play-icon svg { width: 40px; height: 40px; fill: white; }
+
+        /* 架构svg容器 */
+        .arch-svg {
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 40px;
+            padding: 1rem;
+        }
+
+        /* 团队部分 */
+        .team-row {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .team-card {
+            text-align: center;
+            background: #141428;
+            padding: 2rem 2rem 2.5rem;
+            border-radius: 40px;
+            width: 280px;
+            border: 1px solid #E6007A30;
+        }
+        .team-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 4px solid #E6007A;
+            box-shadow: 0 4px 15px rgba(230,0,122,0.3);
+        }
+
+        /* 团队徽章 */
+        .team-badge {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+        }
+        .team-badge img {
+            height: 60px;
+            width: auto;
+            background: transparent;
+            filter: drop-shadow(0 0 8px #E6007A);
+        }
+
+        /* 按钮 (粉色风格) */
+        .btn {
+            display: inline-block;
+            background: #E6007A;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            margin: 2rem 1rem 0 0;
+            border: 1px solid #ff9fd0;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #E6007A;
+            color: #E6007A;
+        }
+        .btn:hover {
+            background: #ff1a8c;
+            color: black;
+        }
+
+        /* 导航 (仿ppt.html) 适配深色 */
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: #E6007A;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(230,0,122,0.5);
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            user-select: none;
+        }
+        .nav-btn:hover {
+            background: #b3005c;
+            transform: scale(1.1);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: rgba(10,10,20,0.8);
+            backdrop-filter: blur(4px);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #E6007A;
+            border: 1px solid #E6007A60;
+            z-index: 100;
+        }
+
+        /* fade-in 动画 */
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 合作伙伴/感谢页样式 */
+        .partners-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            margin: 2rem 0;
+        }
+        .partner-logo {
+            height: 80px;
+            width: auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 0.8rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            border: 1px solid #E6007A60;
+            backdrop-filter: blur(5px);
+        }
+        .acknowledgement-title {
+            font-size: 2.8rem;
+            color: white;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        /* 移动端适配 (参考ppt.html) */
+        @media (max-width: 1024px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2.2rem; }
+            .slide { padding: 1.5rem; }
+        }
+        @media (max-width: 767px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; border-left-width: 5px; padding-left: 1rem; }
+            p, li { font-size: 1rem; }
+            .card-grid { gap: 1rem; }
+            .team-card { width: 220px; padding: 1.5rem; }
+            .team-card img { width: 100px; height: 100px; }
+            .navigation { bottom: 1rem; right: 1rem; }
+            .nav-btn { width: 44px; height: 44px; font-size: 1.2rem; }
+            .slide-counter { bottom: 1rem; left: 1rem; font-size: 0.9rem; }
+            .partner-logo { height: 60px; padding: 0.5rem 1rem; font-size: 1rem; }
+            .btn { padding: 0.7rem 1.8rem; font-size: 1.1rem; }
+            .quote { font-size: 1.4rem; padding: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 幻灯片按顺序：封面、原有slide1~11、感谢页 (共13页) -->
+    <section class="slide" id="slide1">
+        <div class="slide-content fade-in">
+            <!-- 封面页 (新增) -->
+            <div style="margin-bottom: 2rem;">
+                <svg width="100" height="100" viewBox="0 0 100 100" style="margin:0 auto;">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#E6007A" stroke-width="3" stroke-dasharray="6 6"/>
+                    <circle cx="50" cy="50" r="15" fill="#E6007A" />
+                    <text x="50" y="80" text-anchor="middle" fill="#E6007A" font-size="12">◎</text>
+                </svg>
+            </div>
+            <h1>PolkaInk</h1>
+            <p class="subhead">On-Chain Polkadot History Preservation Protocol</p>
+            <div style="font-size: 2rem; margin: 2rem 0; color: #E6007A;">⸻</div>
+            <p style="font-size: 1.5rem;">Write history on-chain. Memory that cannot be erased.</p>
+            <p style="color: #aaa;">基于 Polkadot Hub · DAO 治理 · 永久存储</p>
+            <div style="margin-top: 3rem;">
+                <span class="btn" onclick="nextSlide()">探索 →</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide1: 高概念开场 -->
+    <section class="slide" id="slide2">
+        <div class="slide-content fade-in">
+            <p style="color:#E6007A; letter-spacing:4px;">✦ 创世共识 ✦</p>
+            <h1 style="font-size:5rem; line-height:1.1;">“当一条链的历史<br>开始被遗忘，<br>它的未来就已经死了。”</h1>
+            <svg width="300" height="100" viewBox="0 0 300 100">
+                <circle cx="120" cy="40" r="18" fill="#E6007A" />
+                <circle cx="160" cy="30" r="8" fill="#E6007A" opacity="0.6" />
+                <circle cx="190" cy="50" r="12" fill="#E6007A" opacity="0.4" />
+                <circle cx="140" cy="70" r="10" fill="#E6007A" opacity="0.3" />
+                <circle cx="200" cy="70" r="6" fill="#E6007A" opacity="0.2" />
+                <text x="0" y="90" fill="white" font-size="16">Polkadot 诞生于2020。你还记得为什么吗？</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- 原slide2: 世界观：辉煌与困境 -->
+    <section class="slide" id="slide3">
+        <div class="slide-content fade-in">
+            <h2>一个互联网的梦，正在沉默中碎裂</h2>
+            <div style="display:flex; gap:2rem; flex-wrap:wrap; text-align:left;">
+                <div style="flex:2;">
+                    <p><span style="color:#E6007A;">Polkadot</span> 曾经是一个革命性的愿景：用 Relay Chain 连接所有链，用 XCM 让价值自由流动。</p>
+                    <p>Gavin Wood 写下的是<strong>创世共识</strong>：链与链之间应当互联互信。</p>
+                    <p class="quote">然而今天：生态项目各自为营，社区共识涣散，历史文档散落，AI 生成的“历史”正在污染早期记忆。</p>
+                </div>
+                <div style="flex:1;">
+                    <svg viewBox="0 0 200 200" width="100%">
+                        <line x1="10" y1="40" x2="180" y2="40" stroke="#E6007A" stroke-width="2" stroke-dasharray="6 6" />
+                        <circle cx="40" cy="40" r="8" fill="#E6007A" />
+                        <circle cx="100" cy="40" r="8" fill="#E6007A" opacity="0.5" />
+                        <circle cx="150" cy="40" r="8" fill="#E6007A" opacity="0.3" />
+                        <rect x="20" y="70" width="50" height="30" fill="#2d2d5a" stroke="#E6007A" rx="6" />
+                        <rect x="100" y="70" width="40" height="30" fill="#2d2d5a" stroke="#E6007A" opacity="0.8" rx="6" />
+                        <text x="25" y="92" fill="white" font-size="8">Github</text>
+                        <text x="105" y="92" fill="white" font-size="8">论坛</text>
+                    </svg>
+                </div>
+            </div>
+            <p style="color:#E6007A; margin-top:2rem;"><strong>失去历史的共识，只剩形态，没有灵魂。</strong></p>
+        </div>
+    </section>
+
+    <!-- 原slide3: 演示视频A（问题场景） -->
+    <section class="slide" id="slide4">
+        <div class="slide-content fade-in">
+            <h2>你以为的历史，其实可以被改写</h2>
+            <div class="video-placeholder">
+                <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
+                <p style="font-size:1.8rem;">演示视频 A (待录制)</p>
+                <p>维基页面「已删除」 · AI 给出错误历史 · GitHub 文档「last edited 3 days ago」</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide4: PolkaInk 出现 -->
+    <section class="slide" id="slide5">
+        <div class="slide-content fade-in">
+            <h2>拾起创世共识 — PolkaInk</h2>
+            <p class="subhead">如果 Polkadot 是一条链，PolkaInk 就是它永远无法被删除的记忆。</p>
+            <div class="card-grid">
+                <div class="card"><h3>🔩 纯链上 · 零外部</h3><p>Markdown 以 calldata 刻入区块本身。</p></div>
+                <div class="card"><h3>🗳️ DAO 共识</h3><p>DOT + NFT 权重投票，60% 赞成才能修改历史。</p></div>
+                <div class="card"><h3>🤖 AI之上的人类共识</h3><p>链上真相 > AI 生成内容，抵抗熵增。</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide5: 演示视频B（Demo） -->
+    <section class="slide" id="slide6">
+        <div class="slide-content fade-in">
+            <h2>见证历史被写入链上的那一刻</h2>
+            <div class="video-placeholder">
+                <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
+                <p style="font-size:1.8rem;">演示视频 B (待录制)</p>
+                <p>① PolkaInk界面 → ② 搜索“创世事件” → ③ 版本历史 → ④ 编辑提案 DAO 投票 → ⑤ 通过，上链，铸造 Author NFT</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide6: 技术架构简洁版 -->
+    <section class="slide" id="slide7">
+        <div class="slide-content fade-in">
+            <h2>熵减机器 — 技术架构</h2>
+            <div class="arch-svg">
+                <svg viewBox="0 0 800 340" width="100%">
+                    <rect x="60" y="20" width="680" height="80" rx="16" fill="#1f1f3a" stroke="#E6007A" stroke-width="2" />
+                    <text x="100" y="70" fill="white" font-size="18">前端 React + IPFS · 任何人可验证</text>
+                    <rect x="60" y="120" width="680" height="100" rx="16" fill="#2a2a4a" stroke="#E6007A" stroke-width="2" />
+                    <text x="80" y="160" fill="#E6007A" font-size="18">Polkadot Asset Hub 合约层</text>
+                    <text x="80" y="190" fill="#ccc" font-size="14">Registry | VersionStore | GovernanceCore | ArchiveCouncil | NFTReward</text>
+                    <rect x="60" y="240" width="680" height="60" rx="16" fill="#1a1a32" stroke="#E6007A" stroke-width="2" />
+                    <text x="80" y="280" fill="white" font-size="16">Archive Council (7人伦理委员会) — 仅 veto</text>
+                </svg>
+            </div>
+            <ul style="list-style:none; columns:2; margin-top:1rem;">
+                <li>✅ 内容以 calldata 写入链上</li><li>✅ UUPS 可升级 + 48h Timelock</li>
+                <li>✅ DAO + 伦理守护</li><li>✅ Author NFT 激励</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 原slide6.5: 存储对比 (极端技术选择) -->
+    <section class="slide" id="slide8">
+        <div class="slide-content fade-in">
+            <h2>没有数据库。没有云。只有链本身。</h2>
+            <table class="comparison-table">
+                <tr><th>方案</th><th>存储位置</th><th>删除</th><th>篡改</th><th>离线验证</th></tr>
+                <tr><td>GitHub/论坛</td><td>中心化</td><td class="check-no">随时删</td><td class="check-no">随时改</td><td class="check-no">❌</td></tr>
+                <tr><td>IPFS+合约</td><td>链下P2P</td><td class="check-warn">节点下线</td><td class="check-warn">CID可换</td><td class="check-warn">需Pin</td></tr>
+                <tr><td><strong style="color:#E6007A;">PolkaInk (calldata)</strong></td><td><strong>Polkadot 区块本身</strong></td><td class="check-yes">❌ 无法删除</td><td class="check-yes">❌ 无法篡改</td><td class="check-yes">✅ 任何全节点</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <!-- 原slide7: 为什么 Polkadot -->
+    <section class="slide" id="slide9">
+        <div class="slide-content fade-in">
+            <h2>不是每一段历史都值得刻进石头——但这一段值得</h2>
+            <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin:2rem 0;">
+                <div style="border-left:4px solid #E6007A; padding-left:1rem; flex:1;">① 改变了世界的运转方式</div>
+                <div style="border-left:4px solid #E6007A; padding-left:1rem; flex:1;">② 真相正在被稀释</div>
+                <div style="border-left:4px solid #E6007A; padding-left:1rem; flex:1;">③ Polkadot 自己就是最好的容器</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide8: 熵减叙事 -->
+    <section class="slide" id="slide10">
+        <div class="slide-content fade-in">
+            <h2>在熵增的时代，我们选择做熵减</h2>
+            <p>用人类的集体共识，建立一道 AI 无法伪造的真相防线。</p>
+        </div>
+    </section>
+
+    <!-- 原slide9: 路线图 -->
+    <section class="slide" id="slide11">
+        <div class="slide-content fade-in">
+            <h2>一步一步写入历史</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+                <div style="background:#1a1a30; border-radius:28px; padding:1.5rem; width:160px;"><span style="color:#E6007A;">Phase 0</span><br>合约架构·测试网</div>
+                <div style="background:#1a1a30; border-radius:28px; padding:1.5rem; width:160px;"><span style="color:#E6007A;">Phase 1</span><br>主网上线·浏览器</div>
+                <div style="background:#1a1a30; border-radius:28px; padding:1.5rem; width:160px;"><span style="color:#E6007A;">Phase 2</span><br>DAO + NFT奖励</div>
+                <div style="background:#1a1a30; border-radius:28px; padding:1.5rem; width:160px;"><span style="color:#E6007A;">Phase 3</span><br>开放API·AI摘要</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原slide10: 团队 (修改为 Alice & Jolin, 加徽章) -->
+    <section class="slide" id="slide12">
+        <div class="slide-content fade-in">
+            <div class="team-badge">
+                <img src="./polkaclaw.png" alt="PolkaClaw team badge" style="max-width:180px;">
+            </div>
+            <h2>拾起共识的人</h2>
+            <div class="team-row">
+                <div class="team-card">
+                    <img src="https://arrowtower.netlify.app/ppt/alice.jpg" alt="Alice">
+                    <h3>Alice</h3>
+                    <p>全栈工程师 / 产品设计/治理机制设计，热爱Web3叙事。</p>
+                </div>
+                <div class="team-card">
+                    <img src="https://arrowtower.netlify.app/ppt/jolin.jpg" alt="Jolin">
+                    <h3>Jolin</h3>
+                    <p>智能合约开发/前端开发 ，深耕Polkadot生态。</p>
+                </div>
+            </div>
+            <p style="margin-top:2rem;">团队：<strong>PolkaClaw</strong> · 让历史无法删除</p>
+        </div>
+    </section>
+
+    <!-- 原slide11: 结尾 Call to Action -->
+    <section class="slide" id="slide13">
+        <div class="slide-content fade-in">
+            <h2 style="border-left:none; text-align:center;">把历史写进链上，让记忆无法被删除</h2>
+            <div style="margin:2rem auto; width:200px;">
+                <svg viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="40" fill="none" stroke="#E6007A" stroke-width="6" stroke-dasharray="8 8"/>
+                    <circle cx="60" cy="60" r="18" fill="#E6007A" />
+                </svg>
+            </div>
+            <div>
+                <a href="#" class="btn">🔗 体验测试网 Demo</a>
+                <a href="#" class="btn btn-outline">🗳️ 加入创世 DAO</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 感谢页 (新增) 参考ppt.html slide10, 去除wuxiang/nantang -->
+    <section class="slide" id="slide14">
+        <div class="slide-content fade-in">
+            <h2 class="acknowledgement-title">感谢您</h2>
+            <h2 class="acknowledgement-title">Acknowledgements</h2>
+            <div class="partners-container">
+                <div class="partner-logo">Polkadot</div>
+                <div class="partner-logo">Papermoon</div>
+                <div class="partner-logo">OneBlock</div>
+            </div>
+            <p>感谢 Polkadot 生态支持 Web3 基础设施</p>
+            <p>感谢所有开发者和社区成员！</p>
+            <p style="margin-top:2rem; color:#E6007A;">Write history on-chain. Memory that cannot be erased.</p>
+        </div>
+    </section>
+
+    <!-- 导航按钮 + 计数器 -->
+    <div class="navigation">
+        <div class="nav-btn" id="prev-btn">←</div>
+        <div class="nav-btn" id="next-btn">→</div>
+    </div>
+    <div class="slide-counter" id="slide-counter">1 / 14</div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const counter = document.getElementById('slide-counter');
+            let current = 0;
+            const total = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((s, i) => {
+                    s.style.display = i === index ? 'flex' : 'none';
+                });
+                // 添加fade-in
+                const content = slides[index].querySelector('.slide-content');
+                content.classList.remove('fade-in');
+                void content.offsetWidth;
+                content.classList.add('fade-in');
+                counter.textContent = `${index+1} / ${total}`;
+            }
+
+            function nextSlide() {
+                if (current < total-1) {
+                    current++;
+                    showSlide(current);
+                }
+            }
+            function prevSlide() {
+                if (current > 0) {
+                    current--;
+                    showSlide(current);
+                }
+            }
+
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+
+            // 键盘
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') prevSlide();
+                else if (e.key === 'ArrowRight') nextSlide();
+            });
+
+            // 触摸滑动
+            let touchStartX = 0;
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            document.addEventListener('touchend', (e) => {
+                const diff = e.changedTouches[0].screenX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) prevSlide();
+                    else nextSlide();
+                }
+            });
+
+            // 暴露给内联btn
+            window.nextSlide = nextSlide;
+
+            // 初始化
+            showSlide(0);
+        })();
+    </script>
+</body>
+</html>

@@ -16,12 +16,12 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
-[![ethers.js](https://img.shields.io/badge/ethers.js-v6-764ABC)](https://docs.ethers.org/v6/)
+[![viem](https://img.shields.io/badge/viem-v2-5C3C8D)](https://viem.sh)
 
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions)](https://github.com/easyshellworld/polkaink/actions)
 [![Tests](https://img.shields.io/badge/测试-64%20通过-brightgreen)](https://github.com/easyshellworld/polkaink/actions)
 [![Chain ID](https://img.shields.io/badge/Chain_ID-420420417-E6007A)](https://polkadot.testnet.routescan.io/)
-[![i18n](https://img.shields.io/badge/多语言-EN%20%7C%20ZH%20%7C%20KR-blueviolet)](#)
+[![i18n](https://img.shields.io/badge/多语言-EN%20%7C%20ZH%20%7C%20FR%20%7C%20RU%20%7C%20ES%20%7C%20AR-blueviolet)](#)
 
 ---
 
@@ -41,14 +41,14 @@ PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议
 
 ## ✨ 核心特性
 
-- **📜 纯链上 Calldata 存储** — 文档内容以 EVM calldata 写入区块，与区块等寿，任何全节点均可验证。
+- **📜 纯链上 Calldata 存储** — 文档内容以calldata 写入区块，与区块等寿，任何全节点均可验证。
 - **🗳️ DAO 链上治理** — 所有编辑、提案、审批均通过链上社区投票完成，全程透明，无需信任。
 - **🛡️ 档案守护委员会** — 7 人伦理委员会，仅拥有否决权；可守护历史，但永远无法主动改写。
 - **⏳ 48 小时 Timelock** — 所有治理操作须经过强制延迟，防止仓促或恶意变更。
 - **🏅 作者 NFT 奖励** — 贡献者通过验证的知识贡献，可获得链上 NFT 凭证。
 - **💰 社区 Treasury** — 由社区治理的资金库，用于协议持续发展与贡献者激励。
 - **🔄 UUPS 可升级架构** — 合约采用代理升级模式，协议可持续演进而不丢失历史数据。
-- **🌐 多语言支持** — 界面支持 English、中文、한국어。
+- **🌐 多语言支持** — 界面支持 English、中文、Français、Русский、Español、العربية。
 
 ---
 
@@ -57,7 +57,7 @@ PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议
 ```
 ┌──────────────────────────────────────────────────────┐
 │       前端 · React 18 + Vite + TypeScript            │
-│     Tailwind CSS v4 · ethers.js v6 · Zustand         │
+│     Tailwind CSS v4 · viem v2 · Zustand              │
 └───────────────────────┬──────────────────────────────┘
                         │
 ┌───────────────────────▼──────────────────────────────┐
@@ -79,9 +79,9 @@ PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议
 | 层级 | 技术栈 |
 |---|---|
 | 合约 | Solidity 0.8.28 / Hardhat / OpenZeppelin UUPS / @parity/hardhat-polkadot |
-| 前端 | React 18 + Vite + TypeScript + Tailwind CSS v4 + ethers.js v6 |
+| 前端 | React 18 + Vite + TypeScript + Tailwind CSS v4 + viem v2 |
 | 状态管理 | Zustand + React Query |
-| 多语言 | English / 中文 / 한국어 |
+| 多语言 | English / 中文 / Français / Русский / Español / العربية |
 
 ---
 
@@ -128,7 +128,7 @@ frontend/
   src/pages/              # Home、Library、Document、Create、Propose、Governance
   src/hooks/              # useDocuments、useProposals、useVote、useMarkdownContent 等
   src/lib/contracts/      # 多合约 ABI + 地址
-  public/locales/         # en、zh-CN、kr
+  public/locales/         # en, zh, fr, ru, es, ar
 skills/
   polkaink_agent_skill.md # AI Agent 可直接调用的技能文件
 docs/
@@ -176,4 +176,4 @@ MIT 许可证 — 开源，永久。
 
 ---
 
-**由 PolkaClaw 构建** — *把历史写进链上，让记忆无法被删除。* 🦑✨
+**由 PolkaClaw 构建** — *把我们的历史写进链上，让记忆无法被删除。* 🦑✨

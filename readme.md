@@ -16,12 +16,12 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
-[![ethers.js](https://img.shields.io/badge/ethers.js-v6-764ABC)](https://docs.ethers.org/v6/)
+[![viem](https://img.shields.io/badge/viem-v2-5C3C8D)](https://viem.sh)
 
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions)](https://github.com/easyshellworld/polkaink/actions)
 [![Tests](https://img.shields.io/badge/tests-64%20passing-brightgreen)](https://github.com/easyshellworld/polkaink/actions)
 [![Chain ID](https://img.shields.io/badge/Chain_ID-420420417-E6007A)](https://polkadot.testnet.routescan.io/)
-[![i18n](https://img.shields.io/badge/i18n-EN%20%7C%20ZH%20%7C%20KR-blueviolet)](#)
+[![i18n](https://img.shields.io/badge/i18n-EN%20%7C%20ZH%20%7C%20FR%20%7C%20RU%20%7C%20ES%20%7C%20AR-blueviolet)](#)
 
 ---
 
@@ -41,14 +41,14 @@ Every word written through PolkaInk is encoded directly as calldata into Polkado
 
 ## ✨ Core Features
 
-- **📜 Calldata-Native Storage** — Document content written as EVM calldata; permanent as the block itself, verifiable by any full node.
+- **📜 Calldata-Native Storage** — Document content written as calldata; permanent as the block itself, verifiable by any full node.
 - **🗳️ DAO Governance** — All edits, proposals, and approvals flow through on-chain community voting with full transparency.
 - **🛡️ Archive Council** — A 7-member ethics committee with veto power only; they can protect history but never rewrite it.
 - **⏳ 48h Timelock** — Every governance action passes through a mandatory delay, preventing rushed or malicious changes.
 - **🏅 Author NFT Rewards** — Contributors earn on-chain NFT credentials for verified knowledge contributions.
 - **💰 Treasury** — Community-governed fund for sustained protocol development and contributor incentives.
 - **🔄 UUPS Upgradeable** — Contracts are upgradeable via proxy pattern, ensuring the protocol can evolve without losing history.
-- **🌐 Multilingual** — Interface available in English, 中文, and 한국어.
+- **🌐 Multilingual** — Interface available in English, 中文, Français, Русский, Español, العربية.
 
 ---
 
@@ -57,7 +57,7 @@ Every word written through PolkaInk is encoded directly as calldata into Polkado
 ```
 ┌──────────────────────────────────────────────────────┐
 │        Frontend · React 18 + Vite + TypeScript       │
-│     Tailwind CSS v4 · ethers.js v6 · Zustand         │
+│     Tailwind CSS v4 · viem v2 · Zustand              │
 └───────────────────────┬──────────────────────────────┘
                         │
 ┌───────────────────────▼──────────────────────────────┐
@@ -79,9 +79,9 @@ Every word written through PolkaInk is encoded directly as calldata into Polkado
 | Layer | Technology |
 |---|---|
 | Contracts | Solidity 0.8.28 / Hardhat / OpenZeppelin UUPS / @parity/hardhat-polkadot |
-| Frontend | React 18 + Vite + TypeScript + Tailwind CSS v4 + ethers.js v6 |
+| Frontend | React 18 + Vite + TypeScript + Tailwind CSS v4 + viem v2 |
 | State | Zustand + React Query |
-| i18n | English / 中文 / 한국어 |
+| i18n | English / 中文 / Français / Русский / Español / العربية |
 
 ---
 
@@ -128,7 +128,7 @@ frontend/
   src/pages/              # Home, Library, Document, Create, Propose, Governance
   src/hooks/              # useDocuments, useProposals, useVote, useMarkdownContent, ...
   src/lib/contracts/      # Multi-contract ABIs + addresses
-  public/locales/         # en, zh-CN, kr
+  public/locales/         # en, zh, fr, ru, es, ar
 skills/
   polkaink_agent_skill.md # Agent-friendly skill file for AI interaction
 docs/
@@ -176,4 +176,6 @@ MIT License — open source, forever.
 
 ---
 
-**Built by PolkaClaw** — *Write history on-chain. Memory that cannot be erased.* 🦑✨
+**Built by PolkaClaw** — *Write Our history on-chain. Memory that cannot be erased.* 🦑✨
+
+

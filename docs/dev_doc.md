@@ -2594,4 +2594,4 @@ PolkaInk 不仅仅是一个文档系统，它的终极目标是成为 **Web3 世
 
 *PolkaInk Design Document v1.0*
 *把历史写进链上，让记忆无法被删除。*
-*Write history on-chain. Memory that cannot be erased.*
+*Write Our history on-chain. Memory that cannot be erased.*
