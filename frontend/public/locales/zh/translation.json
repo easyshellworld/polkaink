@@ -11,9 +11,10 @@
     "home": "首页"
   },
   "home": {
-    "hero_title_1": "波卡历史，",
+    "hero_title_1": "记录历史，",
     "hero_title_2": "链上永存",
-    "hero_subtitle": "由 DAO 治理、社区共识驱动的 Polkadot 生态链上历史档案。",
+    "hero_subtitle": "寻根溯源 · 链上永存 · 浑然天成",
+    "hero_desc": "PolkaInk 是一个去中心化的链上档案协议。所有文档直接写入链上，由DAO投票治理，并受伦理委员会守护。我们旨在于波卡链上构建一个永久性不可篡改的档案库。",
     "cta_explore": "浏览文档库",
     "cta_propose": "新建文档",
     "stats_documents": "文档",

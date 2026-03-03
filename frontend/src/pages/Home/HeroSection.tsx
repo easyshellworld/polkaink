@@ -21,6 +21,9 @@ export function HeroSection() {
       <p className="mx-auto mt-4 max-w-lg text-[var(--color-text-secondary)] animate-slide-up" style={{ animationDelay: '100ms' }}>
         {t('home.hero_subtitle')}
       </p>
+      <p className="mx-auto mt-3 max-w-xl text-sm text-[var(--color-text-secondary)] opacity-80 animate-slide-up" style={{ animationDelay: '150ms' }}>
+        {t('home.hero_desc')}
+      </p>
       <div className="mt-8 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
         <Link to="/create">
           <Button variant="primary" size="lg" className="hover-lift hover-glow">

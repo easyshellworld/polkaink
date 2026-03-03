@@ -11,9 +11,10 @@
     "home": "Home"
   },
   "home": {
-    "hero_title_1": "Polkadot History,",
-    "hero_title_2": "Written On-Chain",
-    "hero_subtitle": "A DAO-governed, community-consensus archive preserving the Polkadot ecosystem's history on-chain — permanently.",
+    "hero_title_1": "History, now",
+    "hero_title_2": "it's all ON-CHAIN",
+    "hero_subtitle": "Secured by code · Written on-chain · Immutable by design",
+    "hero_desc": "PolkaInk is a decentralized archive protocol. Documents are written on-chain, governed by DAO voting, and protected by ethics council. We aim to build a permanent, tamper-proof knowledge base on Polkadot.",
     "cta_explore": "Explore Library",
     "cta_propose": "New Document",
     "stats_documents": "Documents",

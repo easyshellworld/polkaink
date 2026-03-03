@@ -3,6 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { formatEther } from 'viem';
 import { useDocument } from '../../hooks/useDocuments';
 import { useRealProposer } from '../../hooks/useRealProposer';
+
+function fmtPct(v: bigint, total: number) {
+  if (total === 0) return '0.0';
+  return ((parseFloat(formatEther(v)) / total) * 100).toFixed(1);
+}
 import { StatusBadge } from '../../components/governance/StatusBadge';
 import { Progress } from '../../components/ui/Progress';
 import { shortenAddress, timeRemaining } from '../../lib/utils';
@@ -13,8 +18,10 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
   const { data: doc } = useDocument(Number(p.docId));
   const { data: realInfo } = useRealProposer(Number(p.id));
 
-  const total = Number(p.yesVotes) + Number(p.noVotes);
-  const yesPercent = total > 0 ? (Number(p.yesVotes) / total) * 100 : 0;
+  const yesNum = parseFloat(formatEther(p.yesVotes));
+  const noNum = parseFloat(formatEther(p.noVotes));
+  const total = yesNum + noNum;
+  const yesPercent = total > 0 ? (yesNum / total) * 100 : 0;
   const title = doc?.title
     ? (p.description ? `${p.description} — ${doc.title}` : doc.title)
     : (p.description || t('governance.version_update'));
@@ -58,8 +65,8 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
           <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
             <Progress
               yesPercent={yesPercent}
-              yesLabel={`${t('governance.vote_yes')} ${yesPercent.toFixed(1)}%`}
-              noLabel={`${t('governance.vote_no')} ${(100 - yesPercent).toFixed(1)}%`}
+              yesLabel={`${t('governance.vote_yes')} ${fmtPct(p.yesVotes, total)}%`}
+              noLabel={`${t('governance.vote_no')} ${fmtPct(p.noVotes, total)}%`}
             />
           </div>
         )}

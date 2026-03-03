@@ -5,11 +5,11 @@ import { ConnectButton } from '../wallet/ConnectButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 const navItems = [
-  { path: '/library', key: 'nav.library' },
-  { path: '/governance', key: 'nav.governance' },
-  { path: '/council', key: 'nav.council' },
-  { path: '/treasury', key: 'nav.treasury' },
-  { path: '/create', key: 'nav.create' },
+  { path: '/library', key: 'nav.library', also: ['/document', '/propose'] },
+  { path: '/governance', key: 'nav.governance', also: [] as string[] },
+  { path: '/council', key: 'nav.council', also: [] as string[] },
+  { path: '/treasury', key: 'nav.treasury', also: [] as string[] },
+  { path: '/create', key: 'nav.create', also: [] as string[] },
 ];
 
 function LogoMenu() {
@@ -137,8 +137,10 @@ export function Header() {
         <LogoMenu />
 
         <nav className="hidden items-center gap-1 md:flex">
-          {navItems.map(({ path, key }) => {
-            const active = location.pathname === path || location.pathname.startsWith(path + '/');
+          {navItems.map(({ path, key, also }) => {
+            const active = location.pathname === path
+              || location.pathname.startsWith(path + '/')
+              || also.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
             return (
               <Link
                 key={path}

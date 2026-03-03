@@ -48,3 +48,5 @@
 * fixed multiple bugs mentioned in RFC_doc.md
 ## 20260303 15:38(ET)
 * polished ui
+## 20260303 18:15(ET)
+* trying to make slogan 信达雅

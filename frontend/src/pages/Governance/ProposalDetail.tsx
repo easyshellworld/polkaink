@@ -140,9 +140,17 @@ export default function ProposalDetailPage() {
 
   const p = proposal;
   const proposerAddr = realInfo?.proposer ?? p.proposer;
-  const total = Number(p.yesVotes) + Number(p.noVotes);
-  const totalWithAbstain = total + Number(p.abstainVotes);
-  const yesPercent = total > 0 ? (Number(p.yesVotes) / total) * 100 : 0;
+  const fmtVotes = (v: bigint) => {
+    const s = formatEther(v);
+    const n = parseFloat(s);
+    return n === 0 ? '0' : n < 0.01 ? n.toFixed(4) : n % 1 === 0 ? n.toFixed(0) : n.toFixed(2);
+  };
+  const yesNum = parseFloat(formatEther(p.yesVotes));
+  const noNum = parseFloat(formatEther(p.noVotes));
+  const abstainNum = parseFloat(formatEther(p.abstainVotes));
+  const total = yesNum + noNum;
+  const totalWithAbstain = total + abstainNum;
+  const yesPercent = total > 0 ? (yesNum / total) * 100 : 0;
   const isActive = p.status === 1;
   const isPassed = p.status === 2;
   const isTimelockQueued = p.status === 3;
@@ -230,21 +238,21 @@ export default function ProposalDetailPage() {
             </h2>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-[var(--color-success)] font-medium">
-                {t('governance.vote_yes')}: {Number(p.yesVotes)} ({yesPercent.toFixed(1)}%)
+                {t('governance.vote_yes')}: {fmtVotes(p.yesVotes)} ({yesPercent.toFixed(1)}%)
               </span>
               <span className="text-[var(--color-error)] font-medium">
-                {t('governance.vote_no')}: {Number(p.noVotes)} ({total > 0 ? (100 - yesPercent).toFixed(1) : '0.0'}%)
+                {t('governance.vote_no')}: {fmtVotes(p.noVotes)} ({total > 0 ? (100 - yesPercent).toFixed(1) : '0.0'}%)
               </span>
             </div>
             <Progress yesPercent={total > 0 ? yesPercent : 0} showLabels={false} height="md" />
 
             <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
               <div className="rounded-xl bg-[var(--color-primary-10)] p-3">
-                <div className="text-lg font-bold text-[var(--color-primary)]">{totalWithAbstain}</div>
+                <div className="text-lg font-bold text-[var(--color-primary)]">{totalWithAbstain % 1 === 0 ? totalWithAbstain.toFixed(0) : totalWithAbstain.toFixed(2)}</div>
                 <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.total_votes_label')}</div>
               </div>
               <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
-                <div className="text-lg font-bold">{Number(p.abstainVotes)}</div>
+                <div className="text-lg font-bold">{fmtVotes(p.abstainVotes)}</div>
                 <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.abstain')}</div>
               </div>
               <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
