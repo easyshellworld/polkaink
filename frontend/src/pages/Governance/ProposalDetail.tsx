@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { formatEther } from 'viem';
 import { useProposal, useHasVoted } from '../../hooks/useProposals';
 import { useDocument } from '../../hooks/useDocuments';
-import { useRealProposer } from '../../hooks/useRealProposer';
-import { useVetoStatus, useIsCouncilMember, useCastVeto, useCouncilApprove } from '../../hooks/useCouncil';
+import { useIsOGGold } from '../../hooks/useCouncil';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useVote } from '../../hooks/useVote';
 import { useWalletStore } from '../../store/walletStore';
@@ -15,17 +13,15 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/governance/StatusBadge';
 import { VotingPowerDisplay } from '../../components/governance/VotingPowerDisplay';
-import { Progress } from '../../components/ui/Progress';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Badge } from '../../components/ui/Badge';
 import { shortenAddress, timeRemaining } from '../../lib/utils';
 
-const LOCK_OPTIONS = [
-  { days: 0, label: 'No Lock', multiplier: '×1.0' },
-  { days: 30, label: '30 Days', multiplier: '×1.2' },
-  { days: 90, label: '90 Days', multiplier: '×1.5' },
-  { days: 180, label: '180 Days', multiplier: '×2.0' },
-];
+function fmtScore(score: bigint): string {
+  const n = Number(score) / 1e18;
+  const sign = n >= 0 ? '+' : '';
+  return `${sign}${n.toFixed(2)}`;
+}
 
 export default function ProposalDetailPage() {
   const { t } = useTranslation();
@@ -38,17 +34,10 @@ export default function ProposalDetailPage() {
   const { data: proposal, isLoading, refetch } = useProposal(proposalId);
   const docIdNum = proposal ? Number(proposal.docId) : undefined;
   const { data: doc } = useDocument(docIdNum);
-  const { data: realInfo } = useRealProposer(proposalId);
   const { data: voted } = useHasVoted(proposalId, address);
   const { voting, castVote } = useVote(proposalId ?? 0);
-  const { data: vetoStatus } = useVetoStatus(proposalId);
-  const { data: isMember } = useIsCouncilMember(address);
-  const { submitting: vetoSubmitting, castVeto } = useCastVeto();
-  const { submitting: approveSubmitting, approve } = useCouncilApprove();
+  const { data: isOGGold } = useIsOGGold(address);
 
-  const [lockDays, setLockDays] = useState(0);
-  const [vetoReason, setVetoReason] = useState('');
-  const [showVetoInput, setShowVetoInput] = useState(false);
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
   useEffect(() => {
@@ -73,23 +62,6 @@ export default function ProposalDetailPage() {
     }
   };
 
-  const handleQueue = async () => {
-    if (!walletClient || !proposalId) return;
-    const nid = `queue-${Date.now()}`;
-    try {
-      addNotification({ id: nid, type: 'pending', message: t('governance.queuing') });
-      const hash = await writeContract(walletClient, 'GovernanceCore', 'queueProposal', [
-        BigInt(proposalId),
-      ]);
-      updateNotification(nid, { message: t('governance.waiting_confirm') });
-      await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: t('governance.queued') });
-      refetch();
-    } catch (err) {
-      updateNotification(nid, { type: 'error', message: (err as Error).message });
-    }
-  };
-
   const handleCancel = async () => {
     if (!walletClient || !proposalId) return;
     const nid = `cancel-${Date.now()}`;
@@ -105,20 +77,6 @@ export default function ProposalDetailPage() {
     } catch (err) {
       updateNotification(nid, { type: 'error', message: (err as Error).message });
     }
-  };
-
-  const handleVeto = async () => {
-    if (!proposalId) return;
-    await castVeto(proposalId, vetoReason);
-    setShowVetoInput(false);
-    setVetoReason('');
-    refetch();
-  };
-
-  const handleApprove = async () => {
-    if (!proposalId) return;
-    await approve(proposalId);
-    refetch();
   };
 
   if (isLoading) {
@@ -139,29 +97,14 @@ export default function ProposalDetailPage() {
   }
 
   const p = proposal;
-  const proposerAddr = realInfo?.proposer ?? p.proposer;
-  const fmtVotes = (v: bigint) => {
-    const s = formatEther(v);
-    const n = parseFloat(s);
-    return n === 0 ? '0' : n < 0.01 ? n.toFixed(4) : n % 1 === 0 ? n.toFixed(0) : n.toFixed(2);
-  };
-  const yesNum = parseFloat(formatEther(p.yesVotes));
-  const noNum = parseFloat(formatEther(p.noVotes));
-  const abstainNum = parseFloat(formatEther(p.abstainVotes));
-  const total = yesNum + noNum;
-  const totalWithAbstain = total + abstainNum;
-  const yesPercent = total > 0 ? (yesNum / total) * 100 : 0;
-  const isActive = p.status === 1;
-  const isPassed = p.status === 2;
-  const isTimelockQueued = p.status === 3;
-  const isPending = p.status === 0;
+  const scoreNum = Number(p.score) / 1e18;
+  const isActive = p.status === 0;
+  const isApproved = p.status === 1;
   const isEnded = Number(p.endTime) <= now;
-  const isProposer = address?.toLowerCase() === proposerAddr.toLowerCase();
-  const canExecute = isTimelockQueued;
-  const canQueue = isPassed;
+  const isProposer = address?.toLowerCase() === p.proposer.toLowerCase();
+  const canExecute = isApproved;
   const canVote = isActive && !isEnded && !voted;
-  const canCancel = isPending && isProposer;
-  const canCouncilReview = isMember && (isPassed || isTimelockQueued);
+  const canCancel = isActive && isProposer;
 
   return (
     <PageWrapper>
@@ -182,8 +125,8 @@ export default function ProposalDetailPage() {
               <span className="text-sm font-medium text-[var(--color-text-secondary)]">
                 #{Number(p.id)}
               </span>
-              {p.proposalType === 1 && (
-                <Badge variant="warning" pill>{t('governance.type_upgrade')}</Badge>
+              {p.goldVetoed && (
+                <Badge variant="error" pill>{t('governance.vetoed_by_gold', 'Vetoed by OG Gold')}</Badge>
               )}
             </div>
             <h1 className="text-xl font-bold">
@@ -195,14 +138,14 @@ export default function ProposalDetailPage() {
         </div>
 
         {/* Metadata Grid */}
-        <div className="grid grid-cols-2 gap-4 rounded-xl bg-[var(--color-primary-10)]/40 p-4 text-sm md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 rounded-xl bg-[var(--color-primary-10)]/40 p-4 text-sm md:grid-cols-3">
           <div>
             <div className="text-[var(--color-text-secondary)]">{t('governance.proposer')}</div>
             <Link
-              to={`/profile/${proposerAddr}`}
+              to={`/profile/${p.proposer}`}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
-              {shortenAddress(proposerAddr)}
+              {shortenAddress(p.proposer)}
             </Link>
           </div>
           <div>
@@ -213,10 +156,6 @@ export default function ProposalDetailPage() {
             >
               {t('governance.doc', { id: Number(p.docId) })}
             </Link>
-          </div>
-          <div>
-            <div className="text-[var(--color-text-secondary)]">{t('governance.stake')}</div>
-            <div className="font-medium">{formatEther(p.stakeAmount)} PAS</div>
           </div>
           <div>
             <div className="text-[var(--color-text-secondary)]">
@@ -230,36 +169,35 @@ export default function ProposalDetailPage() {
       <div className="grid gap-5 md:grid-cols-3">
         {/* Left: Voting Results & Actions */}
         <div className="md:col-span-2 space-y-4">
-          {/* Vote Results */}
+          {/* Score Display */}
           <Card padding="lg">
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
               <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
               {t('governance.voting_results')}
             </h2>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-[var(--color-success)] font-medium">
-                {t('governance.vote_yes')}: {fmtVotes(p.yesVotes)} ({yesPercent.toFixed(1)}%)
-              </span>
-              <span className="text-[var(--color-error)] font-medium">
-                {t('governance.vote_no')}: {fmtVotes(p.noVotes)} ({total > 0 ? (100 - yesPercent).toFixed(1) : '0.0'}%)
-              </span>
-            </div>
-            <Progress yesPercent={total > 0 ? yesPercent : 0} showLabels={false} height="md" />
 
-            <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
-              <div className="rounded-xl bg-[var(--color-primary-10)] p-3">
-                <div className="text-lg font-bold text-[var(--color-primary)]">{totalWithAbstain % 1 === 0 ? totalWithAbstain.toFixed(0) : totalWithAbstain.toFixed(2)}</div>
-                <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.total_votes_label')}</div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-xl bg-[var(--color-primary-10)] p-4">
+                <div className={`text-2xl font-bold ${scoreNum > 0 ? 'text-[var(--color-success)]' : scoreNum < 0 ? 'text-[var(--color-error)]' : ''}`}>
+                  {fmtScore(p.score)}
+                </div>
+                <div className="text-xs text-[var(--color-text-secondary)] mt-1">{t('governance.score', 'Score')}</div>
               </div>
-              <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
-                <div className="text-lg font-bold">{fmtVotes(p.abstainVotes)}</div>
-                <div className="text-[var(--color-text-secondary)] mt-0.5">{t('governance.abstain')}</div>
+              <div className="rounded-xl bg-[var(--color-surface-alt)] p-4">
+                <div className="text-2xl font-bold">{Number(p.noVoterCount)}</div>
+                <div className="text-xs text-[var(--color-text-secondary)] mt-1">{t('governance.vote_no')}</div>
               </div>
-              <div className="rounded-xl bg-[var(--color-surface-alt)] p-3">
+              <div className="rounded-xl bg-[var(--color-surface-alt)] p-4">
                 <div className="text-sm font-bold">{t('governance.threshold')}</div>
-                <div className="text-[var(--color-text-secondary)] mt-0.5">&gt;60% + 5%</div>
+                <div className="text-xs text-[var(--color-text-secondary)] mt-1">&gt; 2.0</div>
               </div>
             </div>
+
+            {p.goldVetoed && (
+              <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-700 font-medium">
+                {t('governance.vetoed_by_gold', 'Vetoed by OG Gold holder')}
+              </div>
+            )}
           </Card>
 
           {/* Voting Panel */}
@@ -270,30 +208,9 @@ export default function ProposalDetailPage() {
                 {t('governance.cast_vote')}
               </h2>
 
-              <div className="mb-5">
-                <label className="text-xs font-medium text-[var(--color-text-secondary)] mb-2 block">
-                  {t('governance.lock_period')}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {LOCK_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.days}
-                      onClick={() => setLockDays(opt.days)}
-                      className={`rounded-xl border px-4 py-2 text-xs font-medium transition-all duration-200 ${
-                        lockDays === opt.days
-                          ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/20'
-                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-10)]'
-                      }`}
-                    >
-                      {opt.label} <span className={lockDays === opt.days ? 'opacity-80' : 'opacity-50'}>{opt.multiplier}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <div className="flex gap-3">
                 <Button
-                  onClick={() => castVote(true, false, lockDays)}
+                  onClick={() => castVote(0)}
                   disabled={voting}
                   loading={voting}
                   className="flex-1 !rounded-xl !bg-[var(--color-success)] hover:!opacity-90 !shadow-md !shadow-green-200/30"
@@ -302,7 +219,7 @@ export default function ProposalDetailPage() {
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => castVote(false, false, lockDays)}
+                  onClick={() => castVote(1)}
                   disabled={voting}
                   loading={voting}
                   className="flex-1 !rounded-xl !shadow-md !shadow-red-200/30"
@@ -311,12 +228,12 @@ export default function ProposalDetailPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => castVote(false, true, lockDays)}
+                  onClick={() => castVote(2)}
                   disabled={voting}
                   loading={voting}
                   className="!rounded-xl hover:!border-[var(--color-primary)] hover:!text-[var(--color-primary)]"
                 >
-                  {t('governance.abstain')}
+                  {t('governance.vote_abstain', 'Abstain')}
                 </Button>
               </div>
             </Card>
@@ -324,83 +241,13 @@ export default function ProposalDetailPage() {
 
           {voted && (
             <Card className="text-center text-sm !bg-[var(--color-primary-10)] !border-[var(--color-primary)]/15">
-              <span className="text-[var(--color-primary)] font-medium">✓ {t('governance.already_voted')}</span>
-            </Card>
-          )}
-
-          {/* Council Review Section */}
-          {canCouncilReview && (
-            <Card padding="lg" className="!border-amber-200">
-              <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                <span className="h-4 w-1 rounded-full bg-amber-400" />
-                {t('council.review_title')}
-              </h2>
-              <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-                {t('council.review_desc')}
-              </p>
-
-              {showVetoInput ? (
-                <div className="space-y-2">
-                  <textarea
-                    value={vetoReason}
-                    onChange={(e) => setVetoReason(e.target.value)}
-                    placeholder={t('council.veto_reason_placeholder')}
-                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none resize-none"
-                    rows={3}
-                  />
-                  <div className="flex items-center justify-between text-xs text-[var(--color-text-secondary)]">
-                    <span>{vetoReason.length}/50 {t('council.min_chars')}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={handleVeto}
-                      disabled={vetoSubmitting || vetoReason.length < 50}
-                      loading={vetoSubmitting}
-                    >
-                      {t('council.confirm_veto')}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { setShowVetoInput(false); setVetoReason(''); }}
-                    >
-                      {t('common.cancel')}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => setShowVetoInput(true)}
-                  >
-                    {t('council.veto_action')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleApprove}
-                    disabled={approveSubmitting}
-                    loading={approveSubmitting}
-                  >
-                    {t('council.approve_action')}
-                  </Button>
-                </div>
-              )}
+              <span className="text-[var(--color-primary)] font-medium">{t('governance.already_voted')}</span>
             </Card>
           )}
 
           {/* Action Buttons */}
-          {(canQueue || canExecute || canCancel) && (
+          {(canExecute || canCancel) && (
             <div className="flex flex-wrap gap-3">
-              {canQueue && (
-                <Button variant="secondary" onClick={handleQueue} className="flex-1 !rounded-xl">
-                  {t('governance.queue_proposal')}
-                </Button>
-              )}
               {canExecute && (
                 <Button variant="primary" onClick={handleExecute} className="flex-1 !rounded-xl !shadow-md !shadow-[var(--color-primary)]/20">
                   {t('governance.execute')}
@@ -418,34 +265,18 @@ export default function ProposalDetailPage() {
         {/* Right Sidebar */}
         <div className="space-y-4">
           {/* Voting Power */}
-          <VotingPowerDisplay proposalId={proposalId} />
+          <VotingPowerDisplay proposalId={proposalId} docId={docIdNum} />
 
-          {/* Veto Status */}
-          {vetoStatus && (
+          {/* OG Gold Status */}
+          {isOGGold && (
             <Card>
-              <h3 className="text-xs font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
                 <span className="h-4 w-1 rounded-full bg-amber-400" />
-                {t('council.veto_status')}
+                OG Gold
               </h3>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">
-                  {vetoStatus.vetoCount} / 4 {t('council.vetos_cast')}
-                </span>
-                {vetoStatus.vetoed ? (
-                  <Badge variant="error" pill>{t('governance.status_vetoed')}</Badge>
-                ) : vetoStatus.vetoCount > 0 ? (
-                  <Badge variant="warning" pill>{t('council.veto_in_progress')}</Badge>
-                ) : (
-                  <Badge variant="success" pill>{t('council.veto_clear')}</Badge>
-                )}
-              </div>
-              <div className="mt-2">
-                <Progress
-                  yesPercent={(vetoStatus.vetoCount / 4) * 100}
-                  showLabels={false}
-                  height="sm"
-                />
-              </div>
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                {t('governance.og_gold_veto_power', 'You hold OG Gold — your NO vote triggers an instant veto.')}
+              </p>
             </Card>
           )}
 
@@ -461,10 +292,6 @@ export default function ProposalDetailPage() {
                 <span className="font-medium rounded-full bg-[var(--color-primary-10)] px-2.5 py-0.5 text-[var(--color-primary)]">
                   {p.proposalType === 0 ? t('governance.type_version') : t('governance.type_upgrade')}
                 </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[var(--color-text-secondary)]">{t('governance.snapshot_block')}</span>
-                <span className="font-mono font-medium">#{Number(p.snapshotBlock)}</span>
               </div>
               {Number(p.targetVersionId) > 0 && (
                 <div className="flex justify-between items-center">

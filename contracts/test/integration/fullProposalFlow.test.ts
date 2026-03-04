@@ -1,146 +1,103 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { loadFixture, time } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { deployFixture } from "../fixtures/deployFixture";
+import { deployFixture, stakeFor } from "../fixtures/deployFixture";
 
-/**
- * Integration test: Full proposal flow
- *
- * Steps:
- *   1. Deploy all contracts
- *   2. Create document
- *   3. Propose version (with calldata Markdown)
- *   4. Community votes (YES > 60%, participation > 5%)
- *   5. Queue proposal (timelock)
- *   6. Wait for timelock delay
- *   7. Execute proposal → mergeProposal → mint Author NFT → distribute reward
- *   8. Verify: version merged + Author NFT minted + reward distributed
- */
-describe("Full Proposal Flow", () => {
-  const MIN_STAKE   = ethers.parseUnits("5", 12);
+describe("Full Proposal Flow (v2)", () => {
   const VOTING_PERIOD = 7 * 24 * 3600;
-  const TIMELOCK_DELAY = 48 * 3600; // GovernanceCore default: 48 hours
 
-  it("should execute: create doc → propose version → vote → queue → execute → mint NFT", async () => {
+  it("should execute: stake → create doc → propose → vote → finalize → execute → mint Creator NFT", async () => {
     const { contracts, actors } = await loadFixture(deployFixture);
-    const { registry, governanceCore, versionStore, nftReward, treasury } = contracts;
-    const { author1, voter1, voter2, voter3, admin } = actors;
+    const { registry, governanceCore, nftReward, stakingManager } = contracts;
+    const { author1, voter1, voter2, voter3 } = actors;
 
-    // ── Step 1: Create document ───────────────────────────────────────────
-    await registry.connect(author1).createDocument("Polkadot Governance History", ["governance", "history"]);
+    // Step 1: Stake
+    await stakeFor(stakingManager, author1, 12);
+    await stakeFor(stakingManager, voter1, 6);
+    await stakeFor(stakingManager, voter2, 3);
+    await stakeFor(stakingManager, voter3, 3);
+
+    // Step 2: Create document
+    await registry.connect(author1).createDocument("Polkadot History", ["polkadot"]);
     const doc = await registry.getDocument(1);
-    expect(doc.title).to.equal("Polkadot Governance History");
+    expect(doc.title).to.equal("Polkadot History");
 
-    // ── Step 2: Propose version ───────────────────────────────────────────
-    const markdown = ethers.toUtf8Bytes("# Polkadot Governance History\n\nContent here...");
-    const contentHash = ethers.keccak256(markdown);
-
-    // Registry.proposeVersion delegates to GovernanceCore, so we need to update
-    // GovernanceCore's registry address. In test we patch via direct GovernanceCore call.
-    // For integration test, call GovernanceCore.createProposal directly (bypassing registry
-    // flow which requires proper wiring) to test governance + merge separately.
-
-    // Create proposal via GovernanceCore directly (simulating registry integration)
-    const tx = await governanceCore.connect(author1).createProposal(
-      0, // VersionUpdate
-      1,
-      0, // no version yet (we simulate post-store)
-      "0x",
-      "Add Polkadot Governance History doc",
-      { value: MIN_STAKE }
+    // Step 3: Propose version (non-payable)
+    const contentHash = ethers.keccak256(ethers.toUtf8Bytes("# Polkadot History\nContent..."));
+    await registry.connect(author1).proposeVersion(
+      1, 0, contentHash, ethers.toUtf8Bytes("# Polkadot History\nContent...")
     );
-    const receipt = await tx.wait();
-    const proposalId = 1n;
 
-    // ── Step 3: Simulate voting (multiple voters cast YES) ────────────────
-    // We cast votes; power is based on native balance so all voters have power
-    await governanceCore.connect(voter1).vote(proposalId, true, false, 0);
-    await governanceCore.connect(voter2).vote(proposalId, true, false, 0);
-    await governanceCore.connect(voter3).vote(proposalId, true, false, 0);
+    // Step 4: Vote YES
+    await governanceCore.connect(voter1).vote(1, 0); // Yes
+    await governanceCore.connect(voter2).vote(1, 0);
+    await governanceCore.connect(voter3).vote(1, 0);
 
-    const proposal = await governanceCore.getProposal(proposalId);
-    expect(proposal.yesVotes).to.be.gt(0n);
+    const p = await governanceCore.getProposal(1);
+    expect(p.score).to.be.gt(0n);
 
-    // Advance past voting period
+    // Step 5: Advance past voting period and finalize
     await time.increase(VOTING_PERIOD + 1);
+    await governanceCore.finalizeProposal(1);
 
-    // ── Step 4: Queue proposal ────────────────────────────────────────────
-    await governanceCore.connect(voter1).queueProposal(proposalId);
-    const queued = await governanceCore.getProposal(proposalId);
-    // Proposal should be Passed (status 2) or TimelockQueued (status 3)
-    expect([2, 3]).to.include(Number(queued.status));
+    const finalized = await governanceCore.getProposal(1);
+    expect(finalized.status).to.equal(1); // Approved
 
-    // ── Step 5: Wait for timelock ─────────────────────────────────────────
-    await time.increase(TIMELOCK_DELAY + 1);
+    // Step 6: Execute → merges version + mints Creator NFT
+    await governanceCore.executeProposal(1);
 
-    // ── Step 6: Execute ───────────────────────────────────────────────────
-    if (Number(queued.status) === 3) {
-      // TimelockQueued — execute is possible
-      // In this test setup, registry address is ZeroAddress in GovernanceCore,
-      // so mergeProposal call would fail. We verify the status transition and
-      // timelock operation readiness instead.
-      const timelockId = queued.timelockId;
-      const isReady = await contracts.timelock.isOperationReady(timelockId);
-      expect(isReady).to.be.true;
-    }
+    const executed = await governanceCore.getProposal(1);
+    expect(executed.status).to.equal(4); // Executed
+
+    // Verify: version merged
+    const updatedDoc = await registry.getDocument(1);
+    expect(updatedDoc.currentVersionId).to.be.gt(0n);
+
+    // Verify: Creator NFT minted for proposer
+    const creatorCount = await nftReward.activeCreatorCount(author1.address);
+    expect(creatorCount).to.equal(1n);
   });
 
-  it("should handle veto flow correctly", async () => {
+  it("should handle OG Gold veto in full flow", async () => {
     const { contracts, actors } = await loadFixture(deployFixture);
-    const { governanceCore, archiveCouncil } = contracts;
-    const { author1, voter1, voter2, voter3, councilMembers } = actors;
+    const { governanceCore, stakingManager } = contracts;
+    const { author1, voter1, voter2, ogGoldHolder } = actors;
 
-    // Create and vote on proposal
-    await governanceCore.connect(author1).createProposal(0, 1, 0, "0x", "veto test", { value: MIN_STAKE });
-    await governanceCore.connect(voter1).vote(1n, true, false, 0);
-    await governanceCore.connect(voter2).vote(1n, true, false, 0);
-    await governanceCore.connect(voter3).vote(1n, true, false, 0);
+    await stakeFor(stakingManager, author1, 3);
+    await stakeFor(stakingManager, voter1, 3);
+    await stakeFor(stakingManager, voter2, 3);
+    await stakeFor(stakingManager, ogGoldHolder, 3);
 
-    await time.increase(VOTING_PERIOD + 1);
-    await governanceCore.connect(voter1).queueProposal(1n);
+    await governanceCore.connect(author1).createProposal(0, 1, 0, "0x", "veto test");
 
-    const statusAfterQueue = await governanceCore.getProposalStatus(1n);
+    // Community votes YES
+    await governanceCore.connect(voter1).vote(1, 0);
+    await governanceCore.connect(voter2).vote(1, 0);
 
-    if (Number(statusAfterQueue) === 3) {
-      // TimelockQueued — council can veto
-      let vetoCount = 0;
-      for (const member of councilMembers.slice(0, 4)) {
-        await archiveCouncil.connect(member).veto(1n, "Factual inaccuracies detected");
-        vetoCount++;
-      }
+    // OG Gold votes NO → instant veto
+    await governanceCore.connect(ogGoldHolder).vote(1, 1);
 
-      // After 4 vetos, proposal should be Vetoed (6)
-      const finalStatus = await governanceCore.getProposalStatus(1n);
-      expect(Number(finalStatus)).to.equal(6); // Vetoed
-
-      const [count, vetoed] = await archiveCouncil.getVetoStatus(1n);
-      expect(count).to.be.gte(4n);
-      expect(vetoed).to.be.true;
-    }
+    const p = await governanceCore.getProposal(1);
+    expect(p.status).to.equal(3); // Vetoed
+    expect(p.goldVetoed).to.be.true;
   });
 
-  it("should slash stake on failed proposal (below quorum)", async () => {
+  it("should handle rejection when score is below threshold", async () => {
     const { contracts, actors } = await loadFixture(deployFixture);
-    const { governanceCore } = contracts;
-    const { author1 } = actors;
+    const { governanceCore, stakingManager } = contracts;
 
-    // Create proposal but don't vote → will fail quorum check
-    await governanceCore.connect(author1).createProposal(0, 1, 0, "0x", "no votes", { value: MIN_STAKE });
+    await stakeFor(stakingManager, actors.author1, 3);
+    await stakeFor(stakingManager, actors.voter1, 3);
+
+    await governanceCore.connect(actors.author1).createProposal(0, 1, 0, "0x", "reject test");
+
+    // Only 1 YES vote: score ≈ 1.13 (< 2.0 threshold)
+    await governanceCore.connect(actors.voter1).vote(1, 0);
 
     await time.increase(VOTING_PERIOD + 1);
+    await governanceCore.finalizeProposal(1);
 
-    const balBefore = await ethers.provider.getBalance(author1.address);
-    const tx = await governanceCore.connect(author1).queueProposal(1n);
-    const receipt = await tx.wait();
-    const gasUsed = receipt!.gasUsed * receipt!.gasPrice;
-    const balAfter = await ethers.provider.getBalance(author1.address);
-
-    // Stake - slash (30%) should be returned: author receives 70% of MIN_STAKE
-    const returned = balAfter + gasUsed - balBefore;
-    const expectedReturn = (MIN_STAKE * 70n) / 100n;
-    expect(returned).to.be.closeTo(expectedReturn, ethers.parseUnits("1", 9)); // tolerance
-
-    const proposal = await governanceCore.getProposal(1n);
-    expect(Number(proposal.status)).to.equal(5); // Rejected
+    const p = await governanceCore.getProposal(1);
+    expect(p.status).to.equal(2); // Rejected
   });
 });

@@ -2,95 +2,96 @@
 pragma solidity ^0.8.28;
 
 /// @title VotingMath
-/// @notice Voting power calculation utilities
+/// @notice Voting weight calculation library using lookup tables for ln() approximation
 library VotingMath {
+    uint256 internal constant SCALE = 1e18;
+    int256 internal constant THRESHOLD = 2e18; // 2.0
 
-    uint256 internal constant BASE = 100;
+    /// @notice Calculate full voting weight
+    /// @return weight = hasActiveMember ? (SCALE + boost) : 0
+    function calculateWeight(
+        bool hasActiveMember,
+        uint256 creatorCount,
+        bool isAuthorOfDoc,
+        uint256 ogBronzeCount,
+        uint256 ogSilverCount,
+        bool hasOGGold,
+        uint8 lockMonths
+    ) internal pure returns (uint256 weight) {
+        if (!hasActiveMember) return 0;
 
-    /// @notice Apply NFT vote multiplier to base voting power
-    /// @param baseVotingPower Base voting power (e.g. DOT balance)
-    /// @param authorNFTCount Number of Author NFTs held
-    /// @param hasGuardianNFT Whether holder has active Guardian NFT
-    /// @param nftMultiplier Author NFT multiplier (e.g. 150 = 1.5x, base 100)
-    /// @param guardianMultiplier Guardian NFT multiplier (e.g. 200 = 2.0x)
-    /// @return power Adjusted voting power
-    function applyNFTMultiplier(
-        uint256 baseVotingPower,
-        uint256 authorNFTCount,
-        bool hasGuardianNFT,
-        uint256 nftMultiplier,
-        uint256 guardianMultiplier
-    ) internal pure returns (uint256 power) {
-        power = baseVotingPower;
+        uint256 boost = boostCreator(creatorCount)
+            + boostAuthor(isAuthorOfDoc)
+            + boostOG(ogBronzeCount, ogSilverCount, hasOGGold)
+            + boostLock(lockMonths);
 
-        if (hasGuardianNFT) {
-            power = (power * guardianMultiplier) / BASE;
-        } else if (authorNFTCount > 0) {
-            // NFT multiplier scales with count but caps at reasonable level
-            uint256 multiplier = nftMultiplier + ((authorNFTCount - 1) * 10);
-            if (multiplier > 300) multiplier = 300; // cap at 3x
-            power = (power * multiplier) / BASE;
-        }
+        weight = SCALE + boost;
     }
 
-    /// @notice Apply lock bonus to voting power
-    /// @param power Base (optionally NFT-adjusted) voting power
-    /// @param lockDays Lock days (0, 30, 90, or 180)
-    /// @param lockBonus30d Bonus for 30-day lock (e.g. 120 = 1.2x)
-    /// @param lockBonus90d Bonus for 90-day lock
-    /// @param lockBonus180d Bonus for 180-day lock
-    /// @return Adjusted power
-    function applyLockBonus(
-        uint256 power,
-        uint256 lockDays,
-        uint256 lockBonus30d,
-        uint256 lockBonus90d,
-        uint256 lockBonus180d
-    ) internal pure returns (uint256) {
-        if (lockDays >= 180) return (power * lockBonus180d) / BASE;
-        if (lockDays >= 90)  return (power * lockBonus90d) / BASE;
-        if (lockDays >= 30)  return (power * lockBonus30d) / BASE;
-        return power;
+    /// @dev B_creator = 0.30 * ln(1 + creatorCount) / ln(11)
+    ///      Lookup table with linear interpolation for n > 10
+    function boostCreator(uint256 n) internal pure returns (uint256) {
+        if (n == 0) return 0;
+        if (n <= 10) {
+            uint256[11] memory t = [
+                uint256(0),
+                 86_700_000_000_000_000, // 1
+                137_400_000_000_000_000, // 2
+                173_400_000_000_000_000, // 3
+                201_400_000_000_000_000, // 4
+                224_200_000_000_000_000, // 5
+                243_400_000_000_000_000, // 6
+                260_200_000_000_000_000, // 7
+                274_900_000_000_000_000, // 8
+                288_100_000_000_000_000, // 9
+                300_000_000_000_000_000  // 10
+            ];
+            return t[n];
+        }
+        // Sparse table for n = 10..50, linear interpolation between key points
+        // Key points: (10, 0.3000), (20, 0.3809), (30, 0.4296), (50, 0.4919)
+        if (n <= 20) {
+            return 300_000_000_000_000_000
+                + ((n - 10) * (380_900_000_000_000_000 - 300_000_000_000_000_000)) / 10;
+        }
+        if (n <= 30) {
+            return 380_900_000_000_000_000
+                + ((n - 20) * (429_600_000_000_000_000 - 380_900_000_000_000_000)) / 10;
+        }
+        if (n <= 50) {
+            return 429_600_000_000_000_000
+                + ((n - 30) * (491_900_000_000_000_000 - 429_600_000_000_000_000)) / 20;
+        }
+        return 491_900_000_000_000_000; // cap at n=50 value
     }
 
-    /// @notice Check if a proposal passes quorum and threshold
-    /// @param yesVotes Total YES votes
-    /// @param noVotes Total NO votes
-    /// @param totalVotingPower Total voting power in the snapshot
-    /// @param quorumNumerator Quorum percentage numerator (e.g. 5 = 5%)
-    /// @param passingThreshold Passing threshold (e.g. 60 = 60%)
-    /// @return passed Whether proposal passes
-    /// @return reason Human-readable failure reason (empty if passed)
-    function checkPassed(
-        uint256 yesVotes,
-        uint256 noVotes,
-        uint256 totalVotingPower,
-        uint256 quorumNumerator,
-        uint256 passingThreshold
-    ) internal pure returns (bool passed, string memory reason) {
-        uint256 participated = yesVotes + noVotes;
-        if (totalVotingPower == 0) {
-            return (false, "No voting power");
-        }
-
-        uint256 participationBps = (participated * 100) / totalVotingPower;
-        if (participationBps < quorumNumerator) {
-            return (false, "Quorum not reached");
-        }
-
-        uint256 yesBps = (yesVotes * 100) / participated;
-        if (yesBps < passingThreshold) {
-            return (false, "Threshold not met");
-        }
-
-        return (true, "");
+    /// @dev B_author = 0.15 if isAuthor, else 0
+    function boostAuthor(bool isAuthor) internal pure returns (uint256) {
+        return isAuthor ? 150_000_000_000_000_000 : 0;
     }
 
-    /// @notice Calculate slash amount
-    /// @param stakeAmount Original stake
-    /// @param slashRatio Slash ratio (e.g. 30 = 30%)
-    /// @return slashed Amount to slash
-    function calcSlash(uint256 stakeAmount, uint256 slashRatio) internal pure returns (uint256 slashed) {
-        slashed = (stakeAmount * slashRatio) / BASE;
+    /// @dev B_og = 0.05 * min(bronze,3) + 0.10 * min(silver,2) + 0.10 * hasGold
+    function boostOG(uint256 bronze, uint256 silver, bool gold) internal pure returns (uint256 b) {
+        uint256 br = bronze > 3 ? 3 : bronze;
+        uint256 sr = silver > 2 ? 2 : silver;
+        b = br * 50_000_000_000_000_000  // 0.05 each
+          + sr * 100_000_000_000_000_000 // 0.10 each
+          + (gold ? 100_000_000_000_000_000 : 0);
+    }
+
+    /// @dev B_lock = 0.30 * ln(1 + lockMonths) / ln(25)
+    ///      Only valid for lockMonths in {3, 6, 12, 24}
+    function boostLock(uint8 lockMonths) internal pure returns (uint256) {
+        if (lockMonths >= 24) return 300_000_000_000_000_000; // 0.3000
+        if (lockMonths >= 12) return 239_000_000_000_000_000; // 0.2390
+        if (lockMonths >= 6)  return 181_400_000_000_000_000; // 0.1814
+        if (lockMonths >= 3)  return 129_200_000_000_000_000; // 0.1292
+        return 0;
+    }
+
+    /// @notice Check if proposal passes: score > THRESHOLD && !goldVetoed
+    function checkPassed(int256 score, bool goldVetoed) internal pure returns (bool) {
+        if (goldVetoed) return false;
+        return score > THRESHOLD;
     }
 }

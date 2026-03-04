@@ -3,6 +3,7 @@
     "library": "文档库",
     "governance": "治理",
     "council": "委员会",
+    "staking": "质押",
     "treasury": "国库",
     "create": "创建",
     "connect": "连接钱包",
@@ -161,7 +162,7 @@
     "voting_results": "投票结果",
     "total_votes": "共 {{count}} 票",
     "total_votes_label": "总票数",
-    "threshold": "通过门槛：60%",
+    "threshold": "得分 > 2.0",
     "by": "作者",
     "doc": "文档 #{{id}}",
     "time_remaining": "剩余",
@@ -184,7 +185,24 @@
     "type_version": "版本更新",
     "type_upgrade": "合约升级",
     "snapshot_block": "快照区块",
-    "target_version": "目标版本"
+    "target_version": "目标版本",
+    "vote_abstain": "弃权",
+    "score": "得分",
+    "vetoed_by_gold": "被 OG Gold 否决"
+  },
+  "staking": {
+    "title": "质押",
+    "subtitle": "质押 88 DOT 成为会员",
+    "stake_button": "质押 88 DOT",
+    "lock_period": "锁仓期",
+    "months": "月",
+    "your_stake": "您的质押",
+    "amount": "金额",
+    "lock_end": "锁仓到期",
+    "unstake": "解锁",
+    "early_unstake": "提前解锁（10% 罚金）",
+    "not_staked": "您目前未质押",
+    "total_members": "活跃会员"
   },
   "wallet": {
     "connected": "钱包已连接",
@@ -194,7 +212,8 @@
   "status": {
     "active": "活跃",
     "archived": "已归档",
-    "disputed": "争议中"
+    "frozen": "已冻结",
+    "revoked": "已撤销"
   },
   "agent": {
     "button": "Agent Skill",

@@ -18,7 +18,8 @@ import {
 import { defineChain } from 'viem';
 import RegistryABI from './abis/PolkaInkRegistry.json';
 import GovernanceABI from './abis/GovernanceCore.json';
-import CouncilABI from './abis/ArchiveCouncil.json';
+import StakingManagerABI from './abis/StakingManager.json';
+import ReportManagerABI from './abis/ReportManager.json';
 import NftABI from './abis/NFTReward.json';
 import TreasuryABI from './abis/Treasury.json';
 import VersionStoreABI from './abis/VersionStore.json';
@@ -31,10 +32,11 @@ export type { WalletClient, PublicClient, Hash, TransactionReceipt };
 const ABIS: Record<string, Abi> = {
   PolkaInkRegistry: RegistryABI as Abi,
   GovernanceCore: GovernanceABI as Abi,
-  ArchiveCouncil: CouncilABI as Abi,
   NFTReward: NftABI as Abi,
   Treasury: TreasuryABI as Abi,
   VersionStore: VersionStoreABI as Abi,
+  StakingManager: StakingManagerABI as Abi,
+  ReportManager: ReportManagerABI as Abi,
 };
 
 export const pasChain = defineChain({

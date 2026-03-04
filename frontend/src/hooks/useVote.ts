@@ -12,7 +12,7 @@ export function useVote(proposalId: number) {
   const { addNotification, updateNotification } = useNotificationStore();
 
   const castVote = useCallback(
-    async (support: boolean, abstain = false, lockDays = 0) => {
+    async (choice: number) => {
       if (!walletClient) {
         addNotification({ id: 'vote-err', type: 'error', message: 'Connect wallet first!' });
         return;
@@ -22,7 +22,7 @@ export function useVote(proposalId: number) {
       try {
         addNotification({ id: nid, type: 'pending', message: 'Submitting vote...' });
         const hash = await writeContract(walletClient, 'GovernanceCore', 'vote', [
-          BigInt(proposalId), support, abstain, BigInt(lockDays),
+          BigInt(proposalId), choice,
         ], { gas: TX_GAS });
         updateNotification(nid, { message: 'Waiting for confirmation...' });
         await waitForTx(hash);

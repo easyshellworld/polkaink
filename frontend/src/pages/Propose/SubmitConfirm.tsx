@@ -4,14 +4,13 @@ import { Card } from '../../components/ui/Card';
 
 interface SubmitConfirmProps {
   title: string;
-  stakeAmount: string;
   contentSize: number;
   onConfirm: () => void;
   onBack: () => void;
   isSubmitting: boolean;
 }
 
-export function SubmitConfirm({ title, stakeAmount, contentSize, onConfirm, onBack, isSubmitting }: SubmitConfirmProps) {
+export function SubmitConfirm({ title, contentSize, onConfirm, onBack, isSubmitting }: SubmitConfirmProps) {
   const { t } = useTranslation();
 
   return (
@@ -21,10 +20,6 @@ export function SubmitConfirm({ title, stakeAmount, contentSize, onConfirm, onBa
         <div className="flex justify-between">
           <dt className="text-[var(--color-text-secondary)]">Document</dt>
           <dd className="font-medium">{title}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-[var(--color-text-secondary)]">Stake</dt>
-          <dd className="font-medium">{stakeAmount} PAS</dd>
         </div>
         <div className="flex justify-between">
           <dt className="text-[var(--color-text-secondary)]">Content size</dt>

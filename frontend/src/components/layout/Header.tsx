@@ -9,6 +9,7 @@ const navItems = [
   { path: '/governance', key: 'nav.governance', also: [] as string[] },
   { path: '/council', key: 'nav.council', also: [] as string[] },
   { path: '/treasury', key: 'nav.treasury', also: [] as string[] },
+  { path: '/staking', key: 'nav.staking', also: [] as string[] },
   { path: '/create', key: 'nav.create', also: [] as string[] },
 ];
 

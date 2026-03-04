@@ -15,6 +15,7 @@ const ProposalDetailPage = lazy(() => import('./pages/Governance/ProposalDetail'
 const ProfilePage = lazy(() => import('./pages/Profile'));
 const CouncilPage = lazy(() => import('./pages/Council'));
 const TreasuryPage = lazy(() => import('./pages/Treasury'));
+const StakingPage = lazy(() => import('./pages/Staking'));
 const PolkaClawPage = lazy(() => import('./pages/PolkaClaw'));
 
 function PageFallback() {
@@ -43,6 +44,7 @@ function AppContent() {
             <Route path="/profile/:address" element={<ProfilePage />} />
             <Route path="/council" element={<CouncilPage />} />
             <Route path="/treasury" element={<TreasuryPage />} />
+            <Route path="/staking" element={<StakingPage />} />
             <Route path="/polkaclaw" element={<PolkaClawPage />} />
           </Routes>
         </Suspense>

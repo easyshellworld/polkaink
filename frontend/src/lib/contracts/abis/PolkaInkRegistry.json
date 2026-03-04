@@ -91,6 +91,17 @@
         "type": "uint256"
       }
     ],
+    "name": "Registry__DocumentFrozen",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      }
+    ],
     "name": "Registry__DocumentNotFound",
     "type": "error"
   },
@@ -98,16 +109,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "required",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "provided",
+        "name": "docId",
         "type": "uint256"
       }
     ],
-    "name": "Registry__InsufficientStake",
+    "name": "Registry__DocumentRevoked",
     "type": "error"
   },
   {
@@ -124,6 +130,17 @@
   {
     "inputs": [],
     "name": "Registry__InvalidTitle",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "Registry__NotActiveMember",
     "type": "error"
   },
   {
@@ -212,6 +229,31 @@
       }
     ],
     "name": "DocumentCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IPolkaInkRegistry.DocumentStatus",
+        "name": "oldStatus",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IPolkaInkRegistry.DocumentStatus",
+        "name": "newStatus",
+        "type": "uint8"
+      }
+    ],
+    "name": "DocumentStatusChanged",
     "type": "event"
   },
   {
@@ -409,12 +451,6 @@
         "internalType": "bytes32",
         "name": "contentHash",
         "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "stakeAmount",
-        "type": "uint256"
       }
     ],
     "name": "VersionProposed",
@@ -448,7 +484,7 @@
   },
   {
     "inputs": [],
-    "name": "MINTER_ROLE",
+    "name": "REPORT_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -700,7 +736,7 @@
       },
       {
         "internalType": "address",
-        "name": "_treasury",
+        "name": "_stakingManager",
         "type": "address"
       }
     ],
@@ -913,7 +949,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -968,6 +1004,50 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum IPolkaInkRegistry.DocumentStatus",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "setDocumentStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_gc",
+        "type": "address"
+      }
+    ],
+    "name": "setGovernanceCore",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakingManager",
+    "outputs": [
+      {
+        "internalType": "contract IStakingManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -992,19 +1072,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "treasury",
-    "outputs": [
-      {
-        "internalType": "contract ITreasury",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

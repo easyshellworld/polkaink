@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { keccak256, parseEther, toHex } from 'viem';
+import { keccak256, toHex } from 'viem';
 import { useDocument } from '../../hooks/useDocuments';
 import { useWalletStore } from '../../store/walletStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { useMembership } from '../../hooks/useMembership';
 import { writeContract, waitForTx } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
@@ -16,19 +17,24 @@ export default function ProposePage() {
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
   const walletClient = useWalletStore((s) => s.walletClient);
+  const address = useWalletStore((s) => s.address);
   const { addNotification, updateNotification } = useNotificationStore();
   const numDocId = docId ? Number(docId) : undefined;
   const { data: doc } = useDocument(numDocId);
+  const { data: membership } = useMembership(address);
 
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
-  const [stake, setStake] = useState('0.001');
   const [preview, setPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!walletClient || !doc) {
       addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_wallet') });
+      return;
+    }
+    if (membership && !membership.isMember) {
+      addNotification({ id: 'propose-err', type: 'error', message: t('propose.error_not_member', 'You must be an active member to propose.') });
       return;
     }
     if (!content.trim()) {
@@ -45,7 +51,6 @@ export default function ProposePage() {
     try {
       const contentBytes = new TextEncoder().encode(content);
       const contentHash = keccak256(toHex(contentBytes));
-      const stakeWei = parseEther(stake);
 
       addNotification({ id: nid, type: 'pending', message: t('propose.tx_submitting') });
       const markdownHex = toHex(contentBytes);
@@ -54,7 +59,7 @@ export default function ProposePage() {
         BigInt(Number(doc.currentVersionId)),
         contentHash,
         markdownHex,
-      ], { value: stakeWei, gas: 1_000_000n });
+      ], { gas: 1_000_000n });
       updateNotification(nid, { message: t('propose.tx_confirming') });
       const receipt = await waitForTx(hash);
       updateNotification(nid, { type: 'success', message: t('propose.tx_success', { hash: receipt.transactionHash.slice(0, 10) }) });
@@ -96,18 +101,11 @@ export default function ProposePage() {
           />
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">{t('propose.field_stake')}</label>
-          <input
-            type="number"
-            value={stake}
-            onChange={(e) => setStake(e.target.value)}
-            step="0.001"
-            min="0.001"
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none"
-          />
-          <p className="mt-1 text-xs text-[var(--color-text-secondary)]">{t('propose.stake_hint')}</p>
-        </div>
+        {membership && !membership.isMember && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 p-4 text-sm text-amber-800 dark:text-amber-200">
+            {t('propose.warning_not_member', 'You must be an active member to submit proposals.')}
+          </div>
+        )}
 
         <div>
           <div className="mb-1 flex items-center justify-between">
@@ -139,10 +137,10 @@ export default function ProposePage() {
           <div className="text-sm text-[var(--color-text-secondary)]">{t('propose.voting_period')}</div>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || !walletClient}
+            disabled={submitting || !walletClient || (membership != null && !membership.isMember)}
             loading={submitting}
           >
-            {!walletClient ? t('propose.connect_first') : t('propose.submit', { stake })}
+            {!walletClient ? t('propose.connect_first') : t('propose.submit_proposal', 'Submit Proposal')}
           </Button>
         </div>
       </div>

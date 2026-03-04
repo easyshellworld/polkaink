@@ -1,13 +1,12 @@
 /**
- * Unified deployment script — deploys all contracts in correct order.
+ * PolkaInk v2 — Unified deployment script.
  *
- * Order: ProxyAdmin → Timelock → NFT → Treasury → VersionStore →
- *        GovernanceCore(registry=0) → Registry → Council →
- *        wire GovernanceCore.setRegistry → setup roles → activateGuardianNFTs
+ * Order: ProxyAdmin → Timelock → NFTReward → Treasury → VersionStore →
+ *        StakingManager → GovernanceCore → PolkaInkRegistry → ReportManager →
+ *        Setup cross-references + roles
  *
  * Usage:
- *   npx hardhat run scripts/deploy/deploy_all.ts --network polkadotTestnet
- *   npx hardhat run scripts/deploy/deploy_all.ts --network hardhat
+ *   npx hardhat run scripts/deploy/deploy_all.ts --network pasTestnet
  */
 import { ethers, upgrades } from "hardhat";
 import fs from "fs";
@@ -16,157 +15,188 @@ const TIMELOCK_DELAY = 48 * 3600; // 48 hours
 
 function save(data: Record<string, string>) {
   fs.writeFileSync("deployed-addresses.json", JSON.stringify(data, null, 2));
+  console.log("\n✅ Addresses saved to deployed-addresses.json");
 }
 
 async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deployer:", deployer.address);
-  console.log("Balance:", ethers.formatEther(await ethers.provider.getBalance(deployer.address)));
+  console.log("Balance:", ethers.formatEther(await ethers.provider.getBalance(deployer.address)), "DOT\n");
 
-  const addrs: Record<string, string> = {};
-
-  // Council members: use env var or default to deployer repeated (testnet only)
-  const rawMembers = process.env.INITIAL_COUNCIL_MEMBERS || "";
-  let councilMembers = rawMembers.split(",").map((s) => s.trim()).filter(Boolean);
-  if (councilMembers.length !== 7) {
-    console.log("⚠ No INITIAL_COUNCIL_MEMBERS (need 7). Using deployer + generated wallets for testnet.");
-    councilMembers = [];
-    for (let i = 0; i < 7; i++) {
-      councilMembers.push(ethers.Wallet.createRandom().address);
-    }
-  }
-  console.log("Council members:", councilMembers);
-
-  // ── 1. ProxyAdmin ──────────────────────────────────────────────────
-  const ProxyAdminF = await ethers.getContractFactory("ProxyAdmin");
-  const proxyAdmin = await ProxyAdminF.deploy(deployer.address);
+  // 1. ProxyAdmin
+  console.log("1. Deploying ProxyAdmin...");
+  const ProxyAdminFactory = await ethers.getContractFactory("ProxyAdmin");
+  const proxyAdmin = await ProxyAdminFactory.deploy(deployer.address);
   await proxyAdmin.waitForDeployment();
-  addrs.ProxyAdmin = await proxyAdmin.getAddress();
-  console.log("1/9 ProxyAdmin:", addrs.ProxyAdmin);
-  save(addrs);
+  console.log("   ProxyAdmin:", await proxyAdmin.getAddress());
 
-  // ── 2. TimelockController ──────────────────────────────────────────
-  const TimelockF = await ethers.getContractFactory("TimelockController");
-  const timelock = await TimelockF.deploy(
-    TIMELOCK_DELAY,
-    [],
-    [ethers.ZeroAddress],
-    deployer.address
+  // 2. TimelockController
+  console.log("2. Deploying TimelockController...");
+  const TimelockFactory = await ethers.getContractFactory("TimelockController");
+  const timelock = await TimelockFactory.deploy(
+    TIMELOCK_DELAY, [], [ethers.ZeroAddress], deployer.address
   );
   await timelock.waitForDeployment();
-  addrs.TimelockController = await timelock.getAddress();
-  console.log("2/9 TimelockController:", addrs.TimelockController);
-  save(addrs);
+  console.log("   TimelockController:", await timelock.getAddress());
 
-  // ── 3. NFTReward (UUPS) ────────────────────────────────────────────
-  const NftF = await ethers.getContractFactory("NFTReward");
-  const nftReward = await upgrades.deployProxy(NftF, [deployer.address], { kind: "uups" });
+  // 3. NFTReward (UUPS)
+  console.log("3. Deploying NFTReward...");
+  const NFTFactory = await ethers.getContractFactory("NFTReward");
+  const nftReward = await upgrades.deployProxy(NFTFactory, [deployer.address], { kind: "uups" });
   await nftReward.waitForDeployment();
-  addrs.NFTReward = await nftReward.getAddress();
-  console.log("3/9 NFTReward:", addrs.NFTReward);
-  save(addrs);
+  console.log("   NFTReward:", await nftReward.getAddress());
 
-  // ── 4. Treasury (UUPS) ─────────────────────────────────────────────
-  const TreasuryF = await ethers.getContractFactory("Treasury");
-  const treasury = await upgrades.deployProxy(TreasuryF, [deployer.address], { kind: "uups" });
+  // 4. Treasury (UUPS)
+  console.log("4. Deploying Treasury...");
+  const TreasuryFactory = await ethers.getContractFactory("Treasury");
+  const treasury = await upgrades.deployProxy(TreasuryFactory, [deployer.address], { kind: "uups" });
   await treasury.waitForDeployment();
-  addrs.Treasury = await treasury.getAddress();
-  console.log("4/9 Treasury:", addrs.Treasury);
-  save(addrs);
+  console.log("   Treasury:", await treasury.getAddress());
 
-  // ── 5. VersionStore (UUPS) ─────────────────────────────────────────
-  const VsF = await ethers.getContractFactory("VersionStore");
-  const versionStore = await upgrades.deployProxy(VsF, [deployer.address], { kind: "uups" });
+  // 5. VersionStore (UUPS)
+  console.log("5. Deploying VersionStore...");
+  const VersionStoreFactory = await ethers.getContractFactory("VersionStore");
+  const versionStore = await upgrades.deployProxy(VersionStoreFactory, [deployer.address], { kind: "uups" });
   await versionStore.waitForDeployment();
-  addrs.VersionStore = await versionStore.getAddress();
-  console.log("5/9 VersionStore:", addrs.VersionStore);
-  save(addrs);
+  console.log("   VersionStore:", await versionStore.getAddress());
 
-  // ── 6. GovernanceCore (UUPS) — registry=ZeroAddress (set later) ────
-  const GovF = await ethers.getContractFactory("GovernanceCore");
-  const governance = await upgrades.deployProxy(
-    GovF,
-    [deployer.address, addrs.TimelockController, addrs.NFTReward, ethers.ZeroAddress],
+  // 6. StakingManager (UUPS)
+  console.log("6. Deploying StakingManager...");
+  const StakingFactory = await ethers.getContractFactory("StakingManager");
+  const stakingManager = await upgrades.deployProxy(
+    StakingFactory,
+    [deployer.address, await nftReward.getAddress(), await treasury.getAddress()],
     { kind: "uups" }
   );
-  await governance.waitForDeployment();
-  addrs.GovernanceCore = await governance.getAddress();
-  console.log("6/9 GovernanceCore:", addrs.GovernanceCore);
-  save(addrs);
+  await stakingManager.waitForDeployment();
+  console.log("   StakingManager:", await stakingManager.getAddress());
 
-  // ── 7. PolkaInkRegistry (UUPS) ─────────────────────────────────────
-  const RegF = await ethers.getContractFactory("PolkaInkRegistry");
+  // 7. GovernanceCore (UUPS) — registry set later
+  console.log("7. Deploying GovernanceCore...");
+  const GovFactory = await ethers.getContractFactory("GovernanceCore");
+  const governanceCore = await upgrades.deployProxy(
+    GovFactory,
+    [deployer.address, await timelock.getAddress(), await nftReward.getAddress(), await stakingManager.getAddress()],
+    { kind: "uups" }
+  );
+  await governanceCore.waitForDeployment();
+  console.log("   GovernanceCore:", await governanceCore.getAddress());
+
+  // 8. PolkaInkRegistry (UUPS)
+  console.log("8. Deploying PolkaInkRegistry...");
+  const RegistryFactory = await ethers.getContractFactory("PolkaInkRegistry");
   const registry = await upgrades.deployProxy(
-    RegF,
-    [deployer.address, addrs.VersionStore, addrs.GovernanceCore, addrs.NFTReward, addrs.Treasury],
+    RegistryFactory,
+    [
+      deployer.address,
+      await versionStore.getAddress(),
+      await governanceCore.getAddress(),
+      await nftReward.getAddress(),
+      await stakingManager.getAddress(),
+    ],
     { kind: "uups" }
   );
   await registry.waitForDeployment();
-  addrs.PolkaInkRegistry = await registry.getAddress();
-  console.log("7/9 PolkaInkRegistry:", addrs.PolkaInkRegistry);
-  save(addrs);
+  console.log("   PolkaInkRegistry:", await registry.getAddress());
 
-  // Wire GovernanceCore → Registry
-  await (await governance.setRegistry(addrs.PolkaInkRegistry)).wait();
-  console.log("   GovernanceCore.setRegistry done");
-
-  // ── 8. ArchiveCouncil (UUPS) ───────────────────────────────────────
-  const CouncilF = await ethers.getContractFactory("ArchiveCouncil");
-  const council = await upgrades.deployProxy(
-    CouncilF,
-    [deployer.address, addrs.GovernanceCore, addrs.NFTReward, councilMembers],
+  // 9. ReportManager (UUPS)
+  console.log("9. Deploying ReportManager...");
+  const ReportFactory = await ethers.getContractFactory("ReportManager");
+  const reportManager = await upgrades.deployProxy(
+    ReportFactory,
+    [
+      deployer.address,
+      await stakingManager.getAddress(),
+      await governanceCore.getAddress(),
+      await registry.getAddress(),
+    ],
     { kind: "uups" }
   );
-  await council.waitForDeployment();
-  addrs.ArchiveCouncil = await council.getAddress();
-  console.log("8/9 ArchiveCouncil:", addrs.ArchiveCouncil);
-  save(addrs);
+  await reportManager.waitForDeployment();
+  console.log("   ReportManager:", await reportManager.getAddress());
 
-  // ── 9. Setup Roles ─────────────────────────────────────────────────
-  console.log("\n─── Setting up roles ───");
-  const r = (name: string) => ethers.keccak256(ethers.toUtf8Bytes(name));
+  // ─── 10. Setup Cross-References + Roles ──────────────────────────────
 
-  await (await versionStore.grantRole(r("WRITER_ROLE"), addrs.PolkaInkRegistry)).wait();
-  await (await registry.grantRole(r("GOVERNANCE_ROLE"), addrs.GovernanceCore)).wait();
-  await (await registry.grantRole(r("GOVERNANCE_ROLE"), addrs.ArchiveCouncil)).wait();
-  await (await registry.grantRole(r("UPGRADER_ROLE"), addrs.TimelockController)).wait();
-  console.log("✓ Registry + VersionStore roles");
+  console.log("\n10. Setting up cross-references and roles...");
 
-  await (await nftReward.grantRole(r("AUTHOR_MINTER_ROLE"), addrs.PolkaInkRegistry)).wait();
-  await (await nftReward.grantRole(r("GUARDIAN_MINTER_ROLE"), addrs.ArchiveCouncil)).wait();
-  await (await nftReward.grantRole(r("UPGRADER_ROLE"), addrs.TimelockController)).wait();
-  console.log("✓ NFTReward roles");
+  // Set registry in GovernanceCore
+  await (governanceCore as any).setRegistry(await registry.getAddress());
+  console.log("   GovernanceCore.setRegistry ✓");
 
-  await (await treasury.grantRole(r("DISTRIBUTOR_ROLE"), addrs.PolkaInkRegistry)).wait();
-  await (await treasury.grantRole(r("SPEND_ROLE"), addrs.TimelockController)).wait();
-  await (await treasury.grantRole(r("UPGRADER_ROLE"), addrs.TimelockController)).wait();
-  console.log("✓ Treasury roles");
+  const WRITER_ROLE         = ethers.keccak256(ethers.toUtf8Bytes("WRITER_ROLE"));
+  const GOVERNANCE_ROLE     = ethers.keccak256(ethers.toUtf8Bytes("GOVERNANCE_ROLE"));
+  const REGISTRY_ROLE       = ethers.keccak256(ethers.toUtf8Bytes("REGISTRY_ROLE"));
+  const REPORT_ROLE         = ethers.keccak256(ethers.toUtf8Bytes("REPORT_ROLE"));
+  const MEMBER_MINTER_ROLE  = ethers.keccak256(ethers.toUtf8Bytes("MEMBER_MINTER_ROLE"));
+  const CREATOR_MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes("CREATOR_MINTER_ROLE"));
+  const AUTHOR_MINTER_ROLE  = ethers.keccak256(ethers.toUtf8Bytes("AUTHOR_MINTER_ROLE"));
+  const SPEND_ROLE          = ethers.keccak256(ethers.toUtf8Bytes("SPEND_ROLE"));
+  const UPGRADER_ROLE       = ethers.keccak256(ethers.toUtf8Bytes("UPGRADER_ROLE"));
+  const PROPOSER_ROLE       = ethers.keccak256(ethers.toUtf8Bytes("PROPOSER_ROLE"));
+  const CANCELLER_ROLE      = ethers.keccak256(ethers.toUtf8Bytes("CANCELLER_ROLE"));
 
-  await (await governance.grantRole(r("COUNCIL_ROLE"), addrs.ArchiveCouncil)).wait();
-  await (await governance.grantRole(r("UPGRADER_ROLE"), addrs.TimelockController)).wait();
-  console.log("✓ GovernanceCore roles");
+  // VersionStore
+  await (versionStore as any).grantRole(WRITER_ROLE, await registry.getAddress());
+  console.log("   VersionStore.WRITER → Registry ✓");
 
-  await (await council.grantRole(r("GOVERNANCE_ROLE"), addrs.GovernanceCore)).wait();
-  await (await council.grantRole(r("UPGRADER_ROLE"), addrs.TimelockController)).wait();
-  console.log("✓ ArchiveCouncil roles");
+  // NFTReward
+  await (nftReward as any).grantRole(MEMBER_MINTER_ROLE, await stakingManager.getAddress());
+  await (nftReward as any).grantRole(CREATOR_MINTER_ROLE, await registry.getAddress());
+  await (nftReward as any).grantRole(AUTHOR_MINTER_ROLE, await registry.getAddress());
+  console.log("   NFTReward minting roles ✓");
 
-  await (await timelock.grantRole(r("PROPOSER_ROLE"), addrs.GovernanceCore)).wait();
-  await (await timelock.grantRole(r("CANCELLER_ROLE"), addrs.GovernanceCore)).wait();
-  console.log("✓ Timelock roles");
+  // GovernanceCore
+  await (governanceCore as any).grantRole(REGISTRY_ROLE, await registry.getAddress());
+  console.log("   GovernanceCore.REGISTRY → Registry ✓");
 
-  // Mint Guardian NFTs
-  await (await council.activateGuardianNFTs()).wait();
-  console.log("✓ Guardian NFTs activated");
+  // Registry
+  await (registry as any).grantRole(GOVERNANCE_ROLE, await governanceCore.getAddress());
+  await (registry as any).grantRole(REPORT_ROLE, await reportManager.getAddress());
+  console.log("   Registry roles ✓");
 
-  // Transfer ProxyAdmin ownership to Timelock
-  await (await proxyAdmin.transferOwnership(addrs.TimelockController)).wait();
-  console.log("✓ ProxyAdmin → TimelockController");
+  // Treasury
+  await (treasury as any).grantRole(SPEND_ROLE, await timelock.getAddress());
+  console.log("   Treasury.SPEND → Timelock ✓");
 
-  console.log("\n✅ Deployment complete!");
-  console.log(JSON.stringify(addrs, null, 2));
+  // Timelock
+  await (timelock as any).grantRole(PROPOSER_ROLE, await governanceCore.getAddress());
+  await (timelock as any).grantRole(CANCELLER_ROLE, await governanceCore.getAddress());
+  console.log("   Timelock roles ✓");
+
+  // UPGRADER_ROLE for timelock on all upgradeable contracts
+  const upgradeableContracts = [
+    versionStore, registry, nftReward, treasury,
+    governanceCore, stakingManager, reportManager,
+  ];
+  for (const c of upgradeableContracts) {
+    await (c as any).grantRole(UPGRADER_ROLE, await timelock.getAddress());
+  }
+  console.log("   UPGRADER_ROLE → Timelock on all contracts ✓");
+
+  // Transfer ProxyAdmin ownership to timelock
+  await proxyAdmin.transferOwnership(await timelock.getAddress());
+  console.log("   ProxyAdmin ownership → Timelock ✓");
+
+  // ─── Save addresses ──────────────────────────────────────────────────
+
+  const addresses = {
+    ProxyAdmin: await proxyAdmin.getAddress(),
+    TimelockController: await timelock.getAddress(),
+    NFTReward: await nftReward.getAddress(),
+    Treasury: await treasury.getAddress(),
+    VersionStore: await versionStore.getAddress(),
+    StakingManager: await stakingManager.getAddress(),
+    GovernanceCore: await governanceCore.getAddress(),
+    PolkaInkRegistry: await registry.getAddress(),
+    ReportManager: await reportManager.getAddress(),
+  };
+
+  save(addresses);
+  console.log("\n🎉 Deployment complete!\n");
+  console.table(addresses);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
 });

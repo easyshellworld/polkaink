@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { formatEther } from 'viem';
 import { readContract } from '../../lib/contracts';
 import { Card } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/governance/StatusBadge';
@@ -53,8 +52,8 @@ export function ProposalHistory({ address }: { address: string }) {
                   {p.description || t('governance.version_update')}
                 </span>
               </div>
-              <span className="text-xs text-[var(--color-text-secondary)]">
-                {formatEther(p.stakeAmount)} PAS
+              <span className={`text-xs font-medium ${Number(p.score) > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-text-secondary)]'}`}>
+                {Number(p.score) >= 0 ? '+' : ''}{(Number(p.score) / 1e18).toFixed(2)}
               </span>
             </Link>
           ))}

@@ -3,7 +3,7 @@ import { parseAbiItem } from 'viem';
 import { getPublicClient, getContractAddress } from '../lib/contracts';
 
 const VERSION_PROPOSED_EVENT = parseAbiItem(
-  'event VersionProposed(uint256 indexed proposalId, uint256 indexed docId, address indexed proposer, uint256 parentVersionId, bytes32 contentHash, uint256 stakeAmount)'
+  'event VersionProposed(uint256 indexed proposalId, uint256 indexed docId, address indexed proposer, uint256 parentVersionId, bytes32 contentHash)'
 );
 
 export function useRealProposer(proposalId: number | undefined) {
@@ -49,7 +49,7 @@ export function useRealProposer(proposalId: number | undefined) {
       const govLogs = await pc.getLogs({
         address: govAddr,
         event: parseAbiItem(
-          'event ProposalCreated(uint256 indexed proposalId, address indexed proposer, uint8 proposalType, uint256 indexed docId, uint256 stakeAmount, uint256 startTime, uint256 endTime)'
+          'event ProposalCreated(uint256 indexed proposalId, address indexed proposer, uint8 proposalType, uint256 indexed docId, uint256 startTime, uint256 endTime)'
         ),
         fromBlock,
         toBlock: 'latest',

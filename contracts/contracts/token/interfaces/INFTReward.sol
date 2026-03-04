@@ -1,45 +1,47 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title INFTReward
-/// @notice Dual-type NFT system interface: Author NFT (historians) + Guardian NFT (council members)
+/// @title INFTReward v2
+/// @notice Six-type NFT system: Member, Creator, Author, OGBronze, OGSilver, OGGold
 interface INFTReward {
 
-    enum NFTType { Author, Guardian }
+    enum NFTType { Member, Creator, Author, OGBronze, OGSilver, OGGold }
 
     struct NFTMetadata {
         uint256 tokenId;
         NFTType nftType;
-        address recipient;
+        address holder;
         uint256 mintedAt;
-        uint256 linkedProposalId;
-        uint256 linkedDocId;
-        uint256 linkedVersionId;
-        uint256 termEnd;
-        bool soulbound;
-        bool active;
+        uint256 lockEnd;          // Member only; 0 for others
+        uint256 linkedDocId;      // Creator/Author
+        uint256 linkedProposalId; // Creator
+        bool    active;
     }
 
-    function mintAuthorNFT(address recipient, uint256 proposalId, uint256 docId, uint256 versionId) external returns (uint256 tokenId);
-    function mintGuardianNFT(address recipient, uint256 termEnd) external returns (uint256 tokenId);
-    function deactivateGuardianNFT(uint256 tokenId) external;
-    function setAuthorNFTLock(uint256 tokenId, bool locked) external;
+    function mintMemberNFT(address to, uint256 lockEnd) external returns (uint256);
+    function mintCreatorNFT(address to, uint256 docId, uint256 proposalId) external returns (uint256);
+    function mintAuthorNFT(address to, uint256 docId) external returns (uint256);
+    function mintOGNFT(address to, NFTType ogType) external returns (uint256);
+    function deactivate(uint256 tokenId) external;
+    function revokeOGGold(uint256 tokenId) external;
 
     function getNFTMetadata(uint256 tokenId) external view returns (NFTMetadata memory);
-    function getAuthorNFTs(address holder) external view returns (uint256[] memory tokenIds);
-    function getGuardianNFTs(address holder) external view returns (uint256[] memory tokenIds);
-    function hasActiveGuardianNFT(address holder) external view returns (bool);
-    function authorNFTCount(address holder) external view returns (uint256);
-    function totalMinted(NFTType nftType) external view returns (uint256);
+    function getNFTsByHolder(address holder) external view returns (uint256[] memory);
+    function getNFTsByType(address holder, NFTType nftType) external view returns (uint256[] memory);
+    function activeCreatorCount(address holder) external view returns (uint256);
+    function isAuthorOf(address holder, uint256 docId) external view returns (bool);
+    function ogCount(address holder, NFTType ogType) external view returns (uint256);
+    function hasActiveOGGold(address holder) external view returns (bool);
+    function hasActiveMember(address holder) external view returns (bool);
     function tokenURI(uint256 tokenId) external view returns (string memory);
 
-    event AuthorNFTMinted(uint256 indexed tokenId, address indexed recipient, uint256 indexed proposalId, uint256 docId, uint256 versionId);
-    event GuardianNFTMinted(uint256 indexed tokenId, address indexed recipient, uint256 termEnd);
-    event GuardianNFTDeactivated(uint256 indexed tokenId, address indexed holder, uint256 timestamp);
-    event AuthorNFTLockChanged(uint256 indexed tokenId, bool locked);
+    event NFTMinted(uint256 indexed tokenId, address indexed holder, NFTType nftType, uint256 docId);
+    event NFTDeactivated(uint256 indexed tokenId, NFTType nftType);
+    event OGGoldRevoked(uint256 indexed tokenId, address indexed holder);
 
-    error NFT__Soulbound(uint256 tokenId);
-    error NFT__NotOwner(uint256 tokenId, address caller);
-    error NFT__GuardianNFTExpired(uint256 tokenId);
     error NFT__Unauthorized();
+    error NFT__OGCapReached(address holder, uint8 ogType);
+    error NFT__NotActive(uint256 tokenId);
+    error NFT__InvalidOGType(uint8 provided);
+    error NFT__Soulbound(uint256 tokenId);
 }

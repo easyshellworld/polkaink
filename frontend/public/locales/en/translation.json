@@ -4,6 +4,7 @@
     "governance": "Governance",
     "council": "Council",
     "treasury": "Treasury",
+    "staking": "Staking",
     "create": "Create",
     "connect": "Connect Wallet",
     "disconnect": "Disconnect",
@@ -161,7 +162,7 @@
     "voting_results": "Voting Results",
     "total_votes": "{{count}} votes cast",
     "total_votes_label": "Total Votes",
-    "threshold": "Passing threshold: 60%",
+    "threshold": "Score > 2.0",
     "by": "by",
     "doc": "Doc #{{id}}",
     "time_remaining": "remaining",
@@ -184,7 +185,24 @@
     "type_version": "Version Update",
     "type_upgrade": "Contract Upgrade",
     "snapshot_block": "Snapshot Block",
-    "target_version": "Target Version"
+    "target_version": "Target Version",
+    "vote_abstain": "Abstain",
+    "score": "Score",
+    "vetoed_by_gold": "Vetoed by OG Gold"
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Stake 88 DOT to become a member",
+    "stake_button": "Stake 88 DOT",
+    "lock_period": "Lock Period",
+    "months": "months",
+    "your_stake": "Your Stake",
+    "amount": "Amount",
+    "lock_end": "Lock Expires",
+    "unstake": "Unstake",
+    "early_unstake": "Early Unstake (10% penalty)",
+    "not_staked": "You are not currently staked",
+    "total_members": "Active Members"
   },
   "wallet": {
     "connected": "Wallet connected",
@@ -194,7 +212,8 @@
   "status": {
     "active": "Active",
     "archived": "Archived",
-    "disputed": "Disputed"
+    "frozen": "Frozen",
+    "revoked": "Revoked"
   },
   "agent": {
     "button": "Agent Skill",

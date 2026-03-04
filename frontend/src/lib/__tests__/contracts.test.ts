@@ -23,11 +23,12 @@ describe('getContractAddress', () => {
     'PolkaInkRegistry',
     'VersionStore',
     'GovernanceCore',
-    'ArchiveCouncil',
     'TimelockController',
     'NFTReward',
     'Treasury',
     'ProxyAdmin',
+    'StakingManager',
+    'ReportManager',
   ];
 
   contractNames.forEach((name) => {

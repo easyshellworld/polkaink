@@ -76,32 +76,76 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "requested",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "available",
+        "name": "lockEnd",
         "type": "uint256"
       }
     ],
-    "name": "Treasury__InsufficientBalance",
+    "name": "Staking__AlreadyExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "Staking__AlreadyStaked",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "provided",
+        "type": "uint8"
+      }
+    ],
+    "name": "Staking__InvalidLockMonths",
     "type": "error"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "spendId",
+        "name": "lockEnd",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "now_",
         "type": "uint256"
       }
     ],
-    "name": "Treasury__SpendNotApproved",
+    "name": "Staking__LockNotExpired",
     "type": "error"
   },
   {
-    "inputs": [],
-    "name": "Treasury__Unauthorized",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "Staking__NotStaked",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "expected",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "provided",
+        "type": "uint256"
+      }
+    ],
+    "name": "Staking__WrongAmount",
     "type": "error"
   },
   {
@@ -126,23 +170,23 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "sender",
+        "name": "user",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "returned",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "note",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "penalty",
+        "type": "uint256"
       }
     ],
-    "name": "FundsReceived",
+    "name": "EarlyUnstaked",
     "type": "event"
   },
   {
@@ -238,20 +282,45 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
-        "name": "spendId",
+        "name": "amount",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "enum ITreasury.SpendCategory",
-        "name": "category",
+        "internalType": "uint8",
+        "name": "lockMonths",
         "type": "uint8"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lockEnd",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "memberNFTId",
+        "type": "uint256"
+      }
+    ],
+    "name": "Staked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
-        "name": "recipient",
+        "name": "user",
         "type": "address"
       },
       {
@@ -261,7 +330,7 @@
         "type": "uint256"
       }
     ],
-    "name": "SpendExecuted",
+    "name": "Unstaked",
     "type": "event"
   },
   {
@@ -292,12 +361,25 @@
   },
   {
     "inputs": [],
-    "name": "SPEND_ROLE",
+    "name": "EARLY_UNLOCK_PENALTY_BPS",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "uint256",
         "name": "",
-        "type": "bytes32"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "STAKE_AMOUNT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -331,65 +413,7 @@
   },
   {
     "inputs": [],
-    "name": "balance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "enum ITreasury.SpendCategory",
-        "name": "category",
-        "type": "uint8"
-      },
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "createSpendRequest",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
-      }
-    ],
-    "name": "executeSpend",
+    "name": "earlyUnstake",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -416,77 +440,49 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
-    "name": "getSpendRecord",
+    "name": "getStake",
     "outputs": [
       {
         "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum ITreasury.SpendCategory",
-            "name": "category",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
           {
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
           },
           {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
             "internalType": "uint256",
-            "name": "proposalId",
+            "name": "lockStart",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "timestamp",
+            "name": "lockEnd",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "lockMonths",
+            "type": "uint8"
           },
           {
             "internalType": "bool",
-            "name": "executed",
+            "name": "active",
             "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "memberNFTId",
+            "type": "uint256"
           }
         ],
-        "internalType": "struct ITreasury.SpendRecord",
+        "internalType": "struct IStakingManager.StakeInfo",
         "name": "",
         "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTotals",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalIncome",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalSpent",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -540,6 +536,16 @@
         "internalType": "address",
         "name": "admin",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nftReward",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_treasury",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -550,69 +556,30 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "offset",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "limit",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
-    "name": "listSpendRecords",
+    "name": "isActiveMember",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum ITreasury.SpendCategory",
-            "name": "category",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "proposalId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "executed",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct ITreasury.SpendRecord[]",
-        "name": "records",
-        "type": "tuple[]"
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nftReward",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "total",
-        "type": "uint256"
+        "internalType": "contract INFTReward",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -670,6 +637,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint8",
+        "name": "lockMonths",
+        "type": "uint8"
+      }
+    ],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -684,6 +664,39 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalActiveMembers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -703,9 +716,5 @@
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

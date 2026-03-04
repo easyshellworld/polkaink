@@ -14,10 +14,11 @@ import { shortenAddress, formatDate } from '../../lib/utils';
 import { PAS_NETWORK } from '../../lib/contracts/addresses';
 import { useDocCreationTx } from '../../hooks/useRealProposer';
 
-const STATUS_MAP: Record<number, { label: string; variant: 'success' | 'neutral' | 'warning' }> = {
+const STATUS_MAP: Record<number, { label: string; variant: 'success' | 'neutral' | 'warning' | 'error' }> = {
   0: { label: 'active', variant: 'success' },
   1: { label: 'archived', variant: 'neutral' },
-  2: { label: 'disputed', variant: 'warning' },
+  2: { label: 'frozen', variant: 'warning' },
+  3: { label: 'revoked', variant: 'error' },
 };
 
 export default function DocumentPage() {
