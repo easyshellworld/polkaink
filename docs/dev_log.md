@@ -50,3 +50,5 @@
 * polished ui
 ## 20260303 18:15(ET)
 * trying to make slogan 信达雅
+## 20260303 23:27(ET)
+* tokenomics 2.0
