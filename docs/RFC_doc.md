@@ -127,3 +127,9 @@
 * `Governance` 中提案名称应显示文档标题，非 `Version Update Proposal`
 * `Governance` 中 `Proposer` 应显示提案人地址，非合约地址
 * `Header` 钱包连接后应变为下拉菜单（profile / logout）
+---
+
+## 20260304
+* 如果委员人员成员名单出现需要结合`profile`组件做棵点击查看信息
+* 文本库无法阅读了
+* 需要恢复合约可依托共识升级机制
