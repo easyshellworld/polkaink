@@ -379,23 +379,97 @@
 <body>
 
     <!-- Slides in order: cover, slides 1-11, acknowledgements (12 total) -->
-    <section class="slide" id="slide1">
-        <div class="slide-content fade-in">
-            <!-- Cover page -->
-            <div style="margin-bottom: 2rem;">
-                <svg width="100" height="100" viewBox="0 0 100 100" style="margin:0 auto;">
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#E6007A" stroke-width="3" stroke-dasharray="6 6"/>
-                    <circle cx="50" cy="50" r="15" fill="#E6007A" />
-                    <text x="50" y="80" text-anchor="middle" fill="#E6007A" font-size="12">◎</text>
+    <section class="slide" id="slide1" style="background: radial-gradient(ellipse at 20% 30%, #2a0d1f 0%, #0f0b1e 40%, #080812 100%); overflow:hidden;">
+        <!-- Animated background orbs -->
+        <div style="position:absolute; top:-10%; left:-5%; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle, rgba(230,0,122,0.18) 0%, transparent 70%); animation: pulse1 6s ease-in-out infinite; pointer-events:none;"></div>
+        <div style="position:absolute; bottom:-15%; right:-5%; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle, rgba(180,0,200,0.10) 0%, transparent 70%); animation: pulse2 8s ease-in-out infinite; pointer-events:none;"></div>
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:900px; height:900px; border-radius:50%; border:1px solid rgba(230,0,122,0.06); pointer-events:none;"></div>
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:650px; height:650px; border-radius:50%; border:1px solid rgba(230,0,122,0.09); pointer-events:none;"></div>
+
+        <style>
+            @keyframes pulse1 { 0%,100%{transform:scale(1) translate(0,0);} 50%{transform:scale(1.1) translate(20px,15px);} }
+            @keyframes pulse2 { 0%,100%{transform:scale(1) translate(0,0);} 50%{transform:scale(1.08) translate(-15px,-20px);} }
+            @keyframes glow-flicker { 0%,100%{opacity:1;} 50%{opacity:0.85;} }
+            @keyframes chain-scroll { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+            @keyframes badge-pop { 0%{opacity:0; transform:scale(0.8) translateY(10px);} 100%{opacity:1; transform:scale(1) translateY(0);} }
+            .cover-logo-ring {
+                animation: glow-flicker 3s ease-in-out infinite;
+            }
+            .chain-ticker {
+                display: flex;
+                gap: 0;
+                white-space: nowrap;
+                animation: chain-scroll 18s linear infinite;
+            }
+        </style>
+
+        <div class="slide-content fade-in" style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;">
+
+            <!-- Logo mark -->
+            <div class="cover-logo-ring" style="margin-bottom:1.6rem; position:relative;">
+                <svg width="88" height="88" viewBox="0 0 100 100">
+                    <defs>
+                        <filter id="glow1">
+                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#E6007A" stroke-width="2.5" stroke-dasharray="6 4" filter="url(#glow1)"/>
+                    <circle cx="50" cy="50" r="23" fill="none" stroke="rgba(230,0,122,0.4)" stroke-width="1.5"/>
+                    <circle cx="50" cy="50" r="14" fill="#E6007A" filter="url(#glow1)"/>
+                    <circle cx="50" cy="50" r="6" fill="white" opacity="0.9"/>
                 </svg>
             </div>
-            <h1>PolkaInk</h1>
-            <p class="subhead">On-Chain Polkadot History Preservation Protocol</p>
-            <div style="font-size: 2rem; margin: 2rem 0; color: #E6007A;">⸻</div>
-            <p style="font-size: 1.5rem;">Write history on-chain. Memory that cannot be erased.</p>
-            <p style="color: #aaa;">Polkadot Hub · DAO Governance · Permanent Storage</p>
-            <div style="margin-top: 3rem;">
-                <span class="btn" onclick="nextSlide()">Explore →</span>
+
+            <!-- Brand name -->
+            <div style="font-size:4.2rem; font-weight:900; letter-spacing:-0.03em; line-height:1; margin-bottom:0.5rem; background:linear-gradient(135deg,#ffffff 0%,#ffb3d9 60%,#E6007A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 30px rgba(230,0,122,0.5));">PolkaInk</div>
+
+            <!-- Tagline sub -->
+            <div style="font-size:1rem; letter-spacing:3px; text-transform:uppercase; color:rgba(221,179,255,0.7); margin-bottom:2.8rem; font-weight:500;">On-Chain History Preservation · Polkadot</div>
+
+            <!-- ★ HERO HEADLINE ★ -->
+            <div style="margin-bottom:2.8rem; text-align:center;">
+                <div style="font-size:1rem; letter-spacing:5px; text-transform:uppercase; color:#E6007A; margin-bottom:0.8rem; font-weight:600; opacity:0.9;">✦ Genesis Consensus ✦</div>
+                <div style="display:inline-block; position:relative;">
+                    <span style="font-size:3.6rem; font-weight:800; line-height:1.15; letter-spacing:-0.02em; color:#ffffff; display:block;">History, now it's all</span>
+                    <span style="
+                        font-size:4.2rem;
+                        font-weight:900;
+                        letter-spacing:0.04em;
+                        display:block;
+                        background: linear-gradient(90deg, #ff4db8 0%, #E6007A 40%, #ff80c8 80%, #ffffff 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        filter: drop-shadow(0 0 20px rgba(230,0,122,0.7)) drop-shadow(0 0 40px rgba(230,0,122,0.35));
+                        text-transform: uppercase;
+                        line-height: 1.1;
+                        position: relative;
+                    ">ON-CHAIN<span style="-webkit-text-fill-color:rgba(255,255,255,0.15); position:absolute; top:3px; left:3px; z-index:-1; filter:none;">ON-CHAIN</span></span>
+                </div>
+            </div>
+
+            <!-- Chain ticker strip -->
+            <div style="width:min(600px,90vw); overflow:hidden; margin-bottom:2.8rem; border-top:1px solid rgba(230,0,122,0.2); border-bottom:1px solid rgba(230,0,122,0.2); padding:0.5rem 0;">
+                <div style="display:flex;">
+                    <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;">
+                        ◎ PERMANENT &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; UNDELETABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO &nbsp;·&nbsp; NFT &nbsp;·&nbsp; HISTORY &nbsp;·&nbsp; GENESIS &nbsp;·&nbsp; PERMANENT &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; UNDELETABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp;
+                    </div>
+                    <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;" aria-hidden="true">
+                        ◎ PERMANENT &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; UNDELETABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO &nbsp;·&nbsp; NFT &nbsp;·&nbsp; HISTORY &nbsp;·&nbsp; GENESIS &nbsp;·&nbsp; PERMANENT &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; UNDELETABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp;
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges row -->
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-bottom:3rem;">
+                <div style="background:rgba(230,0,122,0.12); border:1px solid rgba(230,0,122,0.4); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ffb3d9; font-weight:600; animation: badge-pop 0.5s ease 0.2s both; box-shadow:0 0 16px rgba(230,0,122,0.2);">⛓ Polkadot Hub</div>
+                <div style="background:rgba(230,0,122,0.12); border:1px solid rgba(230,0,122,0.4); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ffb3d9; font-weight:600; animation: badge-pop 0.5s ease 0.35s both; box-shadow:0 0 16px rgba(230,0,122,0.2);">🗳 DAO Governance</div>
+                <div style="background:rgba(221,179,255,0.10); border:1px solid rgba(221,179,255,0.35); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ddb3ff; font-weight:600; animation: badge-pop 0.5s ease 0.5s both; box-shadow:0 0 16px rgba(180,80,255,0.15);">♾ Permanent Storage</div>
+                <div style="background:rgba(63,224,160,0.08); border:1px solid rgba(63,224,160,0.3); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#3fe0a0; font-weight:600; animation: badge-pop 0.5s ease 0.65s both; box-shadow:0 0 16px rgba(63,224,160,0.12);">🎨 On-Chain NFT</div>
+            </div>
+
+            <div>
+                <span class="btn" onclick="nextSlide()" style="box-shadow:0 0 30px rgba(230,0,122,0.5), 0 4px 20px rgba(230,0,122,0.3);">Explore →</span>
             </div>
         </div>
     </section>
