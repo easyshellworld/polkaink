@@ -63,58 +63,53 @@ export default function GovernancePage() {
     <PageWrapper>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">{t('governance.title')}</h1>
-        <span className="rounded-full bg-[var(--color-primary-10)] px-3 py-1 text-xs font-medium text-[var(--color-primary)]">
-          {t('governance.total_proposals', { count: total })}
-        </span>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-4">
-        <div className="md:col-span-3">
-          <div className="flex flex-wrap gap-2 mb-5">
-            {STATUS_FILTERS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => { setFilter(key); setPage(0); }}
-                className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-                  filter === key
-                    ? 'bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/20'
-                    : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-                }`}
-              >
-                {key === -1 ? 'All' : t(label)}
-              </button>
-            ))}
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-            </div>
-          ) : proposals.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
-              <div className="text-3xl mb-3 opacity-30">◎</div>
-              <h2 className="text-lg font-semibold mb-2">{t('governance.empty_title')}</h2>
-              <p className="text-sm text-[var(--color-text-secondary)]">{t('governance.empty_desc')}</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {proposals.map((p) => (
-                <ProposalCard key={Number(p.id)} proposal={p} />
-              ))}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
-          )}
-        </div>
-
-        <div className="hidden md:block space-y-4">
+        <div className="flex items-center gap-3">
           <VotingPowerDisplay />
+          <span className="rounded-full bg-[var(--color-primary-10)] px-3 py-1 text-xs font-medium text-[var(--color-primary)]">
+            {t('governance.total_proposals', { count: total })}
+          </span>
         </div>
       </div>
+
+      <div className="flex flex-wrap gap-2 mb-5">
+        {STATUS_FILTERS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => { setFilter(key); setPage(0); }}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+              filter === key
+                ? 'bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/20'
+                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+            }`}
+          >
+            {key === -1 ? 'All' : t(label)}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      ) : proposals.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="text-3xl mb-3 opacity-30">◎</div>
+          <h2 className="text-lg font-semibold mb-2">{t('governance.empty_title')}</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t('governance.empty_desc')}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {proposals.map((p) => (
+            <ProposalCard key={Number(p.id)} proposal={p} />
+          ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      )}
     </PageWrapper>
   );
 }

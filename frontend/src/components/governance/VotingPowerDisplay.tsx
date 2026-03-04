@@ -16,16 +16,10 @@ export function VotingPowerDisplay({ proposalId }: { proposalId?: number }) {
       : t('governance.no_nft_bonus');
 
   return (
-    <div className="rounded-lg bg-[var(--color-surface-alt)] p-3 text-sm">
-      <div className="text-xs text-[var(--color-text-secondary)] mb-1">
-        {t('governance.your_voting_power')}
-      </div>
-      <div className="font-semibold text-base">
-        {parseFloat(data.balance).toFixed(2)} PAS
-      </div>
-      <div className="text-xs text-[var(--color-text-secondary)] mt-1">
-        {t('governance.nft_bonus')}: {nftLabel}
-      </div>
+    <div className="inline-flex items-center gap-2 rounded-full bg-[var(--color-surface-alt)] px-3 py-1.5 text-xs">
+      <span className="text-[var(--color-text-secondary)]">{t('governance.your_voting_power')}:</span>
+      <span className="font-semibold">{parseFloat(data.balance).toFixed(2)} PAS</span>
+      <span className="text-[var(--color-text-secondary)]">({nftLabel})</span>
     </div>
   );
 }

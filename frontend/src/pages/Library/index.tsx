@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocuments } from '../../hooks/useDocuments';
@@ -11,7 +11,9 @@ import { DocumentCard } from './DocumentCard';
 export default function LibraryPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
   const perPage = 10;
   const { data, isLoading } = useDocuments(0, 200);
 
@@ -23,8 +25,23 @@ export default function LibraryPage() {
     return Array.from(tagSet).sort();
   }, [allDocs]);
 
-  const filtered = selectedTag
-    ? allDocs.filter((d) => d.tags.includes(selectedTag))
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFilterOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+    setPage(0);
+  };
+
+  const filtered = selectedTags.length > 0
+    ? allDocs.filter((d) => selectedTags.some((tag) => d.tags.includes(tag)))
     : allDocs;
 
   const total = filtered.length;
@@ -42,33 +59,82 @@ export default function LibraryPage() {
         </Link>
       </div>
 
-      {allTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-5">
-          <button
-            onClick={() => { setSelectedTag(null); setPage(0); }}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
-              !selectedTag
-                ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-            }`}
-          >
-            All
-          </button>
-          {allTags.map((tag) => (
+      <div className="flex items-center gap-3 mb-5">
+        {allTags.length > 0 && (
+          <div className="relative" ref={filterRef}>
             <button
-              key={tag}
-              onClick={() => { setSelectedTag(tag); setPage(0); }}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
-                selectedTag === tag
-                  ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+              onClick={() => setFilterOpen(!filterOpen)}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-all duration-200 ${
+                selectedTags.length > 0
+                  ? 'border-[var(--color-primary)] text-[var(--color-primary)] bg-[var(--color-primary-10)]'
+                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]'
               }`}
             >
-              {tag}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              Filter
+              {selectedTags.length > 0 && (
+                <span className="ml-1 rounded-full bg-[var(--color-primary)] text-white text-xs w-5 h-5 flex items-center justify-center">
+                  {selectedTags.length}
+                </span>
+              )}
             </button>
-          ))}
-        </div>
-      )}
+
+            {filterOpen && (
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] py-2 shadow-xl z-50 animate-slide-down max-h-64 overflow-y-auto">
+                {allTags.map((tag) => {
+                  const checked = selectedTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className="flex w-full items-center gap-2.5 px-4 py-2 text-sm hover:bg-[var(--color-surface-alt)] transition-colors"
+                    >
+                      <span className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                        checked
+                          ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white'
+                          : 'border-[var(--color-border)]'
+                      }`}>
+                        {checked && <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                      </span>
+                      {tag}
+                    </button>
+                  );
+                })}
+                {selectedTags.length > 0 && (
+                  <>
+                    <div className="mx-3 my-1.5 border-t border-[var(--color-border)]" />
+                    <button
+                      onClick={() => { setSelectedTags([]); setPage(0); }}
+                      className="w-full px-4 py-2 text-xs text-[var(--color-primary)] hover:bg-[var(--color-surface-alt)] transition-colors text-left"
+                    >
+                      Clear all
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {selectedTags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-10)] px-2.5 py-1 text-xs font-medium text-[var(--color-primary)]"
+              >
+                {tag}
+                <button
+                  onClick={() => toggleTag(tag)}
+                  className="hover:text-[var(--color-primary-hover)] transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
       {isLoading ? (
         <Skeleton count={3} />

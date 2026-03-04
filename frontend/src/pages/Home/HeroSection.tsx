@@ -13,7 +13,7 @@ export function HeroSection() {
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[var(--color-secondary)] opacity-[0.04] blur-3xl" />
       </div>
 
-      <h1 className="mx-auto max-w-2xl text-3xl font-bold leading-tight md:text-5xl animate-slide-up">
+      <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight md:text-6xl animate-slide-up">
         {t('home.hero_title_1')}
         <br />
         <span className="gradient-text">{t('home.hero_title_2')}</span>
