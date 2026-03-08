@@ -3,101 +3,227 @@ import { ethers } from "hardhat";
 import { loadFixture, time } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { deployFixture, stakeFor } from "../fixtures/deployFixture";
 
-describe("Full Proposal Flow (v2)", () => {
-  const VOTING_PERIOD = 7 * 24 * 3600;
+describe("Integration: Full VersionUpdate Proposal Flow", () => {
+  const VOTING_PERIOD  = 10 * 60; // MVP: 10 minutes
+  const COUNCIL_WINDOW = 3  * 60; // MVP: 3 minutes
+  async function lowRewardPoolFixture() {
+    return deployFixture(ethers.parseEther("40"));
+  }
 
-  it("should execute: stake → create doc → propose → vote → finalize → execute → mint Creator NFT", async () => {
+  it("should complete full lifecycle: stake → propose → vote → approve → execute → reward", async () => {
     const { contracts, actors } = await loadFixture(deployFixture);
-    const { registry, governanceCore, nftReward, stakingManager } = contracts;
-    const { author1, voter1, voter2, voter3 } = actors;
 
-    // Step 1: Stake
-    await stakeFor(stakingManager, author1, 12);
-    await stakeFor(stakingManager, voter1, 6);
-    await stakeFor(stakingManager, voter2, 3);
-    await stakeFor(stakingManager, voter3, 3);
+    // Stake for participants
+    await stakeFor(contracts.stakingManager, actors.author1, 12);
+    await stakeFor(contracts.stakingManager, actors.voter1,  6);
+    await stakeFor(contracts.stakingManager, actors.voter2,  3);
+    await stakeFor(contracts.stakingManager, actors.voter3,  3);
 
-    // Step 2: Create document
-    await registry.connect(author1).createDocument("Polkadot History", ["polkadot"]);
-    const doc = await registry.getDocument(1);
+    // Create document
+    await contracts.registry.connect(actors.author1)
+      .createDocument("Polkadot History", ["#history"], "Genesis doc");
+    const doc = await contracts.registry.getDocument(1);
     expect(doc.title).to.equal("Polkadot History");
 
-    // Step 3: Propose version (non-payable)
-    const contentHash = ethers.keccak256(ethers.toUtf8Bytes("# Polkadot History\nContent..."));
-    await registry.connect(author1).proposeVersion(
-      1, 0, contentHash, ethers.toUtf8Bytes("# Polkadot History\nContent...")
-    );
+    // Propose version
+    const contentHash = ethers.keccak256(ethers.toUtf8Bytes("Initial Polkadot history content"));
+    await contracts.registry.connect(actors.author1)
+      .proposeVersion(1, 0, contentHash, "Add 2020-2024 history");
 
-    // Step 4: Vote YES
-    await governanceCore.connect(voter1).vote(1, 0); // Yes
-    await governanceCore.connect(voter2).vote(1, 0);
-    await governanceCore.connect(voter3).vote(1, 0);
+    const p0 = await contracts.governanceCore.getProposal(1);
+    expect(p0.status).to.equal(0); // Active
 
-    const p = await governanceCore.getProposal(1);
-    expect(p.score).to.be.gt(0n);
+    // Vote
+    await contracts.governanceCore.connect(actors.voter1).vote(1, 0); // Yes
+    await contracts.governanceCore.connect(actors.voter2).vote(1, 0); // Yes
+    await contracts.governanceCore.connect(actors.voter3).vote(1, 0); // Yes
 
-    // Step 5: Advance past voting period and finalize
+    // End voting
     await time.increase(VOTING_PERIOD + 1);
-    await governanceCore.finalizeProposal(1);
+    await contracts.governanceCore.finalizeProposal(1);
 
-    const finalized = await governanceCore.getProposal(1);
-    expect(finalized.status).to.equal(1); // Approved
+    const p1 = await contracts.governanceCore.getProposal(1);
+    expect(p1.status).to.equal(1); // Approved
+    expect(p1.voterCount).to.equal(3n);
 
-    // Step 6: Execute → merges version + mints Creator NFT
-    await governanceCore.executeProposal(1);
+    // Wait out council window
+    await time.increase(COUNCIL_WINDOW + 1);
 
-    const executed = await governanceCore.getProposal(1);
-    expect(executed.status).to.equal(4); // Executed
+    const poolBefore = await contracts.treasury.rewardPoolBalance();
 
-    // Verify: version merged
-    const updatedDoc = await registry.getDocument(1);
+    // Execute
+    await contracts.governanceCore.executeProposal(1);
+    const p2 = await contracts.governanceCore.getProposal(1);
+    expect(p2.status).to.equal(4); // Executed
+
+    // Document version updated
+    const updatedDoc = await contracts.registry.getDocument(1);
     expect(updatedDoc.currentVersionId).to.be.gt(0n);
+    expect(updatedDoc.latestProposalId).to.equal(0n);
 
-    // Verify: Creator NFT minted for proposer
-    const creatorCount = await nftReward.activeCreatorCount(author1.address);
-    expect(creatorCount).to.equal(1n);
+    // Creator NFT minted
+    expect(await contracts.nftReward.activeCreatorCount(actors.author1.address)).to.equal(1n);
+
+    // Proposer rewarded (pool reduced)
+    const poolAfter = await contracts.treasury.rewardPoolBalance();
+    expect(poolAfter).to.be.lt(poolBefore);
   });
 
-  it("should handle OG Gold veto in full flow", async () => {
-    const { contracts, actors } = await loadFixture(deployFixture);
-    const { governanceCore, stakingManager } = contracts;
-    const { author1, voter1, voter2, ogGoldHolder } = actors;
+  it("should skip reward when pool balance < 50 PAS", async () => {
+    const { contracts, actors } = await loadFixture(lowRewardPoolFixture);
 
-    await stakeFor(stakingManager, author1, 3);
-    await stakeFor(stakingManager, voter1, 3);
-    await stakeFor(stakingManager, voter2, 3);
-    await stakeFor(stakingManager, ogGoldHolder, 3);
+    await stakeFor(contracts.stakingManager, actors.author1, 6);
+    await stakeFor(contracts.stakingManager, actors.voter1, 3);
+    await stakeFor(contracts.stakingManager, actors.voter2, 3);
+    await stakeFor(contracts.stakingManager, actors.voter3, 3);
+    await contracts.registry.connect(actors.author1)
+      .createDocument("Doc", [], "desc");
+    await contracts.registry.connect(actors.author1)
+      .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1")), "v1");
 
-    await governanceCore.connect(author1).createProposal(0, 1, 0, "0x", "veto test");
-
-    // Community votes YES
-    await governanceCore.connect(voter1).vote(1, 0);
-    await governanceCore.connect(voter2).vote(1, 0);
-
-    // OG Gold votes NO → instant veto
-    await governanceCore.connect(ogGoldHolder).vote(1, 1);
-
-    const p = await governanceCore.getProposal(1);
-    expect(p.status).to.equal(3); // Vetoed
-    expect(p.goldVetoed).to.be.true;
-  });
-
-  it("should handle rejection when score is below threshold", async () => {
-    const { contracts, actors } = await loadFixture(deployFixture);
-    const { governanceCore, stakingManager } = contracts;
-
-    await stakeFor(stakingManager, actors.author1, 3);
-    await stakeFor(stakingManager, actors.voter1, 3);
-
-    await governanceCore.connect(actors.author1).createProposal(0, 1, 0, "0x", "reject test");
-
-    // Only 1 YES vote: score ≈ 1.13 (< 2.0 threshold)
-    await governanceCore.connect(actors.voter1).vote(1, 0);
-
+    await contracts.governanceCore.connect(actors.voter1).vote(1, 0);
+    await contracts.governanceCore.connect(actors.voter2).vote(1, 0);
+    await contracts.governanceCore.connect(actors.voter3).vote(1, 0);
     await time.increase(VOTING_PERIOD + 1);
-    await governanceCore.finalizeProposal(1);
+    await contracts.governanceCore.finalizeProposal(1);
+    await time.increase(COUNCIL_WINDOW + 1);
 
-    const p = await governanceCore.getProposal(1);
-    expect(p.status).to.equal(2); // Rejected
+    await expect(contracts.governanceCore.executeProposal(1))
+      .to.emit(contracts.governanceCore, "RewardSkipped")
+      .withArgs(1, 0)
+      .and.to.emit(contracts.governanceCore, "ProposalExecuted");
+  });
+});
+
+describe("Integration: EmergencyConfirm Flow (v3.4 fix)", () => {
+  const EMERGENCY_VOTE_PERIOD = 5 * 60;
+  const FREEZE_CONFIRM_PERIOD = 15 * 60;
+
+  it("should auto-unfreeze document if EmergencyConfirm deadline passes without DAO execution", async () => {
+    const { contracts, actors } = await loadFixture(deployFixture);
+
+    await stakeFor(contracts.stakingManager, actors.author1, 6);
+    await contracts.registry.connect(actors.author1)
+      .createDocument("Freeze Test Doc", [], "desc");
+
+    // Council triggers emergency freeze (need 5/7 members)
+    const signers = await ethers.getSigners();
+    const vetoDesc = "A".repeat(50); // >= 50 bytes
+
+    for (let i = 6; i <= 10; i++) { // 5 of the 7 genesis members
+      await contracts.archiveCouncil.connect(signers[i])
+        .castEmergencyFreeze(1, 0, vetoDesc);
+    }
+
+    // Verify document is Frozen
+    let doc = await contracts.registry.getDocument(1);
+    expect(doc.status).to.equal(1); // Frozen
+
+    // Advance past freeze confirm deadline (no DAO execution)
+    await time.increase(FREEZE_CONFIRM_PERIOD + 1);
+
+    // Anyone can trigger auto-unfreeze
+    await contracts.archiveCouncil.checkAndAutoUnfreeze(1);
+    doc = await contracts.registry.getDocument(1);
+    expect(doc.status).to.equal(0); // Active again
+  });
+
+  it("should execute EmergencyConfirm without council window and mark freeze as confirmed", async () => {
+    const { contracts, actors } = await loadFixture(deployFixture);
+    await stakeFor(contracts.stakingManager, actors.author1, 12);
+    await stakeFor(contracts.stakingManager, actors.voter1, 6);
+    await stakeFor(contracts.stakingManager, actors.voter2, 3);
+    await stakeFor(contracts.stakingManager, actors.voter3, 3);
+    await contracts.registry.connect(actors.author1).createDocument("Freeze Confirm Doc", [], "desc");
+
+    const signers = await ethers.getSigners();
+    for (let i = 6; i <= 10; i++) {
+      await contracts.archiveCouncil.connect(signers[i]).castEmergencyFreeze(1, 0, "D".repeat(50));
+    }
+
+    await contracts.governanceCore.connect(actors.voter1).vote(1, 0);
+    await contracts.governanceCore.connect(actors.voter2).vote(1, 0);
+    await contracts.governanceCore.connect(actors.voter3).vote(1, 0);
+    await time.increase(EMERGENCY_VOTE_PERIOD + 1);
+    await contracts.governanceCore.finalizeProposal(1);
+
+    const p = await contracts.governanceCore.getProposal(1);
+    expect(p.status).to.equal(1); // Approved
+    expect(p.councilWindowEnd).to.equal(0n); // EmergencyConfirm has no council window
+
+    await contracts.governanceCore.executeProposal(1);
+    const fr = await contracts.archiveCouncil.getFreezeRecord(1);
+    expect(fr.confirmed).to.equal(true);
+
+    await time.increase(FREEZE_CONFIRM_PERIOD + 1);
+    await contracts.archiveCouncil.checkAndAutoUnfreeze(1);
+    const doc = await contracts.registry.getDocument(1);
+    expect(doc.status).to.equal(1); // Still Frozen after deadline because confirmed
+  });
+
+  it("should unfreeze when EmergencyConfirm is rejected", async () => {
+    const { contracts, actors } = await loadFixture(deployFixture);
+    await stakeFor(contracts.stakingManager, actors.author1, 12);
+    await contracts.registry.connect(actors.author1).createDocument("Freeze Reject Doc", [], "desc");
+
+    const signers = await ethers.getSigners();
+    for (let i = 6; i <= 10; i++) {
+      await contracts.archiveCouncil.connect(signers[i]).castEmergencyFreeze(1, 0, "E".repeat(50));
+    }
+
+    await time.increase(EMERGENCY_VOTE_PERIOD + 1);
+    await contracts.governanceCore.finalizeProposal(1);
+
+    const p = await contracts.governanceCore.getProposal(1);
+    expect(p.status).to.equal(3); // Rejected
+    const doc = await contracts.registry.getDocument(1);
+    expect(doc.status).to.equal(0); // Active
+  });
+
+  it("should NOT be able to freeze the same document twice (MAX_FREEZE_PER_DOC = 1)", async () => {
+    const { contracts, actors } = await loadFixture(deployFixture);
+
+    await stakeFor(contracts.stakingManager, actors.author1, 6);
+    await contracts.registry.connect(actors.author1)
+      .createDocument("Double Freeze Doc", [], "desc");
+
+    const signers = await ethers.getSigners();
+    const vetoDesc = "B".repeat(50);
+
+    // First freeze attempt
+    for (let i = 6; i <= 10; i++) {
+      await contracts.archiveCouncil.connect(signers[i])
+        .castEmergencyFreeze(1, 0, vetoDesc);
+    }
+
+    // Auto-unfreeze
+    await time.increase(FREEZE_CONFIRM_PERIOD + 1);
+    await contracts.archiveCouncil.checkAndAutoUnfreeze(1);
+
+    // Second freeze attempt should fail: MAX_FREEZE_PER_DOC = 1 already exhausted
+    await expect(
+      contracts.archiveCouncil.connect(signers[6])
+        .castEmergencyFreeze(1, 0, vetoDesc)
+    ).to.be.revertedWithCustomError(contracts.archiveCouncil, "Council__DocAlreadyFrozenByCouncil");
+  });
+
+  it("should revert castEmergencyFreeze if document is already Frozen (v3.4 fix)", async () => {
+    const { contracts, actors } = await loadFixture(deployFixture);
+
+    await stakeFor(contracts.stakingManager, actors.author1, 6);
+    await contracts.registry.connect(actors.author1)
+      .createDocument("Already Frozen Doc", [], "desc");
+
+    // Manually freeze via COUNCIL_ROLE
+    const COUNCIL_ROLE = ethers.keccak256(ethers.toUtf8Bytes("COUNCIL_ROLE"));
+    await (contracts.registry as any).grantRole(COUNCIL_ROLE, actors.admin.address);
+    await contracts.registry.connect(actors.admin).setDocumentStatus(1, 1); // Frozen
+
+    // Trying to cast freeze on already-frozen doc should revert
+    const signers = await ethers.getSigners();
+    await expect(
+      contracts.archiveCouncil.connect(signers[6])
+        .castEmergencyFreeze(1, 0, "C".repeat(50))
+    ).to.be.revertedWithCustomError(contracts.archiveCouncil, "Council__DocNotActive");
   });
 });

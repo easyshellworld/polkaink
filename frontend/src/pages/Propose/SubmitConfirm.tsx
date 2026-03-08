@@ -25,6 +25,10 @@ export function SubmitConfirm({ title, contentSize, onConfirm, onBack, isSubmitt
           <dt className="text-[var(--color-text-secondary)]">Content size</dt>
           <dd className="font-medium">{(contentSize / 1024).toFixed(1)} KB</dd>
         </div>
+        <div className="flex justify-between">
+          <dt className="text-[var(--color-text-secondary)]">Stake Required</dt>
+          <dd className="font-medium">88 PAS (VersionUpdate)</dd>
+        </div>
       </dl>
       <div className="flex gap-3 justify-end">
         <Button variant="secondary" onClick={onBack} disabled={isSubmitting}>

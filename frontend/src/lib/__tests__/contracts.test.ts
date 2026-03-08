@@ -28,7 +28,7 @@ describe('getContractAddress', () => {
     'Treasury',
     'ProxyAdmin',
     'StakingManager',
-    'ReportManager',
+    'ArchiveCouncil',
   ];
 
   contractNames.forEach((name) => {

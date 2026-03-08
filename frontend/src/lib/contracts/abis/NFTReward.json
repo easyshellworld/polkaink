@@ -168,39 +168,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "provided",
-        "type": "uint8"
-      }
-    ],
-    "name": "NFT__InvalidOGType",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }
     ],
     "name": "NFT__NotActive",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "holder",
-        "type": "address"
-      },
-      {
-        "internalType": "uint8",
-        "name": "ogType",
-        "type": "uint8"
-      }
-    ],
-    "name": "NFT__OGCapReached",
     "type": "error"
   },
   {
@@ -346,30 +319,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "docId",
+        "name": "linkedDocId",
         "type": "uint256"
       }
     ],
     "name": "NFTMinted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "holder",
-        "type": "address"
-      }
-    ],
-    "name": "OGGoldRevoked",
     "type": "event"
   },
   {
@@ -487,19 +441,6 @@
   },
   {
     "inputs": [],
-    "name": "AUTHOR_MINTER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "CREATOR_MINTER_ROLE",
     "outputs": [
       {
@@ -527,19 +468,6 @@
   {
     "inputs": [],
     "name": "MEMBER_MINTER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "OG_MINTER_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -813,7 +741,7 @@
         "type": "address"
       }
     ],
-    "name": "hasActiveMember",
+    "name": "hasActiveGuardian",
     "outputs": [
       {
         "internalType": "bool",
@@ -832,7 +760,7 @@
         "type": "address"
       }
     ],
-    "name": "hasActiveOGGold",
+    "name": "hasActiveMember",
     "outputs": [
       {
         "internalType": "bool",
@@ -873,6 +801,11 @@
         "internalType": "address",
         "name": "admin",
         "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "councilMembers",
+        "type": "address[]"
       }
     ],
     "name": "initialize",
@@ -902,54 +835,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "holder",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      }
-    ],
-    "name": "isAuthorOf",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintAuthorNFT",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1006,30 +891,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "enum INFTReward.NFTType",
-        "name": "ogType",
-        "type": "uint8"
-      }
-    ],
-    "name": "mintOGNFT",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -1037,30 +898,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "holder",
-        "type": "address"
-      },
-      {
-        "internalType": "enum INFTReward.NFTType",
-        "name": "ogType",
-        "type": "uint8"
-      }
-    ],
-    "name": "ogCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1112,19 +949,6 @@
       }
     ],
     "name": "renounceRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "revokeOGGold",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

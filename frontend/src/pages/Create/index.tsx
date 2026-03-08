@@ -42,7 +42,7 @@ export default function CreatePage() {
 
       addNotification({ id: nid, type: 'pending', message: t('create.tx_submitting') });
       const hash = await writeContract(walletClient, 'PolkaInkRegistry', 'createDocument', [
-        title.trim(), tagArray,
+        title.trim(), tagArray, '',
       ], { gas: TX_GAS });
       updateNotification(nid, { message: t('create.tx_confirming') });
       const receipt = await waitForTx(hash);

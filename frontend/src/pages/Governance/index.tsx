@@ -11,12 +11,12 @@ import type { ProposalData } from '../../hooks/useProposals';
 
 const STATUS_FILTERS = [
   { key: -1, label: 'All' },
-  { key: 1, label: 'governance.status_active' },
-  { key: 2, label: 'governance.status_passed' },
-  { key: 3, label: 'governance.status_queued' },
+  { key: 0, label: 'governance.status_active' },
+  { key: 1, label: 'governance.status_passed' },
+  { key: 2, label: 'governance.status_vetoed' },
+  { key: 3, label: 'governance.status_rejected' },
   { key: 4, label: 'governance.status_executed' },
-  { key: 5, label: 'governance.status_rejected' },
-  { key: 6, label: 'governance.status_vetoed' },
+  { key: 5, label: 'governance.status_cancelled' },
 ];
 
 export default function GovernancePage() {

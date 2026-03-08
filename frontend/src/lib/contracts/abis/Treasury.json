@@ -76,12 +76,39 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "requested",
+        "name": "epochId",
+        "type": "uint256"
+      }
+    ],
+    "name": "Treasury__EpochAlreadyFinalized",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "epochId",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "Treasury__EpochNotEnded",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "available",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "required",
         "type": "uint256"
       }
     ],
@@ -91,17 +118,17 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "spendId",
+        "name": "epochId",
         "type": "uint256"
       }
     ],
-    "name": "Treasury__SpendNotApproved",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "Treasury__Unauthorized",
+    "name": "Treasury__NothingToClaim",
     "type": "error"
   },
   {
@@ -126,23 +153,73 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "sender",
+        "name": "member",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      }
+    ],
+    "name": "CouncilAllowancePaid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "note",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "totalVoterReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "voterCount",
+        "type": "uint256"
       }
     ],
-    "name": "FundsReceived",
+    "name": "EpochFinalized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "EpochRewardClaimed",
     "type": "event"
   },
   {
@@ -156,6 +233,75 @@
       }
     ],
     "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "voterCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposerRewarded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardPoolDeposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "poolBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardSkippedInsufficientPool",
     "type": "event"
   },
   {
@@ -238,20 +384,8 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum ITreasury.SpendCategory",
-        "name": "category",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
-        "name": "recipient",
+        "name": "to",
         "type": "address"
       },
       {
@@ -259,6 +393,12 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ITreasury.SpendCategory",
+        "name": "category",
+        "type": "uint8"
       }
     ],
     "name": "SpendExecuted",
@@ -279,12 +419,103 @@
   },
   {
     "inputs": [],
+    "name": "COUNCIL_ALLOWANCE_PER_MEMBER",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "COUNCIL_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "EPOCH_DURATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "EPOCH_MIN_PARTICIPATION_BPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GOVERNANCE_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PROPOSER_SHARE_BPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RESERVE_BPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -331,7 +562,7 @@
   },
   {
     "inputs": [],
-    "name": "balance",
+    "name": "VOTER_SHARE_BPS",
     "outputs": [
       {
         "internalType": "uint256",
@@ -345,13 +576,88 @@
   {
     "inputs": [
       {
-        "internalType": "enum ITreasury.SpendCategory",
-        "name": "category",
-        "type": "uint8"
-      },
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
+      }
+    ],
+    "name": "claimEpochReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositRewardPool",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address",
-        "name": "recipient",
+        "name": "member",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
+      }
+    ],
+    "name": "distributeCouncilAllowance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "voterCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "distributeProposerReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "rewardPaid",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "epochStartTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "to",
         "type": "address"
       },
       {
@@ -360,24 +666,18 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
+        "internalType": "enum ITreasury.SpendCategory",
+        "name": "category",
+        "type": "uint8"
       },
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "memo",
+        "type": "string"
       }
     ],
-    "name": "createSpendRequest",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
-      }
-    ],
+    "name": "executeSpend",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -385,13 +685,64 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "spendId",
+        "name": "epochId",
         "type": "uint256"
       }
     ],
-    "name": "executeSpend",
+    "name": "finalizeEpoch",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getEpochRecord",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "epochId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalVoterReward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "proposalCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "finalized",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ITreasury.EpochRecord",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -408,85 +759,6 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "spendId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getSpendRecord",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum ITreasury.SpendCategory",
-            "name": "category",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "proposalId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "executed",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct ITreasury.SpendRecord",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTotals",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalIncome",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalSpent",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -550,68 +822,21 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "offset",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "limit",
+        "name": "epochId",
         "type": "uint256"
       }
     ],
-    "name": "listSpendRecords",
+    "name": "pendingReward",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum ITreasury.SpendCategory",
-            "name": "category",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "proposalId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "executed",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct ITreasury.SpendRecord[]",
-        "name": "records",
-        "type": "tuple[]"
-      },
-      {
         "internalType": "uint256",
-        "name": "total",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -629,6 +854,29 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "epochId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "weight",
+        "type": "uint256"
+      }
+    ],
+    "name": "recordEpochVoterWeight",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -665,6 +913,19 @@
     "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardPoolBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

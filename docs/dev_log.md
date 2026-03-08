@@ -52,3 +52,9 @@
 * trying to make slogan 信达雅
 ## 20260303 23:27(ET)
 * tokenomics 2.0
+## 20260308
+* Contracts v3.4 修订完成：补齐 EmergencyConfirm 冻结确认/解冻链路、Council Window 分支、Registry `parentVersionId` 场景 B、Council 津贴余额语义；`npm test` 62 passed, 0 failing
+* PAS 测试网完成全套部署（9 个核心合约）并完成角色与交叉引用配置；Treasury 注资 `5000 PAS`，创建 4 条 seed 文档，`SEED_CREATOR_ROLE` 已放弃
+* Frontend 地址与 ABI 同步到 2026-03-08 新部署（含 `ArchiveCouncil`），治理状态枚举/过滤对齐 v3.4，Document/Proposal Markdown 读取与展示链路修复
+* Frontend 文档页增强：版本树 + Diff 视图；Council 页交互增强（成员抽屉、allowance 状态）；`88 DOT` 文案清理为 `88 PAS`
+* Frontend 本地验证：`npm test -- --runInBand` 通过（5 suites, 37 tests），`npm run build` 通过

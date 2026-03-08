@@ -7,14 +7,19 @@ export interface ProposalData {
   proposer: string;
   docId: bigint;
   targetVersionId: bigint;
+  parentVersionId: bigint;
   score: bigint;
+  totalVoteWeight: bigint;
+  voterCount: bigint;
+  snapshotTotalWeight: bigint;
   startTime: bigint;
   endTime: bigint;
+  councilWindowEnd: bigint;
   status: number;
   callData: string;
   description: string;
-  goldVetoed: boolean;
-  noVoterCount: bigint;
+  proposalStake: bigint;
+  timelockTarget: string;
 }
 
 export function useProposals(page: number, perPage = 10) {

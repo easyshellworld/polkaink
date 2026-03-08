@@ -7,29 +7,36 @@ import { Skeleton } from '../../components/ui/Skeleton';
 interface NFTMetadata {
   tokenId: bigint;
   nftType: number;
-  recipient: string;
+  holder: string;
   mintedAt: bigint;
-  linkedProposalId: bigint;
+  lockEnd: bigint;
   linkedDocId: bigint;
-  linkedVersionId: bigint;
-  termEnd: bigint;
-  soulbound: boolean;
+  linkedProposalId: bigint;
   active: boolean;
 }
+
+const NFT_TYPE_CONFIG: Record<number, { label: string; color: string; icon: string }> = {
+  0: { label: 'Member', color: 'bg-blue-500', icon: '◈' },
+  1: { label: 'Creator', color: 'bg-[var(--color-primary)]', icon: '◎' },
+  2: { label: 'Guardian', color: 'bg-amber-500', icon: '⬡' },
+};
 
 function useNFTs(address: string) {
   return useQuery({
     queryKey: ['nfts', address],
     queryFn: async () => {
-      const [authorIds, guardianIds] = await Promise.all([
-        readContract('NFTReward', 'getAuthorNFTs', [address as `0x${string}`]),
-        readContract('NFTReward', 'getGuardianNFTs', [address as `0x${string}`]),
+      const [memberIds, creatorIds, guardianIds] = await Promise.all([
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 0]),
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 1]),
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 2]),
       ]);
 
-      const authorTokenIds = authorIds as bigint[];
-      const guardianTokenIds = guardianIds as bigint[];
+      const allIds = [
+        ...(memberIds as bigint[]),
+        ...(creatorIds as bigint[]),
+        ...(guardianIds as bigint[]),
+      ];
 
-      const allIds = [...authorTokenIds, ...guardianTokenIds];
       if (allIds.length === 0) return [];
 
       const metadataPromises = allIds.map((id) =>
@@ -56,32 +63,30 @@ export function NFTGallery({ address }: { address: string }) {
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-          {nfts.map((nft) => (
-            <div
-              key={Number(nft.tokenId)}
-              className="rounded-lg border border-[var(--color-border)] p-3 text-center"
-            >
-              <div className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold text-white ${
-                nft.nftType === 0
-                  ? 'bg-[var(--color-primary)]'
-                  : 'bg-[var(--color-secondary)]'
-              }`}>
-                ◎
-              </div>
-              <div className="text-xs font-semibold">
-                {nft.nftType === 0 ? 'Historian' : 'Guardian'} #{Number(nft.tokenId)}
-              </div>
-              {nft.nftType === 0 && (
-                <div className="text-xs text-[var(--color-text-secondary)]">
-                  Doc #{Number(nft.linkedDocId)}
+          {nfts.map((nft) => {
+            const type = NFT_TYPE_CONFIG[nft.nftType] ?? NFT_TYPE_CONFIG[1];
+            return (
+              <div
+                key={Number(nft.tokenId)}
+                className="rounded-lg border border-[var(--color-border)] p-3 text-center"
+              >
+                <div className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold text-white ${type.color}`}>
+                  {type.icon}
                 </div>
-              )}
-              <div className="mt-1">
-                {nft.soulbound && <Badge variant="primary" pill>Soulbound</Badge>}
-                {nft.active && <Badge variant="success" pill>Active</Badge>}
+                <div className="text-xs font-semibold">
+                  {type.label} #{Number(nft.tokenId)}
+                </div>
+                {nft.nftType === 1 && Number(nft.linkedDocId) > 0 && (
+                  <div className="text-xs text-[var(--color-text-secondary)]">
+                    Doc #{Number(nft.linkedDocId)}
+                  </div>
+                )}
+                <div className="mt-1">
+                  <Badge variant={nft.active ? 'success' : 'neutral'} pill>{nft.active ? 'Active' : 'Inactive'}</Badge>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Card>

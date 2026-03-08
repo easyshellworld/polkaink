@@ -1,60 +1,43 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title IVersionStore
-/// @notice Document version storage interface: manages version tree and calldata index
 interface IVersionStore {
 
-    enum CompressionType { None, Gzip, Zstd }
-
     struct Version {
-        uint256 id;
-        uint256 docId;
-        uint256 parentVersionId;
-        address author;
-        bytes32 contentHash;
-        uint256 calldataTxHash;
-        uint256 blockNumber;
-        uint256 timestamp;
-        CompressionType compression;
-        uint32 contentLength;
-        bool isSharded;
-        uint8 shardCount;
-    }
-
-    struct Shard {
         uint256 versionId;
-        uint8 shardIndex;
-        bytes32 shardHash;
-        uint256 calldataTxHash;
+        uint256 docId;
+        uint256 parentVersionId; // 0 = initial version (seed doc first version)
+        address author;
+        uint256 proposalId;      // seed doc first version proposalId = 0
+        bytes32 contentHash;     // seed doc first version contentHash = bytes32(0)
+        uint256 txBlock;
+        uint256 txIndex;
+        uint256 timestamp;
     }
 
     function storeVersion(
         uint256 docId,
         uint256 parentVersionId,
         address author,
+        uint256 proposalId,
         bytes32 contentHash,
-        CompressionType compression,
-        uint32 contentLength
+        uint256 txBlock,
+        uint256 txIndex
     ) external returns (uint256 versionId);
 
-    function appendShard(
-        uint256 versionId,
-        uint8 shardIndex,
-        bytes32 shardHash,
-        uint256 calldataTxHash
-    ) external;
-
-    function setCurrentVersion(uint256 docId, uint256 versionId) external;
-
     function getVersion(uint256 versionId) external view returns (Version memory);
-    function getShards(uint256 versionId) external view returns (Shard[] memory);
-    function getAncestors(uint256 versionId) external view returns (uint256[] memory);
-    function getChildren(uint256 versionId) external view returns (uint256[] memory);
-    function getCurrentVersion(uint256 docId) external view returns (uint256);
-    function getVersionDAG(uint256 docId) external view returns (uint256[] memory versionIds, uint256[] memory parentIds);
+    function getVersionsByDoc(uint256 docId) external view returns (uint256[] memory versionIds);
+    function getVersionAncestors(uint256 versionId) external view returns (uint256[] memory);
     function totalVersions() external view returns (uint256);
 
-    event VersionStored(uint256 indexed versionId, uint256 indexed docId, uint256 indexed parentVersionId, address author, bytes32 contentHash, uint256 blockNumber);
-    event ShardAppended(uint256 indexed versionId, uint8 shardIndex, bytes32 shardHash);
+    event VersionStored(
+        uint256 indexed versionId,
+        uint256 indexed docId,
+        uint256 parentVersionId,
+        address indexed author,
+        bytes32 contentHash
+    );
+
+    error VersionStore__Unauthorized();
+    error VersionStore__VersionNotFound(uint256 versionId);
 }

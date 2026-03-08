@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { keccak256, toHex } from 'viem';
@@ -16,6 +17,7 @@ export default function ProposePage() {
   const { t } = useTranslation();
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const walletClient = useWalletStore((s) => s.walletClient);
   const address = useWalletStore((s) => s.address);
   const { addNotification, updateNotification } = useNotificationStore();
@@ -49,23 +51,32 @@ export default function ProposePage() {
     setSubmitting(true);
     const nid = `propose-${Date.now()}`;
     try {
-      const contentBytes = new TextEncoder().encode(content);
+      const markdown = content;
+      const payload = JSON.stringify({
+        summary: description.trim(),
+        markdown,
+      });
+      const contentBytes = new TextEncoder().encode(markdown);
       const contentHash = keccak256(toHex(contentBytes));
 
       addNotification({ id: nid, type: 'pending', message: t('propose.tx_submitting') });
-      const markdownHex = toHex(contentBytes);
       const hash = await writeContract(walletClient, 'PolkaInkRegistry', 'proposeVersion', [
         BigInt(Number(doc.id)),
         BigInt(Number(doc.currentVersionId)),
         contentHash,
-        markdownHex,
-      ], { gas: 1_000_000n });
+        payload,
+      ]);
       updateNotification(nid, { message: t('propose.tx_confirming') });
       const receipt = await waitForTx(hash);
       updateNotification(nid, { type: 'success', message: t('propose.tx_success', { hash: receipt.transactionHash.slice(0, 10) }) });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['proposals'] }),
+        queryClient.invalidateQueries({ queryKey: ['recentProposals'] }),
+      ]);
       navigate('/governance');
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Failed: ' + (err as Error).message });
+      const msg = err instanceof Error ? err.message : String(err);
+      updateNotification(nid, { type: 'error', message: `Failed: ${msg}` });
     } finally {
       setSubmitting(false);
     }

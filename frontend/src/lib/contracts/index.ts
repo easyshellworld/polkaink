@@ -23,6 +23,7 @@ import ReportManagerABI from './abis/ReportManager.json';
 import NftABI from './abis/NFTReward.json';
 import TreasuryABI from './abis/Treasury.json';
 import VersionStoreABI from './abis/VersionStore.json';
+import ArchiveCouncilABI from './abis/ArchiveCouncil.json';
 import { PAS_NETWORK, getContractAddress } from './addresses';
 
 export { PAS_NETWORK, getContractAddress };
@@ -37,6 +38,7 @@ const ABIS: Record<string, Abi> = {
   VersionStore: VersionStoreABI as Abi,
   StakingManager: StakingManagerABI as Abi,
   ReportManager: ReportManagerABI as Abi,
+  ArchiveCouncil: ArchiveCouncilABI as Abi,
 };
 
 export const pasChain = defineChain({
@@ -108,7 +110,11 @@ export async function writeContract(
 
 export async function waitForTx(hash: Hash): Promise<TransactionReceipt> {
   const pc = getPublicClient();
-  return pc.waitForTransactionReceipt({ hash });
+  const receipt = await pc.waitForTransactionReceipt({ hash });
+  if (receipt.status !== 'success') {
+    throw new Error(`Transaction reverted: ${hash}`);
+  }
+  return receipt;
 }
 
 export function createBrowserWalletClient(account: `0x${string}`): WalletClient {

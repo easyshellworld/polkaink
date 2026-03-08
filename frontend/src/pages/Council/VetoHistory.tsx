@@ -9,7 +9,7 @@ export function VetoHistory() {
   const { data } = useProposals(0, 50);
 
   const proposals = data?.proposals ?? [];
-  const vetoedProposals = proposals.filter((p) => p.status === 3);
+  const vetoedProposals = proposals.filter((p) => p.status === 2);
 
   return (
     <Card>

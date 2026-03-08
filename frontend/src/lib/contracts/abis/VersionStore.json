@@ -84,6 +84,22 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "VersionStore__Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "versionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "VersionStore__VersionNotFound",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -176,31 +192,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint8",
-        "name": "shardIndex",
-        "type": "uint8"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "shardHash",
-        "type": "bytes32"
-      }
-    ],
-    "name": "ShardAppended",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "implementation",
         "type": "address"
@@ -225,13 +216,13 @@
         "type": "uint256"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256",
         "name": "parentVersionId",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "author",
         "type": "address"
@@ -241,12 +232,6 @@
         "internalType": "bytes32",
         "name": "contentHash",
         "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "blockNumber",
-        "type": "uint256"
       }
     ],
     "name": "VersionStored",
@@ -307,91 +292,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "shardIndex",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "shardHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "calldataTxHash",
-        "type": "uint256"
-      }
-    ],
-    "name": "appendShard",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAncestors",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getChildren",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getCurrentVersion",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "role",
         "type": "bytes32"
@@ -416,54 +316,13 @@
         "type": "uint256"
       }
     ],
-    "name": "getShards",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "versionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint8",
-            "name": "shardIndex",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "shardHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "calldataTxHash",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IVersionStore.Shard[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
     "name": "getVersion",
     "outputs": [
       {
         "components": [
           {
             "internalType": "uint256",
-            "name": "id",
+            "name": "versionId",
             "type": "uint256"
           },
           {
@@ -482,44 +341,29 @@
             "type": "address"
           },
           {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          },
+          {
             "internalType": "bytes32",
             "name": "contentHash",
             "type": "bytes32"
           },
           {
             "internalType": "uint256",
-            "name": "calldataTxHash",
+            "name": "txBlock",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "blockNumber",
+            "name": "txIndex",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
             "name": "timestamp",
             "type": "uint256"
-          },
-          {
-            "internalType": "enum IVersionStore.CompressionType",
-            "name": "compression",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint32",
-            "name": "contentLength",
-            "type": "uint32"
-          },
-          {
-            "internalType": "bool",
-            "name": "isSharded",
-            "type": "bool"
-          },
-          {
-            "internalType": "uint8",
-            "name": "shardCount",
-            "type": "uint8"
           }
         ],
         "internalType": "struct IVersionStore.Version",
@@ -534,20 +378,34 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "versionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getVersionAncestors",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "docId",
         "type": "uint256"
       }
     ],
-    "name": "getVersionDAG",
+    "name": "getVersionsByDoc",
     "outputs": [
       {
         "internalType": "uint256[]",
-        "name": "versionIds",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "parentIds",
+        "name": "",
         "type": "uint256[]"
       }
     ],
@@ -667,24 +525,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "versionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCurrentVersion",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "parentVersionId",
         "type": "uint256"
       },
@@ -694,19 +534,24 @@
         "type": "address"
       },
       {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
         "internalType": "bytes32",
         "name": "contentHash",
         "type": "bytes32"
       },
       {
-        "internalType": "enum IVersionStore.CompressionType",
-        "name": "compression",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "txBlock",
+        "type": "uint256"
       },
       {
-        "internalType": "uint32",
-        "name": "contentLength",
-        "type": "uint32"
+        "internalType": "uint256",
+        "name": "txIndex",
+        "type": "uint256"
       }
     ],
     "name": "storeVersion",

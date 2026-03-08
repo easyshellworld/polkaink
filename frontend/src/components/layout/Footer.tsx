@@ -3,10 +3,7 @@ import { Link } from 'react-router-dom';
 import { PAS_NETWORK, getContractAddress } from '../../lib/contracts/addresses';
 
 const DONATE_ADDRESSES = [
-  { chain: 'Polkadot / BSC / EVM', address: '0x9D0aB09c181A9238816645811611b203A7934EE5' },
-  { chain: 'Tron', address: 'TLb1pjrbNJZN7gdiywvqJ6dsxZWWATXgUV' },
-  { chain: 'Solana', address: 'EvQr6ueXbV2j93YhoQJY2kxrT9zrT4tMjKoHjgDT6p7K' },
-  { chain: 'Bitcoin', address: 'bc1qxyz2k42dnt7l887uqm3z2letruhkjskq2swafz' },
+  { chain: 'Polkadot (SS58)', address: '5FhEszW3yVUwPTbLjjVgHqyAese8zoaxHJbjbqzQDhecmfg3' },
 ];
 
 export function Footer() {

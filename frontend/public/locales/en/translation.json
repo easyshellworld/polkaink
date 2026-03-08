@@ -192,8 +192,8 @@
   },
   "staking": {
     "title": "Staking",
-    "subtitle": "Stake 88 DOT to become a member",
-    "stake_button": "Stake 88 DOT",
+    "subtitle": "Stake 88 PAS to become a member",
+    "stake_button": "Stake 88 PAS",
     "lock_period": "Lock Period",
     "months": "months",
     "your_stake": "Your Stake",

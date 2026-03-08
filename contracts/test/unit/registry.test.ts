@@ -1,88 +1,151 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { loadFixture, time } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { deployFixture, stakeFor } from "../fixtures/deployFixture";
 
-describe("PolkaInkRegistry v2", () => {
+describe("PolkaInkRegistry v3.3", () => {
+  const VOTING_PERIOD = 10 * 60;
+
   describe("createDocument", () => {
-    it("should create document and mint Author NFT for active members", async () => {
+    it("should allow active members to create documents", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
 
       await expect(
-        contracts.registry.connect(actors.author1).createDocument("Polkadot History", ["polkadot"])
+        contracts.registry.connect(actors.author1).createDocument("My Doc", ["#test"], "desc")
       ).to.emit(contracts.registry, "DocumentCreated");
 
       const doc = await contracts.registry.getDocument(1);
-      expect(doc.title).to.equal("Polkadot History");
-      expect(doc.author).to.equal(actors.author1.address);
-
-      // Author NFT should be minted
-      expect(await contracts.nftReward.isAuthorOf(actors.author1.address, 1)).to.be.true;
+      expect(doc.title).to.equal("My Doc");
+      expect(doc.isSeed).to.be.false;
     });
 
     it("should revert for non-members", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await expect(
-        contracts.registry.connect(actors.author1).createDocument("Doc", [])
+        contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc")
       ).to.be.revertedWithCustomError(contracts.registry, "Registry__NotActiveMember");
     });
+  });
 
-    it("should revert on empty title", async () => {
+  describe("createSeedDocument", () => {
+    it("should allow SEED_CREATOR_ROLE to create seed documents with empty content", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1);
+
       await expect(
-        contracts.registry.connect(actors.author1).createDocument("", [])
-      ).to.be.revertedWithCustomError(contracts.registry, "Registry__InvalidTitle");
+        contracts.registry.connect(actors.admin).createSeedDocument("Seed Doc", ["#seed"])
+      ).to.emit(contracts.registry, "DocumentCreated");
+
+      const doc = await contracts.registry.getDocument(1);
+      expect(doc.isSeed).to.be.true;
+      expect(doc.title).to.equal("Seed Doc");
+      expect(doc.currentVersionId).to.equal(0);
     });
 
-    it("should revert on too many tags", async () => {
+    it("should revert after SEED_CREATOR_ROLE is renounced", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1);
-      const tags = Array.from({ length: 11 }, (_, i) => `tag${i}`);
+      const SEED_CREATOR_ROLE = ethers.keccak256(ethers.toUtf8Bytes("SEED_CREATOR_ROLE"));
+      await (contracts.registry as any).renounceRole(SEED_CREATOR_ROLE, actors.admin.address);
+
       await expect(
-        contracts.registry.connect(actors.author1).createDocument("Doc", tags)
-      ).to.be.revertedWithCustomError(contracts.registry, "Registry__TooManyTags");
+        contracts.registry.connect(actors.admin).createSeedDocument("Seed", [])
+      ).to.be.reverted;
     });
   });
 
   describe("proposeVersion", () => {
-    it("should propose version (non-payable) for active members", async () => {
+    it("should create proposal for active members", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
-      await contracts.registry.connect(actors.author1).createDocument("Test Doc", []);
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
 
-      const contentHash = ethers.keccak256(ethers.toUtf8Bytes("content"));
       await expect(
-        contracts.registry.connect(actors.author1).proposeVersion(
-          1, 0, contentHash, ethers.toUtf8Bytes("# Content")
-        )
+        contracts.registry.connect(actors.author1)
+          .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1")), "First version")
       ).to.emit(contracts.registry, "VersionProposed");
     });
 
-    it("should revert for non-members", async () => {
+    it("should revert if active proposal already exists", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
-      await contracts.registry.connect(actors.author1).createDocument("Doc", []);
+      await stakeFor(contracts.stakingManager, actors.author2);
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
+
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1")), "v1");
 
       await expect(
-        contracts.registry.connect(actors.voter1).proposeVersion(
-          1, 0, ethers.ZeroHash, "0x"
-        )
-      ).to.be.revertedWithCustomError(contracts.registry, "Registry__NotActiveMember");
+        contracts.registry.connect(actors.author2)
+          .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1b")), "v1b")
+      ).to.be.revertedWithCustomError(contracts.registry, "Registry__ActiveProposalExists");
+    });
+
+    it("should allow parentVersionId case B when previous proposal is Approved but unexecuted", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      await stakeFor(contracts.stakingManager, actors.author1, 12);
+      await stakeFor(contracts.stakingManager, actors.voter1, 6);
+      await stakeFor(contracts.stakingManager, actors.voter2, 3);
+      await stakeFor(contracts.stakingManager, actors.voter3, 3);
+
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1")), "v1");
+
+      await contracts.governanceCore.connect(actors.voter1).vote(1, 0);
+      await contracts.governanceCore.connect(actors.voter2).vote(1, 0);
+      await contracts.governanceCore.connect(actors.voter3).vote(1, 0);
+      await time.increase(VOTING_PERIOD + 1);
+      await contracts.governanceCore.finalizeProposal(1);
+
+      const p1 = await contracts.governanceCore.getProposal(1);
+      expect(p1.status).to.equal(1); // Approved
+
+      await expect(
+        contracts.registry.connect(actors.author1)
+          .proposeVersion(1, p1.targetVersionId, ethers.keccak256(ethers.toUtf8Bytes("v2")), "v2")
+      ).to.emit(contracts.registry, "VersionProposed");
+    });
+
+    it("should reject parentVersionId=currentVersionId when case B parent is required", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      await stakeFor(contracts.stakingManager, actors.author1, 12);
+      await stakeFor(contracts.stakingManager, actors.voter1, 6);
+      await stakeFor(contracts.stakingManager, actors.voter2, 3);
+      await stakeFor(contracts.stakingManager, actors.voter3, 3);
+
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v1")), "v1");
+
+      await contracts.governanceCore.connect(actors.voter1).vote(1, 0);
+      await contracts.governanceCore.connect(actors.voter2).vote(1, 0);
+      await contracts.governanceCore.connect(actors.voter3).vote(1, 0);
+      await time.increase(VOTING_PERIOD + 1);
+      await contracts.governanceCore.finalizeProposal(1);
+
+      await expect(
+        contracts.registry.connect(actors.author1)
+          .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("v2")), "v2")
+      ).to.be.revertedWithCustomError(contracts.registry, "Registry__InvalidParentVersion");
     });
   });
 
-  describe("listDocuments", () => {
-    it("should paginate correctly", async () => {
+  describe("setDocumentStatus", () => {
+    it("should allow COUNCIL_ROLE to freeze and unfreeze documents", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
-      for (let i = 0; i < 5; i++) {
-        await contracts.registry.connect(actors.author1).createDocument(`Doc ${i}`, []);
-      }
-      const [docs, total] = await contracts.registry.listDocuments(0, 3);
-      expect(total).to.equal(5n);
-      expect(docs.length).to.equal(3);
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
+
+      const COUNCIL_ROLE = ethers.keccak256(ethers.toUtf8Bytes("COUNCIL_ROLE"));
+      await (contracts.registry as any).grantRole(COUNCIL_ROLE, actors.admin.address);
+
+      await contracts.registry.connect(actors.admin).setDocumentStatus(1, 1); // Frozen
+      let doc = await contracts.registry.getDocument(1);
+      expect(doc.status).to.equal(1); // Frozen
+
+      await contracts.registry.connect(actors.admin).setDocumentStatus(1, 0); // Active
+      doc = await contracts.registry.getDocument(1);
+      expect(doc.status).to.equal(0); // Active
     });
   });
 });

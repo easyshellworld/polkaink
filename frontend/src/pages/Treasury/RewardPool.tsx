@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { formatEther } from 'viem';
+import { formatEther, parseEther } from 'viem';
 import { readContract } from '../../lib/contracts';
 import { Card } from '../../components/ui/Card';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -8,37 +8,27 @@ import { Skeleton } from '../../components/ui/Skeleton';
 export function RewardPool() {
   const { t } = useTranslation();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['treasuryTotals'],
-    queryFn: async () => {
-      const result = await readContract('Treasury', 'getTotals');
-      const [totalIncome, totalSpent] = result as [bigint, bigint];
-      return {
-        totalIncome: formatEther(totalIncome),
-        totalSpent: formatEther(totalSpent),
-      };
-    },
+  const { data: poolBalance, isLoading } = useQuery({
+    queryKey: ['rewardPoolBalance'],
+    queryFn: async () => readContract('Treasury', 'rewardPoolBalance') as Promise<bigint>,
     staleTime: 30_000,
   });
 
   if (isLoading) return <Skeleton className="h-24 mb-6" />;
 
+  const isPaused = (poolBalance ?? 0n) < parseEther('50');
+
   return (
     <Card className="mb-6">
       <h2 className="text-sm font-semibold mb-3">{t('treasury.reward_pool')}</h2>
-      <div className="grid grid-cols-2 gap-4 text-center">
-        <div>
-          <div className="text-lg font-bold text-[var(--color-success)]">
-            {data ? parseFloat(data.totalIncome).toFixed(4) : '0'} PAS
-          </div>
-          <div className="text-xs text-[var(--color-text-secondary)]">{t('treasury.total_income')}</div>
+      <div className="text-center">
+        <div className={`text-2xl font-bold ${isPaused ? 'text-amber-500' : 'text-[var(--color-success)]'}`}>
+          {formatEther(poolBalance ?? 0n)} PAS
         </div>
-        <div>
-          <div className="text-lg font-bold text-[var(--color-error)]">
-            {data ? parseFloat(data.totalSpent).toFixed(4) : '0'} PAS
-          </div>
-          <div className="text-xs text-[var(--color-text-secondary)]">{t('treasury.total_spent')}</div>
-        </div>
+        <div className="text-xs text-[var(--color-text-secondary)]">Reward Pool Balance</div>
+        {isPaused && (
+          <div className="mt-2 text-xs text-amber-600">Rewards paused until pool reaches 50 PAS.</div>
+        )}
       </div>
     </Card>
   );

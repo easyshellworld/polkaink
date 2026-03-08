@@ -3,12 +3,28 @@ import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { deployFixture, stakeFor } from "../fixtures/deployFixture";
 
-describe("NFTReward v2", () => {
+describe("NFTReward v3.3", () => {
+  describe("Guardian NFT", () => {
+    it("should mint Guardian NFTs in constructor for all 7 genesis members", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      // councilMember1 and councilMember2 are among genesis members
+      expect(await contracts.nftReward.hasActiveGuardian(actors.councilMember1.address)).to.be.true;
+      expect(await contracts.nftReward.hasActiveGuardian(actors.councilMember2.address)).to.be.true;
+    });
+
+    it("should NOT have GUARDIAN_MINTER_ROLE on any address", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      const GUARDIAN_MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes("GUARDIAN_MINTER_ROLE"));
+      expect(
+        await (contracts.nftReward as any).hasRole(GUARDIAN_MINTER_ROLE, actors.admin.address)
+      ).to.be.false;
+    });
+  });
+
   describe("Member NFT", () => {
-    it("should be minted on stake and tracked", async () => {
+    it("should be minted on stake", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
-
       expect(await contracts.nftReward.hasActiveMember(actors.author1.address)).to.be.true;
       const nfts = await contracts.nftReward.getNFTsByType(actors.author1.address, 0); // Member=0
       expect(nfts.length).to.equal(1);
@@ -17,7 +33,6 @@ describe("NFTReward v2", () => {
     it("should be soulbound (non-transferable)", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1);
-
       const nfts = await contracts.nftReward.getNFTsByType(actors.author1.address, 0);
       await expect(
         contracts.nftReward.connect(actors.author1).transferFrom(
@@ -25,59 +40,28 @@ describe("NFTReward v2", () => {
         )
       ).to.be.revertedWithCustomError(contracts.nftReward, "NFT__Soulbound");
     });
-  });
 
-  describe("Author NFT", () => {
-    it("should be minted on document creation", async () => {
+    it("should deactivate Member NFT on unstake", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1);
+      await stakeFor(contracts.stakingManager, actors.author1, 3);
 
-      await contracts.registry.connect(actors.author1).createDocument("Test Doc", ["test"]);
-      expect(await contracts.nftReward.isAuthorOf(actors.author1.address, 1)).to.be.true;
+      const { time } = await import("@nomicfoundation/hardhat-toolbox/network-helpers");
+      await time.increase(3 * 30 * 24 * 3600 + 1);
+
+      await contracts.stakingManager.connect(actors.author1).unstake();
+      expect(await contracts.nftReward.hasActiveMember(actors.author1.address)).to.be.false;
     });
   });
 
-  describe("OG NFTs", () => {
-    it("should mint OG Gold and have active status", async () => {
+  describe("Creator NFT", () => {
+    it("should be minted by CREATOR_MINTER_ROLE only", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      // ogGoldHolder already has OG Gold from fixture
-      expect(await contracts.nftReward.hasActiveOGGold(actors.ogGoldHolder.address)).to.be.true;
-    });
-
-    it("should enforce OG caps", async () => {
-      const { contracts, actors } = await loadFixture(deployFixture);
-      // ogGoldHolder already has 1 OG Gold, try to mint another
+      // Direct mint from non-CREATOR_MINTER should fail
       await expect(
-        contracts.nftReward.connect(actors.admin).mintOGNFT(actors.ogGoldHolder.address, 5)
-      ).to.be.revertedWithCustomError(contracts.nftReward, "NFT__OGCapReached");
-    });
-
-    it("should allow multiple OG Bronze (up to 3)", async () => {
-      const { contracts, actors } = await loadFixture(deployFixture);
-      await contracts.nftReward.mintOGNFT(actors.voter1.address, 3); // OGBronze=3
-      await contracts.nftReward.mintOGNFT(actors.voter1.address, 3);
-      await contracts.nftReward.mintOGNFT(actors.voter1.address, 3);
-      await expect(
-        contracts.nftReward.mintOGNFT(actors.voter1.address, 3)
-      ).to.be.revertedWithCustomError(contracts.nftReward, "NFT__OGCapReached");
-    });
-
-    it("should revoke OG Gold", async () => {
-      const { contracts, actors } = await loadFixture(deployFixture);
-      const nfts = await contracts.nftReward.getNFTsByType(actors.ogGoldHolder.address, 5);
-      await contracts.nftReward.connect(actors.admin).revokeOGGold(nfts[0]);
-      expect(await contracts.nftReward.hasActiveOGGold(actors.ogGoldHolder.address)).to.be.false;
-    });
-  });
-
-  describe("tokenURI", () => {
-    it("should return on-chain JSON", async () => {
-      const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1);
-      const nfts = await contracts.nftReward.getNFTsByType(actors.author1.address, 0);
-      const uri = await contracts.nftReward.tokenURI(nfts[0]);
-      expect(uri).to.include("data:application/json");
-      expect(uri).to.include("Member");
+        contracts.nftReward.connect(actors.author1).mintCreatorNFT(
+          actors.author1.address, 1, 1
+        )
+      ).to.be.reverted;
     });
   });
 });

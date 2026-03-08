@@ -78,9 +78,14 @@
         "internalType": "uint256",
         "name": "docId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
       }
     ],
-    "name": "Registry__DocumentArchived",
+    "name": "Registry__ActiveProposalExists",
     "type": "error"
   },
   {
@@ -91,7 +96,7 @@
         "type": "uint256"
       }
     ],
-    "name": "Registry__DocumentFrozen",
+    "name": "Registry__DocumentFrozenCannotMerge",
     "type": "error"
   },
   {
@@ -109,18 +114,12 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "docId",
+        "name": "provided",
         "type": "uint256"
-      }
-    ],
-    "name": "Registry__DocumentRevoked",
-    "type": "error"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "versionId",
+        "name": "expected",
         "type": "uint256"
       }
     ],
@@ -147,7 +146,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "max",
+        "name": "count",
         "type": "uint256"
       }
     ],
@@ -185,25 +184,6 @@
         "type": "uint256"
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "DocumentArchived",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
         "indexed": true,
         "internalType": "address",
         "name": "author",
@@ -217,15 +197,9 @@
       },
       {
         "indexed": false,
-        "internalType": "string[]",
-        "name": "tags",
-        "type": "string[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "isSeed",
+        "type": "bool"
       }
     ],
     "name": "DocumentCreated",
@@ -239,12 +213,6 @@
         "internalType": "uint256",
         "name": "docId",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum IPolkaInkRegistry.DocumentStatus",
-        "name": "oldStatus",
-        "type": "uint8"
       },
       {
         "indexed": false,
@@ -267,6 +235,37 @@
       }
     ],
     "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newVersionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "creatorNFTId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposalMerged",
     "type": "event"
   },
   {
@@ -349,31 +348,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string[]",
-        "name": "oldTags",
-        "type": "string[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "string[]",
-        "name": "newTags",
-        "type": "string[]"
-      }
-    ],
-    "name": "TagsUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "implementation",
         "type": "address"
@@ -388,50 +362,13 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
         "name": "docId",
         "type": "uint256"
       },
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "newVersionId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "author",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "VersionMerged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
         "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "docId",
         "type": "uint256"
       },
       {
@@ -448,13 +385,26 @@
       },
       {
         "indexed": false,
-        "internalType": "bytes32",
-        "name": "contentHash",
-        "type": "bytes32"
+        "internalType": "uint256",
+        "name": "targetVersionId",
+        "type": "uint256"
       }
     ],
     "name": "VersionProposed",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "COUNCIL_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -484,7 +434,7 @@
   },
   {
     "inputs": [],
-    "name": "REPORT_ROLE",
+    "name": "SEED_CREATOR_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -524,13 +474,29 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string[]",
+        "name": "tags",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "createDocument",
+    "outputs": [
+      {
         "internalType": "uint256",
         "name": "docId",
         "type": "uint256"
       }
     ],
-    "name": "archiveDocument",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -547,7 +513,7 @@
         "type": "string[]"
       }
     ],
-    "name": "createDocument",
+    "name": "createSeedDocument",
     "outputs": [
       {
         "internalType": "uint256",
@@ -572,7 +538,7 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "id",
+            "name": "docId",
             "type": "uint256"
           },
           {
@@ -581,23 +547,18 @@
             "type": "string"
           },
           {
+            "internalType": "string[]",
+            "name": "tags",
+            "type": "string[]"
+          },
+          {
             "internalType": "address",
             "name": "author",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "currentVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "createdAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "updatedAt",
             "type": "uint256"
           },
           {
@@ -606,9 +567,19 @@
             "type": "uint8"
           },
           {
-            "internalType": "string[]",
-            "name": "tags",
-            "type": "string[]"
+            "internalType": "bool",
+            "name": "isSeed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "latestProposalId",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IPolkaInkRegistry.Document",
@@ -633,25 +604,6 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getVersionHistory",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",
@@ -731,11 +683,6 @@
       },
       {
         "internalType": "address",
-        "name": "_nftReward",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_stakingManager",
         "type": "address"
       }
@@ -764,7 +711,7 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "id",
+            "name": "docId",
             "type": "uint256"
           },
           {
@@ -773,23 +720,18 @@
             "type": "string"
           },
           {
+            "internalType": "string[]",
+            "name": "tags",
+            "type": "string[]"
+          },
+          {
             "internalType": "address",
             "name": "author",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "currentVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "createdAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "updatedAt",
             "type": "uint256"
           },
           {
@@ -798,9 +740,19 @@
             "type": "uint8"
           },
           {
-            "internalType": "string[]",
-            "name": "tags",
-            "type": "string[]"
+            "internalType": "bool",
+            "name": "isSeed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "latestProposalId",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IPolkaInkRegistry.Document[]",
@@ -840,7 +792,7 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "id",
+            "name": "docId",
             "type": "uint256"
           },
           {
@@ -849,23 +801,18 @@
             "type": "string"
           },
           {
+            "internalType": "string[]",
+            "name": "tags",
+            "type": "string[]"
+          },
+          {
             "internalType": "address",
             "name": "author",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "currentVersionId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "createdAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "updatedAt",
             "type": "uint256"
           },
           {
@@ -874,9 +821,19 @@
             "type": "uint8"
           },
           {
-            "internalType": "string[]",
-            "name": "tags",
-            "type": "string[]"
+            "internalType": "bool",
+            "name": "isSeed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentVersionId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "latestProposalId",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IPolkaInkRegistry.Document[]",
@@ -896,6 +853,11 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "proposalId",
         "type": "uint256"
       }
@@ -903,19 +865,6 @@
     "name": "mergeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "nftReward",
-    "outputs": [
-      {
-        "internalType": "contract INFTReward",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -936,9 +885,9 @@
         "type": "bytes32"
       },
       {
-        "internalType": "bytes",
-        "name": "markdownCalldata",
-        "type": "bytes"
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "name": "proposeVersion",
@@ -1020,19 +969,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_gc",
-        "type": "address"
-      }
-    ],
-    "name": "setGovernanceCore",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "stakingManager",
     "outputs": [
@@ -1075,24 +1011,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string[]",
-        "name": "newTags",
-        "type": "string[]"
-      }
-    ],
-    "name": "updateTags",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

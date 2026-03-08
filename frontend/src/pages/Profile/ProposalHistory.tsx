@@ -5,6 +5,7 @@ import { readContract } from '../../lib/contracts';
 import { Card } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/governance/StatusBadge';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { getProposalSummary } from '../../lib/utils';
 import type { ProposalData } from '../../hooks/useProposals';
 
 export function ProposalHistory({ address }: { address: string }) {
@@ -49,7 +50,7 @@ export function ProposalHistory({ address }: { address: string }) {
                 <StatusBadge status={p.status} />
                 <span className="text-sm font-medium">#{Number(p.id)}</span>
                 <span className="text-sm text-[var(--color-text-secondary)] truncate max-w-[200px]">
-                  {p.description || t('governance.version_update')}
+                  {getProposalSummary(p.description) || t('governance.version_update')}
                 </span>
               </div>
               <span className={`text-xs font-medium ${Number(p.score) > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-text-secondary)]'}`}>

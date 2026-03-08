@@ -20,3 +20,20 @@ export function timeRemaining(endTime: bigint): string {
   const mins = Math.floor((diff % 3600) / 60);
   return `${hours}h ${mins}m remaining`;
 }
+
+export function getProposalSummary(description: string): string {
+  if (!description) return '';
+
+  try {
+    const parsed = JSON.parse(description) as { summary?: string };
+    if (typeof parsed.summary === 'string') return parsed.summary.trim();
+  } catch {
+    // noop
+  }
+
+  if (/^0x[0-9a-fA-F]{32,}$/.test(description)) {
+    return '';
+  }
+
+  return description;
+}

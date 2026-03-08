@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { formatEther } from 'viem';
-import { readContract } from '../../lib/contracts';
+import { getContractAddress, getPublicClient, readContract } from '../../lib/contracts';
 import { Card } from '../../components/ui/Card';
 import { Skeleton } from '../../components/ui/Skeleton';
 
@@ -11,8 +11,15 @@ export function BalanceCard() {
   const { data, isLoading } = useQuery({
     queryKey: ['treasuryBalance'],
     queryFn: async () => {
-      const balance = await readContract('Treasury', 'balance');
-      return formatEther(balance as bigint);
+      const pc = getPublicClient();
+      const [nativeBalance, rewardPool] = await Promise.all([
+        pc.getBalance({ address: getContractAddress('Treasury') as `0x${string}` }),
+        readContract('Treasury', 'rewardPoolBalance').catch(() => 0n),
+      ]);
+      return {
+        nativeBalance: formatEther(nativeBalance),
+        rewardPool: formatEther(rewardPool as bigint),
+      };
     },
     staleTime: 30_000,
   });
@@ -25,10 +32,10 @@ export function BalanceCard() {
         {t('treasury.balance')}
       </div>
       <div className="text-3xl font-bold text-[var(--color-primary)]">
-        {data ? parseFloat(data).toFixed(4) : '0'} PAS
+        {data ? parseFloat(data.nativeBalance).toFixed(4) : '0'} PAS
       </div>
       <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-        {t('treasury.balance_desc')}
+        Reward Pool: {data ? parseFloat(data.rewardPool).toFixed(4) : '0'} PAS
       </p>
     </Card>
   );

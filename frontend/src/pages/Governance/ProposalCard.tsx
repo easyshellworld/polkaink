@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatUnits } from 'viem';
 import { useDocument } from '../../hooks/useDocuments';
 import { StatusBadge } from '../../components/governance/StatusBadge';
-import { shortenAddress, timeRemaining } from '../../lib/utils';
+import { shortenAddress, timeRemaining, getProposalSummary } from '../../lib/utils';
 import type { ProposalData } from '../../hooks/useProposals';
 
 function fmtScore(score: bigint): string {
@@ -16,9 +16,10 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
   const { t } = useTranslation();
   const { data: doc } = useDocument(Number(p.docId));
 
+  const summary = getProposalSummary(p.description);
   const title = doc?.title
-    ? (p.description ? `${p.description} — ${doc.title}` : doc.title)
-    : (p.description || t('governance.version_update'));
+    ? (summary ? `${summary} - ${doc.title}` : doc.title)
+    : (summary || t('governance.version_update'));
 
   return (
     <Link to={`/governance/${Number(p.id)}`} className="block group">
@@ -27,9 +28,9 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
               <StatusBadge status={p.status} />
-              {p.goldVetoed && (
+              {p.status === 2 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                  🏆 {t('governance.gold_vetoed', 'Gold Vetoed')}
+                  {t('governance.status_vetoed', 'Council Vetoed')}
                 </span>
               )}
               <span className="text-xs font-medium text-[var(--color-text-secondary)]">#{Number(p.id)}</span>

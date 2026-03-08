@@ -60,17 +60,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "Gov__AlreadyFinalized",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "voter",
         "type": "address"
@@ -87,23 +76,87 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "caller",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "windowEnd",
+        "type": "uint256"
       }
     ],
-    "name": "Gov__NotActiveMember",
+    "name": "Gov__CouncilWindowNotClosed",
     "type": "error"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "proposalId",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "activeProposalId",
         "type": "uint256"
       }
     ],
-    "name": "Gov__NotApproved",
+    "name": "Gov__DocumentHasActiveProposal",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "required",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "provided",
+        "type": "uint256"
+      }
+    ],
+    "name": "Gov__InsufficientStake",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "provided",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expected",
+        "type": "uint256"
+      }
+    ],
+    "name": "Gov__InvalidParentVersion",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      }
+    ],
+    "name": "Gov__MergeBlockedByFrozen",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "Gov__NotActiveMember",
     "type": "error"
   },
   {
@@ -140,19 +193,24 @@
     "type": "error"
   },
   {
-    "inputs": [],
-    "name": "Gov__Unauthorized",
-    "type": "error"
-  },
-  {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "proposalId",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cooldownEnd",
         "type": "uint256"
       }
     ],
-    "name": "Gov__VotingEnded",
+    "name": "Gov__RejectionCooldown",
     "type": "error"
   },
   {
@@ -207,13 +265,13 @@
         "type": "uint256"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "goldHolder",
-        "type": "address"
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "windowEnd",
+        "type": "uint256"
       }
     ],
-    "name": "GoldVeto",
+    "name": "CouncilWindowOpened",
     "type": "event"
   },
   {
@@ -227,25 +285,6 @@
       }
     ],
     "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "cancelledBy",
-        "type": "address"
-      }
-    ],
-    "name": "ProposalCancelled",
     "type": "event"
   },
   {
@@ -278,7 +317,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "startTime",
+        "name": "parentVersionId",
         "type": "uint256"
       },
       {
@@ -298,6 +337,12 @@
         "indexed": true,
         "internalType": "uint256",
         "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardAmount",
         "type": "uint256"
       }
     ],
@@ -324,9 +369,34 @@
         "internalType": "int256",
         "name": "score",
         "type": "int256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "participationBps",
+        "type": "uint256"
       }
     ],
     "name": "ProposalFinalized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "poolBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardSkipped",
     "type": "event"
   },
   {
@@ -450,12 +520,64 @@
   },
   {
     "inputs": [],
+    "name": "COUNCIL_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "COUNCIL_WINDOW",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "EMERGENCY_VOTING_PERIOD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PROPOSAL_STAKE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -476,7 +598,7 @@
   },
   {
     "inputs": [],
-    "name": "TIMELOCK_DELAY",
+    "name": "REJECTION_COOLDOWN",
     "outputs": [
       {
         "internalType": "uint256",
@@ -527,6 +649,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "archiveCouncil",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -536,6 +671,30 @@
     ],
     "name": "cancelProposal",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "docId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      }
+    ],
+    "name": "createEmergencyConfirm",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -555,6 +714,16 @@
         "internalType": "uint256",
         "name": "targetVersionId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "parentVersionId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "timelockTarget",
+        "type": "address"
       },
       {
         "internalType": "bytes",
@@ -575,7 +744,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -584,11 +753,6 @@
         "internalType": "address",
         "name": "proposer",
         "type": "address"
-      },
-      {
-        "internalType": "enum IGovernanceCore.ProposalType",
-        "name": "proposalType",
-        "type": "uint8"
       },
       {
         "internalType": "uint256",
@@ -601,9 +765,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "callData",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "parentVersionId",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -652,7 +816,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "proposalId",
+        "name": "id",
         "type": "uint256"
       }
     ],
@@ -686,9 +850,29 @@
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "parentVersionId",
+            "type": "uint256"
+          },
+          {
             "internalType": "int256",
             "name": "score",
             "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalVoteWeight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "voterCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "snapshotTotalWeight",
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -698,6 +882,11 @@
           {
             "internalType": "uint256",
             "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "councilWindowEnd",
             "type": "uint256"
           },
           {
@@ -716,14 +905,14 @@
             "type": "string"
           },
           {
-            "internalType": "bool",
-            "name": "goldVetoed",
-            "type": "bool"
+            "internalType": "uint256",
+            "name": "proposalStake",
+            "type": "uint256"
           },
           {
-            "internalType": "uint256",
-            "name": "noVoterCount",
-            "type": "uint256"
+            "internalType": "address",
+            "name": "timelockTarget",
+            "type": "address"
           }
         ],
         "internalType": "struct IGovernanceCore.Proposal",
@@ -805,11 +994,6 @@
         "internalType": "address",
         "name": "voter",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "docId",
-        "type": "uint256"
       }
     ],
     "name": "getVotingWeight",
@@ -886,6 +1070,11 @@
         "internalType": "address",
         "name": "_stakingManager",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_treasury",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -941,9 +1130,29 @@
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "parentVersionId",
+            "type": "uint256"
+          },
+          {
             "internalType": "int256",
             "name": "score",
             "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalVoteWeight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "voterCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "snapshotTotalWeight",
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -953,6 +1162,11 @@
           {
             "internalType": "uint256",
             "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "councilWindowEnd",
             "type": "uint256"
           },
           {
@@ -971,14 +1185,14 @@
             "type": "string"
           },
           {
-            "internalType": "bool",
-            "name": "goldVetoed",
-            "type": "bool"
+            "internalType": "uint256",
+            "name": "proposalStake",
+            "type": "uint256"
           },
           {
-            "internalType": "uint256",
-            "name": "noVoterCount",
-            "type": "uint256"
+            "internalType": "address",
+            "name": "timelockTarget",
+            "type": "address"
           }
         ],
         "internalType": "struct IGovernanceCore.Proposal[]",
@@ -992,6 +1206,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "markCouncilVetoed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1073,11 +1300,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_registry",
+        "name": "council",
         "type": "address"
       }
     ],
-    "name": "setRegistry",
+    "name": "setArchiveCouncil",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1086,11 +1313,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_sm",
+        "name": "_registry",
         "type": "address"
       }
     ],
-    "name": "setStakingManager",
+    "name": "setRegistry",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1148,6 +1375,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "contract ITreasury",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

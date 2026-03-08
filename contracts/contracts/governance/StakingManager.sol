@@ -8,8 +8,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./interfaces/IStakingManager.sol";
 import "../token/interfaces/INFTReward.sol";
 
-/// @title StakingManager
-/// @notice Manages 88 DOT staking for PolkaInk membership
+/// @title StakingManager v3.3
+/// @notice Manages 88 PAS staking for PolkaInk membership
 contract StakingManager is
     Initializable,
     AccessControlUpgradeable,
@@ -19,14 +19,15 @@ contract StakingManager is
 {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
-    uint256 public constant STAKE_AMOUNT = 88 ether; // 88 DOT
-    uint256 public constant EARLY_UNLOCK_PENALTY_BPS = 10; // 10%
+    uint256 public constant STAKE_AMOUNT             = 88 ether; // 88 PAS
+    uint256 public constant EARLY_UNLOCK_PENALTY_BPS = 1000;     // 10%
 
     INFTReward public nftReward;
-    address public treasury;
+    address    public treasury;
 
     mapping(address => StakeInfo) private _stakes;
     uint256 private _activeMemberCount;
+    uint256 private _totalActiveMemberWeight; // sum of 1e18 per active member
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() { _disableInitializers(); }
@@ -38,11 +39,10 @@ contract StakingManager is
     ) external initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
-        __UUPSUpgradeable_init();
-        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+_grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(UPGRADER_ROLE, admin);
         nftReward = INFTReward(_nftReward);
-        treasury = _treasury;
+        treasury  = _treasury;
     }
 
     function stake(uint8 lockMonths) external payable nonReentrant {
@@ -54,17 +54,18 @@ contract StakingManager is
             revert Staking__AlreadyStaked(msg.sender);
 
         uint256 lockEnd = block.timestamp + uint256(lockMonths) * 30 days;
-        uint256 nftId = nftReward.mintMemberNFT(msg.sender, lockEnd);
+        uint256 nftId   = nftReward.mintMemberNFT(msg.sender, lockEnd);
 
         _stakes[msg.sender] = StakeInfo({
-            amount: msg.value,
-            lockStart: block.timestamp,
-            lockEnd: lockEnd,
-            lockMonths: lockMonths,
-            active: true,
+            amount:      msg.value,
+            lockStart:   block.timestamp,
+            lockEnd:     lockEnd,
+            lockMonths:  lockMonths,
+            active:      true,
             memberNFTId: nftId
         });
         _activeMemberCount++;
+        _totalActiveMemberWeight += 1e18;
 
         emit Staked(msg.sender, msg.value, lockMonths, lockEnd, nftId);
     }
@@ -78,6 +79,7 @@ contract StakingManager is
         uint256 amount = info.amount;
         info.active = false;
         _activeMemberCount--;
+        _totalActiveMemberWeight -= 1e18;
 
         nftReward.deactivate(info.memberNFTId);
 
@@ -93,18 +95,18 @@ contract StakingManager is
         if (block.timestamp >= info.lockEnd)
             revert Staking__AlreadyExpired(info.lockEnd);
 
-        uint256 penalty = (info.amount * EARLY_UNLOCK_PENALTY_BPS) / 100;
+        uint256 penalty  = (info.amount * EARLY_UNLOCK_PENALTY_BPS) / 10_000;
         uint256 returned = info.amount - penalty;
         info.active = false;
         _activeMemberCount--;
+        _totalActiveMemberWeight -= 1e18;
 
         nftReward.deactivate(info.memberNFTId);
 
-        // Send penalty to Treasury
+        // Penalty goes to Treasury rewardPool
         (bool ok1,) = treasury.call{value: penalty}("");
         require(ok1, "StakingManager: penalty transfer failed");
 
-        // Return remainder to user
         (bool ok2,) = msg.sender.call{value: returned}("");
         require(ok2, "StakingManager: return transfer failed");
 
@@ -121,6 +123,10 @@ contract StakingManager is
 
     function totalActiveMembers() external view returns (uint256) {
         return _activeMemberCount;
+    }
+
+    function totalActiveMemberWeight() external view returns (uint256) {
+        return _totalActiveMemberWeight;
     }
 
     function _isValidLockMonths(uint8 m) internal pure returns (bool) {

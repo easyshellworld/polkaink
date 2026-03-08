@@ -3,66 +3,75 @@ import { ethers } from "hardhat";
 import { loadFixture, time } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { deployFixture, stakeFor, STAKE_AMOUNT } from "../fixtures/deployFixture";
 
-describe("StakingManager", () => {
+describe("StakingManager v3.3", () => {
   describe("stake", () => {
-    it("should stake 88 DOT and mint Member NFT", async () => {
+    it("should stake 88 PAS and mint Member NFT", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await expect(
-        contracts.stakingManager.connect(actors.author1).stake(3, { value: STAKE_AMOUNT })
-      ).to.emit(contracts.stakingManager, "Staked");
+      await stakeFor(contracts.stakingManager, actors.author1, 3);
 
+      expect(await contracts.stakingManager.isActiveMember(actors.author1.address)).to.be.true;
       const info = await contracts.stakingManager.getStake(actors.author1.address);
-      expect(info.active).to.be.true;
       expect(info.amount).to.equal(STAKE_AMOUNT);
       expect(info.lockMonths).to.equal(3);
-      expect(await contracts.stakingManager.isActiveMember(actors.author1.address)).to.be.true;
-      expect(await contracts.stakingManager.totalActiveMembers()).to.equal(1n);
+
+      expect(await contracts.nftReward.hasActiveMember(actors.author1.address)).to.be.true;
     });
 
-    it("should revert on wrong amount", async () => {
+    it("should reject wrong amount", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await expect(
         contracts.stakingManager.connect(actors.author1).stake(3, { value: ethers.parseEther("1") })
       ).to.be.revertedWithCustomError(contracts.stakingManager, "Staking__WrongAmount");
     });
 
-    it("should revert on invalid lock months", async () => {
+    it("should reject invalid lock months", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await expect(
         contracts.stakingManager.connect(actors.author1).stake(5, { value: STAKE_AMOUNT })
       ).to.be.revertedWithCustomError(contracts.stakingManager, "Staking__InvalidLockMonths");
     });
 
-    it("should revert on double stake", async () => {
+    it("should reject double stake", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1);
+      await stakeFor(contracts.stakingManager, actors.author1, 3);
       await expect(
-        contracts.stakingManager.connect(actors.author1).stake(3, { value: STAKE_AMOUNT })
+        stakeFor(contracts.stakingManager, actors.author1, 3)
       ).to.be.revertedWithCustomError(contracts.stakingManager, "Staking__AlreadyStaked");
+    });
+
+    it("should track totalActiveMemberWeight", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      expect(await contracts.stakingManager.totalActiveMemberWeight()).to.equal(0n);
+
+      await stakeFor(contracts.stakingManager, actors.author1, 3);
+      expect(await contracts.stakingManager.totalActiveMemberWeight()).to.equal(ethers.parseEther("1"));
+
+      await stakeFor(contracts.stakingManager, actors.voter1, 3);
+      expect(await contracts.stakingManager.totalActiveMemberWeight()).to.equal(ethers.parseEther("2"));
     });
   });
 
   describe("unstake", () => {
-    it("should return 88 DOT after lock expires", async () => {
+    it("should return 88 PAS after lock expires", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1, 3);
 
-      // Advance 3 months
       await time.increase(3 * 30 * 24 * 3600 + 1);
 
-      const balBefore = await ethers.provider.getBalance(actors.author1.address);
+      const before = await ethers.provider.getBalance(actors.author1.address);
       const tx = await contracts.stakingManager.connect(actors.author1).unstake();
       const receipt = await tx.wait();
       const gasUsed = receipt!.gasUsed * receipt!.gasPrice;
-      const balAfter = await ethers.provider.getBalance(actors.author1.address);
+      const after = await ethers.provider.getBalance(actors.author1.address);
 
-      expect(balAfter + gasUsed - balBefore).to.equal(STAKE_AMOUNT);
+      expect(after + gasUsed - before).to.equal(STAKE_AMOUNT);
       expect(await contracts.stakingManager.isActiveMember(actors.author1.address)).to.be.false;
     });
 
-    it("should revert before lock expires", async () => {
+    it("should revert if lock not expired", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await stakeFor(contracts.stakingManager, actors.author1, 3);
+
       await expect(
         contracts.stakingManager.connect(actors.author1).unstake()
       ).to.be.revertedWithCustomError(contracts.stakingManager, "Staking__LockNotExpired");
@@ -70,19 +79,19 @@ describe("StakingManager", () => {
   });
 
   describe("earlyUnstake", () => {
-    it("should return 90% and send 10% penalty to Treasury", async () => {
+    it("should apply 10% penalty and send to Treasury", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
-      await stakeFor(contracts.stakingManager, actors.author1, 3);
+      const poolBefore = await contracts.treasury.rewardPoolBalance();
 
-      const treasuryAddr = await contracts.treasury.getAddress();
-      const treasuryBalBefore = await ethers.provider.getBalance(treasuryAddr);
+      await stakeFor(contracts.stakingManager, actors.author1, 12);
 
       const tx = await contracts.stakingManager.connect(actors.author1).earlyUnstake();
       await tx.wait();
 
-      const treasuryBalAfter = await ethers.provider.getBalance(treasuryAddr);
-      const penalty = (STAKE_AMOUNT * 10n) / 100n; // 8.8 DOT
-      expect(treasuryBalAfter - treasuryBalBefore).to.equal(penalty);
+      const penalty = STAKE_AMOUNT / 10n;
+      const poolAfter = await contracts.treasury.rewardPoolBalance();
+
+      expect(poolAfter - poolBefore).to.equal(penalty);
       expect(await contracts.stakingManager.isActiveMember(actors.author1.address)).to.be.false;
     });
   });

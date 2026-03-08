@@ -9,20 +9,23 @@ export function ContributionStats({ address }: { address: string }) {
   const { data } = useQuery({
     queryKey: ['contributionStats', address],
     queryFn: async () => {
-      const [authorNFTs, guardianNFTs] = await Promise.all([
-        readContract('NFTReward', 'getAuthorNFTs', [address as `0x${string}`]).catch(() => []),
-        readContract('NFTReward', 'getGuardianNFTs', [address as `0x${string}`]).catch(() => []),
+      const [memberNFTs, creatorNFTs, guardianNFTs] = await Promise.all([
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 0]).catch(() => []),
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 1]).catch(() => []),
+        readContract('NFTReward', 'getNFTsByType', [address as `0x${string}`, 2]).catch(() => []),
       ]);
-      const authorCount = (authorNFTs as bigint[]).length;
+      const memberCount = (memberNFTs as bigint[]).length;
+      const creatorCount = (creatorNFTs as bigint[]).length;
       const guardianCount = (guardianNFTs as bigint[]).length;
-      const isMember = await readContract('ArchiveCouncil', 'isActiveMember', [
+      const isMember = await readContract('ArchiveCouncil', 'isMember', [
         address as `0x${string}`,
       ]).catch(() => false);
 
       return {
-        authorNFTs: authorCount,
+        memberNFTs: memberCount,
+        creatorNFTs: creatorCount,
         guardianNFTs: guardianCount,
-        totalNFTs: authorCount + guardianCount,
+        totalNFTs: memberCount + creatorCount + guardianCount,
         isCouncilMember: isMember as boolean,
       };
     },
@@ -30,9 +33,9 @@ export function ContributionStats({ address }: { address: string }) {
   });
 
   const stats = [
-    { label: t('profile.author_nfts'), value: data?.authorNFTs ?? 0 },
+    { label: t('profile.member_nfts', 'Member NFTs'), value: data?.memberNFTs ?? 0 },
+    { label: t('profile.creator_nfts', 'Creator NFTs'), value: data?.creatorNFTs ?? 0 },
     { label: t('profile.guardian_nfts'), value: data?.guardianNFTs ?? 0 },
-    { label: t('profile.total_nfts'), value: data?.totalNFTs ?? 0 },
     { label: t('profile.council_member'), value: data?.isCouncilMember ? '✓' : '—' },
   ];
 

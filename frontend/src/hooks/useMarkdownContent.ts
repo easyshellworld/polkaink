@@ -1,10 +1,57 @@
 import { useQuery } from '@tanstack/react-query';
-import { decodeFunctionData, parseAbiItem } from 'viem';
-import { getPublicClient, getContractAddress, getAbi } from '../lib/contracts';
+import { decodeFunctionData } from 'viem';
+import { getPublicClient, getAbi } from '../lib/contracts';
+import { readContract } from '../lib/contracts';
+import type { VersionData } from './useVersionStore';
 
-const VERSION_PROPOSED_EVENT = parseAbiItem(
-  'event VersionProposed(uint256 indexed proposalId, uint256 indexed docId, address indexed proposer, uint256 parentVersionId, bytes32 contentHash, uint256 stakeAmount)'
-);
+function isHexString(value: string): boolean {
+  return /^0x[0-9a-fA-F]*$/.test(value) && value.length % 2 === 0;
+}
+
+function decodeHexToUtf8(hex: string): string {
+  const raw = hex.startsWith('0x') ? hex.slice(2) : hex;
+  const bytes = new Uint8Array(raw.length / 2);
+  for (let i = 0; i < raw.length; i += 2) {
+    bytes[i / 2] = parseInt(raw.slice(i, i + 2), 16);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+function parseMarkdownPayload(input: string): string {
+  if (!input) return '';
+
+  if (isHexString(input)) {
+    return decodeHexToUtf8(input);
+  }
+
+  try {
+    const parsed = JSON.parse(input) as { markdown?: string };
+    if (typeof parsed.markdown === 'string') return parsed.markdown;
+  } catch {
+    // noop
+  }
+
+  return input;
+}
+
+export async function fetchMarkdownByVersion(versionId: bigint): Promise<string | null> {
+  const version = await readContract('VersionStore', 'getVersion', [versionId]) as VersionData;
+  if (!version || version.contentHash === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+    return null;
+  }
+
+  const pc = getPublicClient();
+  const registryAbi = getAbi('PolkaInkRegistry');
+  const block = await pc.getBlock({ blockNumber: version.txBlock, includeTransactions: true });
+  const tx = block.transactions[Number(version.txIndex)];
+  if (!tx || typeof tx === 'string') return null;
+
+  const decoded = decodeFunctionData({ abi: registryAbi, data: tx.input });
+  if (decoded.functionName !== 'proposeVersion') return null;
+
+  const description = (decoded.args as unknown[])[3] as string;
+  return parseMarkdownPayload(description);
+}
 
 export function useMarkdownContent(docId: number | undefined) {
   return useQuery({
@@ -12,49 +59,37 @@ export function useMarkdownContent(docId: number | undefined) {
     queryFn: async () => {
       if (!docId) return null;
 
-      const pc = getPublicClient();
-      const registryAddr = getContractAddress('PolkaInkRegistry') as `0x${string}`;
-      const abi = getAbi('PolkaInkRegistry');
-      const latestBlock = await pc.getBlockNumber();
-      const fromBlock = latestBlock > 100_000n ? latestBlock - 100_000n : 0n;
+      const versionIds = await readContract('VersionStore', 'getVersionsByDoc', [BigInt(docId)]) as bigint[];
+      if (!versionIds.length) return null;
 
-      let logs;
-      try {
-        logs = await pc.getLogs({
-          address: registryAddr,
-          event: VERSION_PROPOSED_EVENT,
-          args: { docId: BigInt(docId) },
-          fromBlock,
-          toBlock: 'latest',
-        });
-      } catch {
-        logs = await pc.getLogs({
-          address: registryAddr,
-          event: VERSION_PROPOSED_EVENT,
-          fromBlock,
-          toBlock: 'latest',
-        });
-        logs = logs.filter((l) => l.args.docId === BigInt(docId));
-      }
-
-      if (logs.length === 0) return null;
-
-      const latestLog = logs[logs.length - 1];
-      const tx = await pc.getTransaction({ hash: latestLog.transactionHash });
-      if (!tx) return null;
-
-      const decoded = decodeFunctionData({ abi, data: tx.input });
-      if (decoded.functionName !== 'proposeVersion') return null;
-
-      const mdHex = (decoded.args as unknown[])[3] as `0x${string}`;
-      const hex = mdHex.slice(2);
-      const bytes = new Uint8Array(hex.length / 2);
-      for (let i = 0; i < hex.length; i += 2) {
-        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-      }
-      return new TextDecoder().decode(bytes);
+      const latestVersionId = versionIds[versionIds.length - 1];
+      return fetchMarkdownByVersion(latestVersionId);
     },
     enabled: docId !== undefined && docId > 0,
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useProposalMarkdown(targetVersionId: bigint | undefined) {
+  return useQuery({
+    queryKey: ['proposalMarkdown', targetVersionId?.toString()],
+    queryFn: async () => {
+      if (!targetVersionId || targetVersionId <= 0n) return null;
+      return fetchMarkdownByVersion(targetVersionId);
+    },
+    enabled: !!targetVersionId && targetVersionId > 0n,
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useVersionMarkdown(versionId: bigint | undefined) {
+  return useQuery({
+    queryKey: ['versionMarkdown', versionId?.toString()],
+    queryFn: async () => {
+      if (!versionId || versionId <= 0n) return null;
+      return fetchMarkdownByVersion(versionId);
+    },
+    enabled: !!versionId && versionId > 0n,
     staleTime: 5 * 60_000,
   });
 }

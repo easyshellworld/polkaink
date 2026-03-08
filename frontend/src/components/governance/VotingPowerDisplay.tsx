@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { useVotingPower } from '../../hooks/useVotingPower';
 import { useWalletStore } from '../../store/walletStore';
 
-export function VotingPowerDisplay({ proposalId, docId }: { proposalId?: number; docId?: number }) {
+export function VotingPowerDisplay() {
   const { t } = useTranslation();
   const address = useWalletStore((s) => s.address);
-  const { data } = useVotingPower(address, docId ?? proposalId);
+  const { data } = useVotingPower(address);
 
   if (!address || !data) return null;
 

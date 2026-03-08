@@ -7,7 +7,7 @@ interface IStakingManager {
         uint256 amount;
         uint256 lockStart;
         uint256 lockEnd;
-        uint8   lockMonths;
+        uint8   lockMonths; // 3 / 6 / 12 / 24
         bool    active;
         uint256 memberNFTId;
     }
@@ -19,6 +19,11 @@ interface IStakingManager {
     function getStake(address user) external view returns (StakeInfo memory);
     function isActiveMember(address user) external view returns (bool);
     function totalActiveMembers() external view returns (uint256);
+    function totalActiveMemberWeight() external view returns (uint256);
+
+    // STAKE_AMOUNT             = 88e18  (88 PAS)
+    // EARLY_UNLOCK_PENALTY_BPS = 1000   (10%)
+    // VALID_LOCK_MONTHS        = [3, 6, 12, 24]
 
     event Staked(address indexed user, uint256 amount, uint8 lockMonths, uint256 lockEnd, uint256 memberNFTId);
     event Unstaked(address indexed user, uint256 amount);

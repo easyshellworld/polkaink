@@ -20,7 +20,10 @@ export function DocumentCard({ doc }: { doc: DocumentData }) {
       <Card hover className="hover-lift">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-semibold">{doc.title}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold">{doc.title}</h3>
+              {doc.isSeed && <Badge variant="primary" pill>{t('document.seed_badge', 'Seed')}</Badge>}
+            </div>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               <span>{t('library.by')} {shortenAddress(doc.author)}</span>
               {hasVersion && (

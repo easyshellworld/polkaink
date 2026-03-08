@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useProposal, useHasVoted } from '../../hooks/useProposals';
 import { useDocument } from '../../hooks/useDocuments';
-import { useIsOGGold } from '../../hooks/useCouncil';
+import { useProposalMarkdown } from '../../hooks/useMarkdownContent';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useVote } from '../../hooks/useVote';
 import { useWalletStore } from '../../store/walletStore';
@@ -14,13 +16,24 @@ import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/governance/StatusBadge';
 import { VotingPowerDisplay } from '../../components/governance/VotingPowerDisplay';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { Badge } from '../../components/ui/Badge';
-import { shortenAddress, timeRemaining } from '../../lib/utils';
+import { shortenAddress, timeRemaining, getProposalSummary } from '../../lib/utils';
+import { ShareButton } from '../../components/ui/ShareButton';
 
 function fmtScore(score: bigint): string {
   const n = Number(score) / 1e18;
   const sign = n >= 0 ? '+' : '';
   return `${sign}${n.toFixed(2)}`;
+}
+
+function formatEta(targetSec: number): string {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const remain = targetSec - nowSec;
+  if (remain <= 0) return 'Ready';
+  const h = Math.floor(remain / 3600);
+  const m = Math.floor((remain % 3600) / 60);
+  const s = remain % 60;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  return `${m}m ${s}s`;
 }
 
 export default function ProposalDetailPage() {
@@ -36,12 +49,18 @@ export default function ProposalDetailPage() {
   const { data: doc } = useDocument(docIdNum);
   const { data: voted } = useHasVoted(proposalId, address);
   const { voting, castVote } = useVote(proposalId ?? 0);
-  const { data: isOGGold } = useIsOGGold(address);
+  const { data: markdown, isLoading: mdLoading } = useProposalMarkdown(proposal?.targetVersionId);
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  const typeLabels = useMemo<Record<number, string>>(() => ({
+    0: t('governance.type_version', 'Version Update'),
+    1: t('governance.type_upgrade', 'Upgrade Contract'),
+    2: t('governance.type_parameter', 'Parameter Change'),
+    3: t('governance.type_emergency', 'Emergency Confirm'),
+  }), [t]);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 30_000);
+    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -97,14 +116,18 @@ export default function ProposalDetailPage() {
   }
 
   const p = proposal;
+  const summary = getProposalSummary(p.description);
   const scoreNum = Number(p.score) / 1e18;
   const isActive = p.status === 0;
   const isApproved = p.status === 1;
   const isEnded = Number(p.endTime) <= now;
   const isProposer = address?.toLowerCase() === p.proposer.toLowerCase();
-  const canExecute = isApproved;
+  const councilWindowReady = Number(p.councilWindowEnd) > 0 ? now > Number(p.councilWindowEnd) : true;
+  const canExecute = isApproved && councilWindowReady;
   const canVote = isActive && !isEnded && !voted;
   const canCancel = isActive && isProposer;
+
+  const shareUrl = `${window.location.href}${address ? `${window.location.search ? '&' : '?'}ref=${address}` : ''}`;
 
   return (
     <PageWrapper>
@@ -116,28 +139,28 @@ export default function ProposalDetailPage() {
         {t('governance.back')}
       </Link>
 
-      {/* Header */}
       <Card padding="lg" className="mb-5 !border-[var(--color-primary)]/10">
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-4 gap-3">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <StatusBadge status={p.status} />
               <span className="text-sm font-medium text-[var(--color-text-secondary)]">
                 #{Number(p.id)}
               </span>
-              {p.goldVetoed && (
-                <Badge variant="error" pill>{t('governance.vetoed_by_gold', 'Vetoed by OG Gold')}</Badge>
-              )}
             </div>
             <h1 className="text-xl font-bold">
               {doc?.title
-                ? (p.description ? `${p.description} — ${doc.title}` : doc.title)
-                : (p.description || t('governance.version_update'))}
+                ? (summary ? `${summary} - ${doc.title}` : doc.title)
+                : (summary || t('governance.version_update'))}
             </h1>
           </div>
+          <ShareButton
+            url={shareUrl}
+            title={`PolkaInk Proposal #${Number(p.id)}`}
+            text="Check out this governance proposal on PolkaInk"
+          />
         </div>
 
-        {/* Metadata Grid */}
         <div className="grid grid-cols-2 gap-4 rounded-xl bg-[var(--color-primary-10)]/40 p-4 text-sm md:grid-cols-3">
           <div>
             <div className="text-[var(--color-text-secondary)]">{t('governance.proposer')}</div>
@@ -164,12 +187,16 @@ export default function ProposalDetailPage() {
             <div className="font-medium">{timeRemaining(p.endTime)}</div>
           </div>
         </div>
+
+        {isApproved && !councilWindowReady && (
+          <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2 text-sm text-amber-700 font-medium">
+            {t('governance.timelock_ends_in', 'Executable in')} {formatEta(Number(p.councilWindowEnd))}
+          </div>
+        )}
       </Card>
 
       <div className="grid gap-5 md:grid-cols-3">
-        {/* Left: Voting Results & Actions */}
         <div className="md:col-span-2 space-y-4">
-          {/* Score Display */}
           <Card padding="lg">
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
               <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
@@ -184,23 +211,29 @@ export default function ProposalDetailPage() {
                 <div className="text-xs text-[var(--color-text-secondary)] mt-1">{t('governance.score', 'Score')}</div>
               </div>
               <div className="rounded-xl bg-[var(--color-surface-alt)] p-4">
-                <div className="text-2xl font-bold">{Number(p.noVoterCount)}</div>
-                <div className="text-xs text-[var(--color-text-secondary)] mt-1">{t('governance.vote_no')}</div>
+                <div className="text-2xl font-bold">{Number(p.voterCount)}</div>
+                <div className="text-xs text-[var(--color-text-secondary)] mt-1">{t('governance.voters', 'Voters')}</div>
               </div>
               <div className="rounded-xl bg-[var(--color-surface-alt)] p-4">
                 <div className="text-sm font-bold">{t('governance.threshold')}</div>
                 <div className="text-xs text-[var(--color-text-secondary)] mt-1">&gt; 2.0</div>
               </div>
             </div>
+          </Card>
 
-            {p.goldVetoed && (
-              <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-700 font-medium">
-                {t('governance.vetoed_by_gold', 'Vetoed by OG Gold holder')}
+          <Card padding="lg">
+            <h2 className="text-sm font-semibold mb-3">{t('governance.proposal_content', 'Proposal Content')}</h2>
+            {mdLoading ? (
+              <Skeleton className="h-28" />
+            ) : markdown ? (
+              <div className="markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
               </div>
+            ) : (
+              <p className="text-sm text-[var(--color-text-secondary)]">{t('governance.no_content', 'No proposal content available.')}</p>
             )}
           </Card>
 
-          {/* Voting Panel */}
           {canVote && (
             <Card padding="lg" className="!border-[var(--color-primary)]/20">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
@@ -245,7 +278,6 @@ export default function ProposalDetailPage() {
             </Card>
           )}
 
-          {/* Action Buttons */}
           {(canExecute || canCancel) && (
             <div className="flex flex-wrap gap-3">
               {canExecute && (
@@ -262,25 +294,9 @@ export default function ProposalDetailPage() {
           )}
         </div>
 
-        {/* Right Sidebar */}
         <div className="space-y-4">
-          {/* Voting Power */}
-          <VotingPowerDisplay proposalId={proposalId} docId={docIdNum} />
+          <VotingPowerDisplay />
 
-          {/* OG Gold Status */}
-          {isOGGold && (
-            <Card>
-              <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
-                <span className="h-4 w-1 rounded-full bg-amber-400" />
-                OG Gold
-              </h3>
-              <p className="text-xs text-[var(--color-text-secondary)]">
-                {t('governance.og_gold_veto_power', 'You hold OG Gold — your NO vote triggers an instant veto.')}
-              </p>
-            </Card>
-          )}
-
-          {/* Proposal Type Info */}
           <Card>
             <h3 className="text-xs font-semibold mb-3 flex items-center gap-2">
               <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
@@ -290,7 +306,7 @@ export default function ProposalDetailPage() {
               <div className="flex justify-between items-center">
                 <span className="text-[var(--color-text-secondary)]">{t('governance.type')}</span>
                 <span className="font-medium rounded-full bg-[var(--color-primary-10)] px-2.5 py-0.5 text-[var(--color-primary)]">
-                  {p.proposalType === 0 ? t('governance.type_version') : t('governance.type_upgrade')}
+                  {typeLabels[p.proposalType] ?? t('common.unknown', 'Unknown')}
                 </span>
               </div>
               {Number(p.targetVersionId) > 0 && (
@@ -299,6 +315,10 @@ export default function ProposalDetailPage() {
                   <span className="font-medium">v{Number(p.targetVersionId)}</span>
                 </div>
               )}
+              <div className="flex justify-between items-center">
+                <span className="text-[var(--color-text-secondary)]">{t('governance.stake', 'Stake')}</span>
+                <span className="font-medium">{Number(p.proposalStake) / 1e18} PAS</span>
+              </div>
             </div>
           </Card>
         </div>

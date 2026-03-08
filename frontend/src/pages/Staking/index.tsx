@@ -64,7 +64,7 @@ export default function StakingPage() {
         {t('staking.title', 'Staking')}
       </h1>
       <p className="text-[var(--color-text-secondary)] mb-6">
-        {t('staking.subtitle', 'Stake 88 DOT to become a member and participate in PolkaInk governance.')}
+        {t('staking.subtitle', 'Stake 88 PAS to become a member and participate in PolkaInk governance.')}
       </p>
 
       <Card padding="lg" className="mb-6">
@@ -91,7 +91,7 @@ export default function StakingPage() {
                     {t('staking.amount', 'Amount')}
                   </div>
                   <div className="text-lg font-bold">
-                    {formatEther(stakeInfo.amount)} DOT
+                    {formatEther(stakeInfo.amount)} PAS
                   </div>
                 </div>
                 <div>
@@ -153,7 +153,7 @@ export default function StakingPage() {
                   disabled={stakeSubmitting}
                   loading={stakeSubmitting}
                 >
-                  {t('staking.stake_btn', 'Stake 88 DOT')}
+                  {t('staking.stake_btn', 'Stake 88 PAS')}
                 </Button>
               </div>
             </Card>
@@ -201,10 +201,10 @@ export default function StakingPage() {
                     </div>
                     <div className="pt-4 border-t border-[var(--color-border)]">
                       <p className="text-sm font-medium text-[var(--color-error)] mb-2">
-                        {t('staking.early_unstake_warning', 'Early Unstake (10% Penalty)')}
+                        {t('staking.early_unstake_warning', 'Early Unstake (8.8 PAS Fixed Penalty)')}
                       </p>
                       <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-                        {t('staking.early_unstake_desc', 'You can unstake before the lock period ends, but 10% of your staked amount will be deducted as a penalty.')}
+                        {t('staking.early_unstake_desc', 'You can unstake before lock ends. A fixed 8.8 PAS penalty will be deducted.')}
                       </p>
                       <Button
                         variant="danger"
@@ -212,7 +212,7 @@ export default function StakingPage() {
                         disabled={unstakeSubmitting}
                         loading={unstakeSubmitting}
                       >
-                        {t('staking.early_unstake_btn', 'Early Unstake (10% Penalty)')}
+                        {t('staking.early_unstake_btn', 'Early Unstake (8.8 PAS Penalty)')}
                       </Button>
                     </div>
                   </>

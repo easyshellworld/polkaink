@@ -6,7 +6,7 @@ PolkaInk is an on-chain Polkadot history preservation protocol. Stake-based gove
 
 **Tokenomics v2 key changes:**
 - Archive Council (7-person committee) removed → OG Gold veto replaces it
-- 88 DOT stake → Member NFT → voting power
+- 88 PAS stake → Member NFT → voting power
 - 6 NFT types: Member, Creator, Author, OG Bronze/Silver/Gold
 - Boost-based voting weight: `weight = has_active_member × (1 + boost)`
 - Passing criteria: `Σ(vote × weight) > 2.0`, OG Gold NO = instant veto
@@ -28,7 +28,7 @@ PolkaInk is an on-chain Polkadot history preservation protocol. Stake-based gove
 | PolkaInkRegistry | Document lifecycle: create, propose versions, merge |
 | VersionStore | Version data storage, DAG tracking |
 | GovernanceCore | Proposal lifecycle, boost-weighted voting, OG Gold veto |
-| **StakingManager** | 88 DOT stake/unstake, Member NFT mint/burn (NEW) |
+| **StakingManager** | 88 PAS stake/unstake, Member NFT mint/burn (NEW) |
 | **ReportManager** | Report/freeze/re-vote for approved docs (NEW) |
 | NFTReward | 6-type NFT system (Member/Creator/Author/OG Bronze/Silver/Gold) |
 | Treasury | DAO treasury: stakes, penalties, rewards |
@@ -76,11 +76,11 @@ const client = createPublicClient({ chain: pasChain, transport: http() });
 
 ```
 stake(uint8 lockMonths) payable
-  Stake 88 DOT, choose lock period: 3/6/12/24 months.
+  Stake 88 PAS, choose lock period: 3/6/12/24 months.
   Mints Member NFT. 1 per address.
 
 unstake()
-  After lock expiry, returns full 88 DOT.
+  After lock expiry, returns full 88 PAS.
 
 earlyUnstake()
   Before expiry, returns 90% (10% penalty to Treasury).
@@ -288,7 +288,7 @@ Key routes:
 - `/#/governance` — Voting hall
 - `/#/governance/:id` — Proposal detail
 - `/#/profile/:address` — User profile + NFTs + staking
-- `/#/staking` — Stake 88 DOT (NEW)
+- `/#/staking` — Stake 88 PAS (NEW)
 - `/#/council` → OG Guardians
 - `/#/treasury` — Treasury overview
 - `/#/polkaclaw` — Team page
@@ -304,7 +304,7 @@ Located at `frontend/src/lib/contracts/abis/`:
 
 | Parameter | Value |
 |-----------|-------|
-| Stake amount | 88 DOT |
+| Stake amount | 88 PAS |
 | Lock options | 3 / 6 / 12 / 24 months |
 | Early unlock penalty | 10% |
 | Voting period | 7 days |
@@ -317,7 +317,7 @@ Located at `frontend/src/lib/contracts/abis/`:
 ## Error Handling
 
 Common revert reasons:
-- `Staking__WrongAmount` — Must send exactly 88 DOT
+- `Staking__WrongAmount` — Must send exactly 88 PAS
 - `Staking__AlreadyStaked` — Address already has Member NFT
 - `Gov__NotActiveMember` — Need active Member NFT to create proposals or vote
 - `Gov__AlreadyVoted` — Already voted on this proposal

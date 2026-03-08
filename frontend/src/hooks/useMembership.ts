@@ -7,15 +7,15 @@ export function useMembership(address: string | null) {
     queryFn: async () => {
       if (!address) return null;
       const addr = address as `0x${string}`;
-      const [isMember, creatorCount, hasOGGold] = await Promise.all([
+      const [isMember, creatorCount, isCouncilMember] = await Promise.all([
         readContract('StakingManager', 'isActiveMember', [addr]).catch(() => false),
         readContract('NFTReward', 'activeCreatorCount', [addr]).catch(() => 0n),
-        readContract('NFTReward', 'hasActiveOGGold', [addr]).catch(() => false),
+        readContract('ArchiveCouncil', 'isMember', [addr]).catch(() => false),
       ]);
       return {
         isMember: isMember as boolean,
         creatorCount: Number(creatorCount as bigint),
-        hasOGGold: hasOGGold as boolean,
+        isCouncilMember: isCouncilMember as boolean,
       };
     },
     enabled: !!address,

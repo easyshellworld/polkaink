@@ -192,8 +192,8 @@
   },
   "staking": {
     "title": "质押",
-    "subtitle": "质押 88 DOT 成为会员",
-    "stake_button": "质押 88 DOT",
+    "subtitle": "质押 88 PAS 成为会员",
+    "stake_button": "质押 88 PAS",
     "lock_period": "锁仓期",
     "months": "月",
     "your_stake": "您的质押",

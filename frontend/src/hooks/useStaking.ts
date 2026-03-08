@@ -60,7 +60,7 @@ export function useStake() {
     setSubmitting(true);
     const nid = `stake-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Staking 88 DOT...' });
+      addNotification({ id: nid, type: 'pending', message: 'Staking 88 PAS...' });
       const hash = await writeContract(walletClient, 'StakingManager', 'stake', [lockMonths], {
         value: STAKE_AMOUNT, gas: TX_GAS,
       });
@@ -110,11 +110,11 @@ export function useUnstake() {
     setSubmitting(true);
     const nid = `early-unstake-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Early unstaking (10% penalty)...' });
+      addNotification({ id: nid, type: 'pending', message: 'Early unstaking (8.8 PAS penalty)...' });
       const hash = await writeContract(walletClient, 'StakingManager', 'earlyUnstake', [], { gas: TX_GAS });
       updateNotification(nid, { message: 'Waiting for confirmation...' });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Early unstake complete! 10% penalty applied.' });
+      updateNotification(nid, { type: 'success', message: 'Early unstake complete! 8.8 PAS penalty applied.' });
       queryClient.invalidateQueries({ queryKey: ['stakeInfo'] });
       queryClient.invalidateQueries({ queryKey: ['isMember'] });
     } catch (err) {
