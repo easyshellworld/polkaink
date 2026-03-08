@@ -38,11 +38,11 @@ jobs:
         run: npx hardhat compile
 
       - name: Run unit tests (Hardhat Network)
-        run: npx hardhat test test/unit --network hardhat
+        run: npx hardhat test test/unit/*.test.ts --network hardhat
         continue-on-error: false
 
       - name: Run integration tests (Hardhat Network)
-        run: npx hardhat test test/integration --network hardhat
+        run: npx hardhat test test/integration/*.test.ts --network hardhat
         continue-on-error: false
 
       - name: Upload test artifacts
@@ -81,13 +81,13 @@ jobs:
         run: bash scripts/setup-node.sh
 
       - name: Run unit tests (anvil-polkadot)
-        run: npx hardhat test test/unit --network hardhat
+        run: npx hardhat test test/unit/*.test.ts --network hardhat
         env:
           POLKADOT_NODE: "true"
         continue-on-error: true
 
       - name: Run integration tests (anvil-polkadot)
-        run: npx hardhat test test/integration --network hardhat
+        run: npx hardhat test test/integration/*.test.ts --network hardhat
         env:
           POLKADOT_NODE: "true"
         continue-on-error: true
