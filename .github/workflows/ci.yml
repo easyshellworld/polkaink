@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: contracts/package-lock.json
 
@@ -70,24 +70,52 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: contracts/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --force
 
       - name: Download / Prepare anvil-polkadot node
         run: bash scripts/setup-node.sh
 
-      - name: Run unit tests (anvil-polkadot)
-        run: npx hardhat test test/unit/*.test.ts --network hardhat
+      - name: Polkadot node smoke test (gating)
+        run: |
+          cat > /tmp/polkadot-smoke.js <<'EOF'
+          async function main() {
+            const { ethers } = require("hardhat");
+            const network = await ethers.provider.getNetwork();
+            const block = await ethers.provider.getBlockNumber();
+            const signers = await ethers.getSigners();
+            const bal = await ethers.provider.getBalance(signers[0].address);
+            console.log(
+              `chainId=${network.chainId} block=${block} signer=${signers[0].address} balance=${bal}`
+            );
+          }
+          main().catch((e) => {
+            console.error(e);
+            process.exit(1);
+          });
+          EOF
+          npx hardhat run /tmp/polkadot-smoke.js --network hardhat --no-compile
+        env:
+          POLKADOT_NODE: "true"
+
+      - name: Run unit tests on Polkadot node (non-blocking report)
+        run: |
+          mkdir -p test-results-polkadot
+          set -o pipefail
+          npx hardhat test test/unit/*.test.ts --network hardhat 2>&1 | tee test-results-polkadot/unit.log
         env:
           POLKADOT_NODE: "true"
         continue-on-error: true
 
-      - name: Run integration tests (anvil-polkadot)
-        run: npx hardhat test test/integration/*.test.ts --network hardhat
+      - name: Run integration tests on Polkadot node (non-blocking report)
+        run: |
+          mkdir -p test-results-polkadot
+          set -o pipefail
+          npx hardhat test test/integration/*.test.ts --network hardhat 2>&1 | tee test-results-polkadot/integration.log
         env:
           POLKADOT_NODE: "true"
         continue-on-error: true
