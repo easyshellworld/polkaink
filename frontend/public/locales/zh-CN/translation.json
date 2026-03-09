@@ -163,6 +163,7 @@
   "status": {
     "active": "活跃",
     "archived": "已归档",
+    "frozen": "已冻结",
     "disputed": "争议中"
   },
   "agent": {

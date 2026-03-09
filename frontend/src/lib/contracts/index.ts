@@ -19,7 +19,6 @@ import { defineChain } from 'viem';
 import RegistryABI from './abis/PolkaInkRegistry.json';
 import GovernanceABI from './abis/GovernanceCore.json';
 import StakingManagerABI from './abis/StakingManager.json';
-import ReportManagerABI from './abis/ReportManager.json';
 import NftABI from './abis/NFTReward.json';
 import TreasuryABI from './abis/Treasury.json';
 import VersionStoreABI from './abis/VersionStore.json';
@@ -37,7 +36,6 @@ const ABIS: Record<string, Abi> = {
   Treasury: TreasuryABI as Abi,
   VersionStore: VersionStoreABI as Abi,
   StakingManager: StakingManagerABI as Abi,
-  ReportManager: ReportManagerABI as Abi,
   ArchiveCouncil: ArchiveCouncilABI as Abi,
 };
 

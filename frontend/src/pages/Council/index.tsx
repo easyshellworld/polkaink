@@ -24,6 +24,7 @@ export default function CouncilPage() {
   const { data: isCouncilMember, refetch: refetchCouncilMember } = useIsCouncilMember(address);
   const { data: members, refetch: refetchMembers } = useCouncilMembers();
   const { data: allowanceStatus, refetch: refetchAllowance } = useCouncilAllowanceStatus(address);
+  const claimableEpochId = allowanceStatus?.claimableEpochId ?? null;
 
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
@@ -33,11 +34,14 @@ export default function CouncilPage() {
   const handleClaimAllowance = async () => {
     if (!walletClient || !address || !isCouncilMember || claiming) return;
 
+    if (!claimableEpochId) return;
     const nid = `claim-allowance-${Date.now()}`;
     try {
       setClaiming(true);
       addNotification({ id: nid, type: 'pending', message: 'Claiming council allowance...' });
-      const hash = await writeContract(walletClient, 'ArchiveCouncil', 'claimCouncilAllowance', []);
+      const hash = await writeContract(walletClient, 'ArchiveCouncil', 'claimCouncilAllowance', [
+        claimableEpochId,
+      ]);
       updateNotification(nid, { message: 'Waiting for confirmation...' });
       await waitForTx(hash);
       updateNotification(nid, { type: 'success', message: 'Council allowance claimed.' });
@@ -96,15 +100,24 @@ export default function CouncilPage() {
         <Card padding="lg" className="mb-6">
           <h2 className="mb-3 text-sm font-semibold">Council Allowance</h2>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm text-[var(--color-text-secondary)]">
-              Epoch: <span className="font-medium text-[var(--color-text)]">{allowanceStatus?.epochId?.toString() ?? '—'}</span>
-              <span className="mx-2">·</span>
-              {allowanceStatus?.claimed ? 'Already claimed in this epoch' : '5 PAS claimable'}
+            <div className="text-sm text-[var(--color-text-secondary)] space-y-1">
+              <div>
+                Epoch:&nbsp;
+                <span className="font-medium text-[var(--color-text)]">{allowanceStatus?.epochId?.toString() ?? '—'}</span>
+              </div>
+              <div>
+                {claimableEpochId !== null
+                  ? `${t('council.claimable_epoch', 'Claimable Epoch')}: ${claimableEpochId.toString()}`
+                  : t('council.claimable_epoch_pending', 'Claimable epoch not ready')}
+              </div>
+              <div>
+                {allowanceStatus?.claimed ? 'Already claimed in this epoch' : '5 PAS claimable'}
+              </div>
             </div>
             <Button
               size="sm"
               onClick={handleClaimAllowance}
-              disabled={claiming || allowanceStatus?.claimed}
+              disabled={claiming || claimableEpochId === null || allowanceStatus?.claimed}
               loading={claiming}
             >
               {allowanceStatus?.claimed ? 'Claimed' : 'Claim 5 PAS'}

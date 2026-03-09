@@ -105,3 +105,38 @@ export function useDocCreationTx(docId: number | undefined) {
     staleTime: Infinity,
   });
 }
+
+export function useVersionTx(versionId: number | undefined, txBlock?: bigint) {
+  return useQuery({
+    queryKey: ['versionTx', versionId, txBlock?.toString()],
+    queryFn: async () => {
+      const pc = getPublicClient();
+      const registryAddr = getContractAddress('PolkaInkRegistry') as `0x${string}`;
+      const targetVersionId = BigInt(versionId!);
+
+      if (txBlock !== undefined) {
+        const blockLogs = await pc.getLogs({
+          address: registryAddr,
+          event: VERSION_PROPOSED_EVENT,
+          fromBlock: txBlock,
+          toBlock: txBlock,
+        });
+        const match = blockLogs.find((l) => l.args.targetVersionId === targetVersionId);
+        if (match) return match.transactionHash;
+      }
+
+      const currentBlock = await pc.getBlockNumber();
+      const fromBlock = currentBlock > 500_000n ? currentBlock - 500_000n : 0n;
+      const logs = await pc.getLogs({
+        address: registryAddr,
+        event: VERSION_PROPOSED_EVENT,
+        fromBlock,
+        toBlock: 'latest',
+      });
+      const match = logs.find((l) => l.args.targetVersionId === targetVersionId);
+      return match?.transactionHash ?? null;
+    },
+    enabled: versionId !== undefined && versionId > 0,
+    staleTime: Infinity,
+  });
+}

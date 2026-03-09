@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { decodeEventLog } from 'viem';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useProposal, useHasVoted } from '../../hooks/useProposals';
@@ -9,7 +11,8 @@ import { useProposalMarkdown } from '../../hooks/useMarkdownContent';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useVote } from '../../hooks/useVote';
 import { useWalletStore } from '../../store/walletStore';
-import { writeContract, waitForTx } from '../../lib/contracts';
+import { useIsCouncilMember } from '../../hooks/useCouncil';
+import { writeContract, waitForTx, getAbi } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -42,6 +45,7 @@ export default function ProposalDetailPage() {
   const proposalId = id ? Number(id) : undefined;
   const address = useWalletStore((s) => s.address);
   const walletClient = useWalletStore((s) => s.walletClient);
+  const queryClient = useQueryClient();
 
   const { addNotification, updateNotification } = useNotificationStore();
   const { data: proposal, isLoading, refetch } = useProposal(proposalId);
@@ -50,6 +54,7 @@ export default function ProposalDetailPage() {
   const { data: voted } = useHasVoted(proposalId, address);
   const { voting, castVote } = useVote(proposalId ?? 0);
   const { data: markdown, isLoading: mdLoading } = useProposalMarkdown(proposal?.targetVersionId);
+  const { data: isCouncilMember } = useIsCouncilMember(address);
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const typeLabels = useMemo<Record<number, string>>(() => ({
@@ -73,8 +78,44 @@ export default function ProposalDetailPage() {
         BigInt(proposalId),
       ]);
       updateNotification(nid, { message: t('governance.waiting_confirm') });
+      const receipt = await waitForTx(hash);
+      const govAbi = getAbi('GovernanceCore');
+      const rewardSkipped = receipt.logs.some((log) => {
+        try {
+          const decoded = decodeEventLog({
+            abi: govAbi,
+            data: log.data,
+            topics: log.topics,
+          });
+          return decoded.eventName === 'RewardSkipped';
+        } catch {
+          return false;
+        }
+      });
+      updateNotification(nid, {
+        type: 'success',
+        message: rewardSkipped
+          ? t('governance.executed_reward_skipped', 'Proposal executed (reward skipped due to low pool).')
+          : t('governance.executed_reward_paid', 'Proposal executed and proposer reward distributed.'),
+      });
+      await queryClient.invalidateQueries({ queryKey: ['document', docIdNum] });
+      refetch();
+    } catch (err) {
+      updateNotification(nid, { type: 'error', message: (err as Error).message });
+    }
+  };
+
+  const handleFinalize = async () => {
+    if (!walletClient || !proposalId) return;
+    const nid = `finalize-${Date.now()}`;
+    try {
+      addNotification({ id: nid, type: 'pending', message: t('governance.finalizing', 'Finalizing proposal...') });
+      const hash = await writeContract(walletClient, 'GovernanceCore', 'finalizeProposal', [
+        BigInt(proposalId),
+      ]);
+      updateNotification(nid, { message: t('governance.waiting_confirm') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: t('governance.executed') });
+      updateNotification(nid, { type: 'success', message: t('governance.finalized', 'Proposal finalized.') });
       refetch();
     } catch (err) {
       updateNotification(nid, { type: 'error', message: (err as Error).message });
@@ -95,6 +136,38 @@ export default function ProposalDetailPage() {
       refetch();
     } catch (err) {
       updateNotification(nid, { type: 'error', message: (err as Error).message });
+    }
+  };
+
+  const handleCastVeto = async () => {
+    if (!walletClient || !proposalId) return;
+    if (vetoDescriptionBytes < 50) {
+      addNotification({
+        id: `veto-${Date.now()}`,
+        type: 'error',
+        message: t('council.veto_description_short', 'Description must be at least 50 bytes.'),
+      });
+      return;
+    }
+
+    const nid = `veto-${Date.now()}`;
+    try {
+      setCastingVeto(true);
+      addNotification({ id: nid, type: 'pending', message: t('council.veto_casting', 'Casting veto...') });
+      const hash = await writeContract(walletClient, 'ArchiveCouncil', 'castVeto', [
+        BigInt(proposalId),
+        vetoReason,
+        vetoDescription,
+      ]);
+      updateNotification(nid, { message: t('governance.waiting_confirm') });
+      await waitForTx(hash);
+      updateNotification(nid, { type: 'success', message: t('council.veto_success', 'Veto submitted.') });
+      setVetoDescription('');
+      refetch();
+    } catch (error) {
+      updateNotification(nid, { type: 'error', message: (error as Error).message });
+    } finally {
+      setCastingVeto(false);
     }
   };
 
@@ -124,10 +197,19 @@ export default function ProposalDetailPage() {
   const isProposer = address?.toLowerCase() === p.proposer.toLowerCase();
   const councilWindowReady = Number(p.councilWindowEnd) > 0 ? now > Number(p.councilWindowEnd) : true;
   const canExecute = isApproved && councilWindowReady;
+  const canFinalize = isActive && isEnded;
   const canVote = isActive && !isEnded && !voted;
   const canCancel = isActive && isProposer;
+  const canCouncilVeto = Boolean(isCouncilMember && isApproved && Number(p.councilWindowEnd) > now);
 
   const shareUrl = `${window.location.href}${address ? `${window.location.search ? '&' : '?'}ref=${address}` : ''}`;
+  const [vetoReason, setVetoReason] = useState(0);
+  const [vetoDescription, setVetoDescription] = useState('');
+  const [castingVeto, setCastingVeto] = useState(false);
+  const vetoDescriptionBytes = useMemo(
+    () => new TextEncoder().encode(vetoDescription).length,
+    [vetoDescription],
+  );
 
   return (
     <PageWrapper>
@@ -193,9 +275,60 @@ export default function ProposalDetailPage() {
             {t('governance.timelock_ends_in', 'Executable in')} {formatEta(Number(p.councilWindowEnd))}
           </div>
         )}
-      </Card>
+        </Card>
 
-      <div className="grid gap-5 md:grid-cols-3">
+        {canCouncilVeto && (
+          <Card padding="lg" className="mb-5 border-pink-200/40 bg-pink-50/40">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-[var(--color-primary)]" />
+                {t('governance.council_veto', 'Council Veto')}
+              </h2>
+              <span className="text-xs text-[var(--color-text-secondary)]">{formatEta(Number(p.councilWindowEnd))}</span>
+            </div>
+            <div className="space-y-3 text-sm">
+              <label className="flex flex-col gap-1">
+                <span className="text-[var(--color-text-secondary)]">{t('council.veto_reason', 'Reason')}</span>
+                <select
+                  className="rounded-lg border px-3 py-2 text-sm"
+                  value={vetoReason}
+                  onChange={(event) => setVetoReason(Number(event.target.value))}
+                >
+                  <option value={0}>{t('council.veto_reason_false_history', 'False History')}</option>
+                  <option value={1}>{t('council.veto_reason_malicious', 'Malicious Upgrade')}</option>
+                  <option value={2}>{t('council.veto_reason_legal', 'Legal Risk')}</option>
+                  <option value={3}>{t('council.veto_reason_hate', 'Hate Speech')}</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-[var(--color-text-secondary)]">
+                  {t('council.veto_description', 'Description (≥50 bytes)')}
+                </span>
+                <textarea
+                  className="w-full min-h-[96px] rounded-lg border px-3 py-2 text-sm resize-y"
+                  value={vetoDescription}
+                  onChange={(event) => setVetoDescription(event.target.value)}
+                  placeholder={t('council.veto_description_placeholder', 'Explain why the proposal must be vetoed.')}
+                />
+              </label>
+              <div className="text-xs text-[var(--color-text-secondary)]">
+                {vetoDescriptionBytes} {t('council.veto_description_bytes', 'bytes')}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="danger"
+                onClick={handleCastVeto}
+                disabled={castingVeto || vetoDescriptionBytes < 50}
+                loading={castingVeto}
+              >
+                {castingVeto ? t('council.vetoing', 'Vetoing...') : t('council.veto_button', 'Veto Proposal')}
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        <div className="grid gap-5 md:grid-cols-3">
         <div className="md:col-span-2 space-y-4">
           <Card padding="lg">
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
@@ -278,8 +411,13 @@ export default function ProposalDetailPage() {
             </Card>
           )}
 
-          {(canExecute || canCancel) && (
+          {(canFinalize || canExecute || canCancel) && (
             <div className="flex flex-wrap gap-3">
+              {canFinalize && (
+                <Button variant="outline" onClick={handleFinalize} className="flex-1 !rounded-xl">
+                  {t('governance.finalize', 'Finalize Proposal')}
+                </Button>
+              )}
               {canExecute && (
                 <Button variant="primary" onClick={handleExecute} className="flex-1 !rounded-xl !shadow-md !shadow-[var(--color-primary)]/20">
                   {t('governance.execute')}

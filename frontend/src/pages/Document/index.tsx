@@ -6,7 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useDocument } from '../../hooks/useDocuments';
 import { useVersion, useVersionHistory, type VersionData } from '../../hooks/useVersionStore';
-import { useMarkdownContent, useVersionMarkdown } from '../../hooks/useMarkdownContent';
+import { useMarkdownContent, useProposalMarkdown, useVersionMarkdown } from '../../hooks/useMarkdownContent';
+import { useProposal } from '../../hooks/useProposals';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -15,15 +16,14 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { shortenAddress, formatDate } from '../../lib/utils';
 import { PAS_NETWORK } from '../../lib/contracts/addresses';
 import { readContract } from '../../lib/contracts';
-import { useDocCreationTx } from '../../hooks/useRealProposer';
+import { useDocCreationTx, useVersionTx } from '../../hooks/useRealProposer';
 import { VersionTree } from './VersionTree';
 import { DiffViewer } from './DiffViewer';
+import { StatusBadge } from '../../components/governance/StatusBadge';
 
 const STATUS_MAP: Record<number, { label: string; variant: 'success' | 'neutral' | 'warning' | 'error' }> = {
   0: { label: 'active', variant: 'success' },
-  1: { label: 'archived', variant: 'neutral' },
-  2: { label: 'frozen', variant: 'warning' },
-  3: { label: 'revoked', variant: 'error' },
+  1: { label: 'frozen', variant: 'warning' },
 };
 
 export default function DocumentPage() {
@@ -46,29 +46,37 @@ export default function DocumentPage() {
     () => (versionIds ?? []).map((x) => Number(x)).filter((x) => x > 0),
     [versionIds]
   );
+  const currentVersionIdNumber = doc && Number(doc.currentVersionId) > 0 ? Number(doc.currentVersionId) : undefined;
+  const visibleVersionIds = useMemo(() => {
+    if (!currentVersionIdNumber) {
+      return normalizedIds;
+    }
+    const merged = normalizedIds.filter((id) => id <= currentVersionIdNumber);
+    return merged.length ? merged : normalizedIds;
+  }, [normalizedIds, currentVersionIdNumber]);
 
   useEffect(() => {
-    if (!normalizedIds.length) {
+    if (!visibleVersionIds.length) {
       setSelectedVersionId(null);
       return;
     }
 
-    const current = versionId ?? normalizedIds[normalizedIds.length - 1];
+    const current = versionId ?? visibleVersionIds[visibleVersionIds.length - 1];
     setSelectedVersionId((prev) => {
-      if (prev && normalizedIds.includes(prev)) return prev;
+      if (prev && visibleVersionIds.includes(prev)) return prev;
       return current;
     });
-  }, [normalizedIds, versionId]);
+  }, [visibleVersionIds, versionId]);
 
   const { data: versionDetails } = useQuery({
-    queryKey: ['documentVersionDetails', docId, normalizedIds.join(',')],
+    queryKey: ['documentVersionDetails', docId, visibleVersionIds.join(',')],
     queryFn: async () => {
       const raws = await Promise.all(
-        normalizedIds.map((vid) => readContract('VersionStore', 'getVersion', [BigInt(vid)]))
+        visibleVersionIds.map((vid) => readContract('VersionStore', 'getVersion', [BigInt(vid)]))
       );
       return raws as VersionData[];
     },
-    enabled: normalizedIds.length > 0,
+    enabled: visibleVersionIds.length > 0,
     staleTime: 60_000,
   });
 
@@ -78,6 +86,10 @@ export default function DocumentPage() {
   const selectedVersionMeta = useMemo(
     () => versionDetails?.find((item) => Number(item.versionId) === selectedVersionId),
     [versionDetails, selectedVersionId]
+  );
+  const { data: selectedVersionTxHash } = useVersionTx(
+    selectedVersionId ?? undefined,
+    selectedVersionMeta?.txBlock
   );
 
   const diffBaseId = selectedVersionMeta && Number(selectedVersionMeta.parentVersionId) > 0
@@ -89,7 +101,10 @@ export default function DocumentPage() {
 
   const currentVersionId = selectedVersionId ?? versionId ?? null;
   const hasVersion = currentVersionId !== null;
-  const versionCount = versionIds?.length ?? 0;
+  const versionCount = visibleVersionIds.length;
+  const pendingProposalId = doc && Number(doc.latestProposalId) > 0 ? Number(doc.latestProposalId) : undefined;
+  const { data: pendingProposal } = useProposal(pendingProposalId);
+  const { data: pendingProposalMarkdown, isLoading: pendingMdLoading } = useProposalMarkdown(pendingProposal?.targetVersionId);
 
   const builtVersionNodes = useMemo(() => {
     if (!versionDetails) return [];
@@ -129,7 +144,9 @@ export default function DocumentPage() {
     );
   }
 
-  const explorerUrl = creationTxHash
+  const explorerUrl = selectedVersionTxHash
+    ? `${PAS_NETWORK.explorer}/tx/${selectedVersionTxHash}`
+    : creationTxHash
     ? `${PAS_NETWORK.explorer}/tx/${creationTxHash}`
     : `${PAS_NETWORK.explorer}/address/${doc.author}`;
   const statusInfo = STATUS_MAP[doc.status] ?? STATUS_MAP[0];
@@ -206,7 +223,7 @@ export default function DocumentPage() {
         </Card>
       )}
 
-      <div className="grid gap-6 md:grid-cols-[1fr_280px]">
+      <div className="grid gap-6 md:grid-cols-[1fr_320px]">
         <Card padding="lg" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
           {loadingMarkdown ? (
             <div className="space-y-3">
@@ -250,27 +267,98 @@ export default function DocumentPage() {
           )}
         </Card>
 
-        <Card className="h-fit animate-slide-up" style={{ animationDelay: '220ms' }}>
-          <VersionTree
-            versions={builtVersionNodes}
-            selectedId={currentVersionId}
-            onSelect={(vid) => setSelectedVersionId(vid)}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3 w-full"
-            onClick={() => setShowDiff((prev) => !prev)}
-            disabled={!diffBaseId}
-          >
-            {showDiff ? 'View Content' : 'View Diff'}
-          </Button>
-          {!diffBaseId && (
-            <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-              Diff requires a parent version.
-            </p>
-          )}
-        </Card>
+        <div className="space-y-4">
+          <Card padding="lg" className="h-fit animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold">{t('document.pending_proposal_title', 'Pending Proposal')}</h3>
+              {pendingProposal && pendingProposalId ? (
+                <Link
+                  to={`/governance/${pendingProposalId}`}
+                  className="text-xs text-[var(--color-primary)] hover:underline"
+                >
+                  {t('document.view_proposal', 'View Proposal')}
+                </Link>
+              ) : (
+                <span className="text-xs text-[var(--color-text-secondary)]">
+                  {t('document.pending_proposal_none_small', 'No proposal')}
+                </span>
+              )}
+            </div>
+            {pendingProposal ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+                  <StatusBadge status={Number(pendingProposal.status)} />
+                  <span>#{Number(pendingProposal.id)}</span>
+                  <span>·</span>
+                  <span>
+                    {t('document.status', 'Status')}:{' '}
+                    {t(
+                      `governance.status_${
+                        ['active', 'passed', 'vetoed', 'rejected', 'executed', 'cancelled'][pendingProposal.status] ?? 'active'
+                      }`
+                    )}
+                  </span>
+                </div>
+                {pendingMdLoading ? (
+                  <Skeleton className="h-20" />
+                ) : pendingProposalMarkdown ? (
+                  <div className="markdown-body max-h-56 overflow-y-auto text-xs">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{pendingProposalMarkdown}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t('document.pending_proposal_no_content', 'No content is available for this proposal yet.')}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2 text-[var(--color-text-secondary)] text-xs">
+                  <span>
+                    {t('document.voting_ends', 'Voting ends')}:{' '}
+                    {pendingProposal ? formatDate(Number(pendingProposal.endTime) * 1000) : '—'}
+                  </span>
+                  {pendingProposal?.councilWindowEnd && (
+                    <span>
+                      · {t('document.council_window', 'Council window ends')}:{' '}
+                      {formatDate(Number(pendingProposal.councilWindowEnd) * 1000)}
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => pendingProposalId && window.location.assign(`/governance/${pendingProposalId}`)}
+                >
+                  {t('document.open_proposal', 'Open Proposal')}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                {t('document.pending_proposal_none', 'No pending proposal for this document.')}
+              </p>
+            )}
+          </Card>
+          <Card className="h-fit animate-slide-up" style={{ animationDelay: '220ms' }}>
+            <VersionTree
+              versions={builtVersionNodes}
+              selectedId={currentVersionId}
+              onSelect={(vid) => setSelectedVersionId(vid)}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={() => setShowDiff((prev) => !prev)}
+              disabled={!diffBaseId}
+            >
+              {showDiff ? 'View Content' : 'View Diff'}
+            </Button>
+            {!diffBaseId && (
+              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
+                Diff requires a parent version.
+              </p>
+            )}
+          </Card>
+        </div>
       </div>
     </PageWrapper>
   );

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { decodeFunctionData } from 'viem';
-import { getPublicClient, getAbi } from '../lib/contracts';
+import { decodeFunctionData, parseAbiItem } from 'viem';
+import { getPublicClient, getAbi, getContractAddress } from '../lib/contracts';
 import { readContract } from '../lib/contracts';
 import type { VersionData } from './useVersionStore';
 
@@ -42,11 +42,22 @@ export async function fetchMarkdownByVersion(versionId: bigint): Promise<string 
 
   const pc = getPublicClient();
   const registryAbi = getAbi('PolkaInkRegistry');
-  const block = await pc.getBlock({ blockNumber: version.txBlock, includeTransactions: true });
-  const tx = block.transactions[Number(version.txIndex)];
-  if (!tx || typeof tx === 'string') return null;
+  const registryAddr = getContractAddress('PolkaInkRegistry') as `0x${string}`;
+  const logs = await pc.getLogs({
+    address: registryAddr,
+    event: parseAbiItem(
+      'event VersionProposed(uint256 indexed docId, uint256 indexed proposalId, address indexed proposer, uint256 parentVersionId, uint256 targetVersionId)'
+    ),
+    fromBlock: version.txBlock,
+    toBlock: version.txBlock,
+  });
+  const matched = logs.find((l) => l.args.targetVersionId === versionId);
+  if (!matched) return null;
 
-  const decoded = decodeFunctionData({ abi: registryAbi, data: tx.input });
+  const tx = await pc.getTransaction({ hash: matched.transactionHash });
+  if (!tx.input) return null;
+
+  const decoded = decodeFunctionData({ abi: registryAbi, data: tx.input as `0x${string}` });
   if (decoded.functionName !== 'proposeVersion') return null;
 
   const description = (decoded.args as unknown[])[3] as string;
@@ -58,12 +69,9 @@ export function useMarkdownContent(docId: number | undefined) {
     queryKey: ['markdownContent', docId],
     queryFn: async () => {
       if (!docId) return null;
-
-      const versionIds = await readContract('VersionStore', 'getVersionsByDoc', [BigInt(docId)]) as bigint[];
-      if (!versionIds.length) return null;
-
-      const latestVersionId = versionIds[versionIds.length - 1];
-      return fetchMarkdownByVersion(latestVersionId);
+      const doc = await readContract('PolkaInkRegistry', 'getDocument', [BigInt(docId)]) as { currentVersionId: bigint };
+      if (!doc.currentVersionId || doc.currentVersionId <= 0n) return null;
+      return fetchMarkdownByVersion(doc.currentVersionId);
     },
     enabled: docId !== undefined && docId > 0,
     staleTime: 5 * 60_000,

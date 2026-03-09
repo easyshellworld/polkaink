@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { readContract } from '../lib/contracts';
 
+export interface CouncilAllowanceStatus {
+  epochId: bigint | null;
+  claimableEpochId: bigint | null;
+  claimed: boolean;
+}
+
 export function useIsCouncilMember(address: string | null) {
   return useQuery({
     queryKey: ['isCouncilMember', address],
@@ -39,11 +45,11 @@ export function useCouncilAllowanceClaimed(address: string | null, epochId: bigi
 }
 
 export function useCouncilAllowanceStatus(address: string | null) {
-  return useQuery({
+  return useQuery<CouncilAllowanceStatus>({
     queryKey: ['councilAllowanceStatus', address],
     queryFn: async () => {
       if (!address) {
-        return { epochId: null, claimed: false };
+        return { epochId: null, claimableEpochId: null, claimed: false };
       }
 
       const [epochStartTime, epochDuration] = await Promise.all([
@@ -54,18 +60,22 @@ export function useCouncilAllowanceStatus(address: string | null) {
       const start = Number(epochStartTime as bigint);
       const duration = Number(epochDuration as bigint);
       if (duration <= 0) {
-        return { epochId: null, claimed: false };
+        return { epochId: null, claimableEpochId: null, claimed: false };
       }
 
       const now = Math.floor(Date.now() / 1000);
       const epochId = now < start ? 0n : BigInt(Math.floor((now - start) / duration));
-      const claimed = await readContract('ArchiveCouncil', 'isAllowanceClaimed', [
-        address as `0x${string}`,
-        epochId,
-      ]).catch(() => false);
+      const claimableEpochId = epochId > 0n ? epochId - 1n : null;
+      const claimed = claimableEpochId
+        ? await readContract('ArchiveCouncil', 'isAllowanceClaimed', [
+            address as `0x${string}`,
+            claimableEpochId,
+          ]).catch(() => false)
+        : false;
 
       return {
         epochId,
+        claimableEpochId,
         claimed: Boolean(claimed),
       };
     },
