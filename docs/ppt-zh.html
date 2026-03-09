@@ -558,7 +558,8 @@
 </head>
 <body>
 
-<!-- ════════════════ SLIDE 1: COVER ════════════════ -->
+
+<!-- ════════════════ SLIDE 1: 封面 ════════════════ -->
 <section class="slide active" id="s1" style="background: radial-gradient(ellipse at 20% 30%, #2a0d1f 0%, #0f0b1e 40%, #080812 100%); overflow:hidden;">
   <div style="position:absolute; top:-10%; left:-5%; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, rgba(230,0,122,0.18) 0%, transparent 70%); animation:pulse1 6s ease-in-out infinite; pointer-events:none;"></div>
   <div style="position:absolute; bottom:-15%; right:-5%; width:620px; height:620px; border-radius:50%; background:radial-gradient(circle, rgba(180,0,200,0.10) 0%, transparent 70%); animation:pulse2 8s ease-in-out infinite; pointer-events:none;"></div>
@@ -603,6 +604,7 @@
   </div>
 </section>
 
+
 <!-- ════════════════ SLIDE 2: 高概念开场 ════════════════ -->
 <section class="slide" id="s2">
   <div class="slide-content fade-in">
@@ -630,38 +632,9 @@
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 3: 视频演示 ════════════════ -->
-<section class="slide" id="s3">
-  <div class="slide-content fade-in">
-    <h2>从问题到答案，一段视频说清楚</h2>
-    <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1.2rem; align-items:stretch;">
-      <div style="flex:1; min-width:260px;">
-        <p style="color:#ff7b8c; font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第一章 · 问题</p>
-        <div class="video-placeholder" style="min-height:200px; margin:0;">
-          <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
-          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">演示视频（待录制）</p>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">维基「已删除」· AI 给出错误历史<br>GitHub 文档「last edited 3 days ago」</p>
-        </div>
-        <p style="text-align:center; margin-top:0.7rem; color:#ff7b8c; font-size:0.92rem;">你以为的历史，其实可以被改写</p>
-      </div>
-      <div style="display:flex; align-items:center; padding:0 0.3rem;">
-        <div style="width:2px; background:linear-gradient(to bottom, transparent, var(--pink), transparent); min-height:180px;"></div>
-      </div>
-      <div style="flex:1; min-width:260px;">
-        <p style="color:var(--green); font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第二章 · 答案</p>
-        <div class="video-placeholder" style="min-height:200px; margin:0; border-color:rgba(63,224,160,0.5);">
-          <div class="play-icon" style="background:var(--green); box-shadow:0 0 30px rgba(63,224,160,0.4);"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
-          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">演示视频（待录制）</p>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">搜索 → 提案 → 投票 → 上链<br>通过，铸造 Creator NFT</p>
-        </div>
-        <p style="text-align:center; margin-top:0.7rem; color:var(--green); font-size:0.92rem;">见证历史被写入链上的那一刻</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ════════════════ SLIDE 4: PolkaInk 是什么 ════════════════ -->
-<section class="slide" id="s3b">
+<!-- ════════════════ SLIDE 3: PolkaInk 是什么 ════════════════ -->
+<section class="slide" id="s3">
   <div class="slide-content fade-in">
 
     <!-- 顶部标语 -->
@@ -747,8 +720,9 @@
   </div>
 </section>
 
+
 <!-- ════════════════ SLIDE 4: 没有数据库，只有链 ════════════════ -->
-<section class="slide" id="s4_storage">
+<section class="slide" id="s4">
   <div class="slide-content fade-in" style="text-align:center;">
     <h2 style="justify-content:center; display:block; border-left:none; font-size:clamp(2rem,4vw,3.2rem); color:#fff;">没有数据库。没有云。<br><span style="color:var(--pink);">只有链本身。</span></h2>
     <p style="color:var(--muted); font-size:1rem; margin:1rem auto 1.8rem; max-width:560px;">Markdown 内容通过 calldata 直接写入 Polkadot 区块，任何全节点可独立验证，永久存在。</p>
@@ -780,8 +754,40 @@
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 5: 六条核心原则 ════════════════ -->
-<section class="slide" id="s5_principles">
+
+<!-- ════════════════ SLIDE 5: 视频演示 ════════════════ -->
+<section class="slide" id="s5">
+  <div class="slide-content fade-in">
+    <h2>从问题到答案，一段视频说清楚</h2>
+    <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1.2rem; align-items:stretch;">
+      <div style="flex:1; min-width:260px;">
+        <p style="color:#ff7b8c; font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第一章 · 问题</p>
+        <div class="video-placeholder" style="min-height:200px; margin:0;">
+          <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
+          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">演示视频（待录制）</p>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">维基「已删除」· AI 给出错误历史<br>GitHub 文档「last edited 3 days ago」</p>
+        </div>
+        <p style="text-align:center; margin-top:0.7rem; color:#ff7b8c; font-size:0.92rem;">你以为的历史，其实可以被改写</p>
+      </div>
+      <div style="display:flex; align-items:center; padding:0 0.3rem;">
+        <div style="width:2px; background:linear-gradient(to bottom, transparent, var(--pink), transparent); min-height:180px;"></div>
+      </div>
+      <div style="flex:1; min-width:260px;">
+        <p style="color:var(--green); font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第二章 · 答案</p>
+        <div class="video-placeholder" style="min-height:200px; margin:0; border-color:rgba(63,224,160,0.5);">
+          <div class="play-icon" style="background:var(--green); box-shadow:0 0 30px rgba(63,224,160,0.4);"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
+          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">演示视频（待录制）</p>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">搜索 → 提案 → 投票 → 上链<br>通过，铸造 Creator NFT</p>
+        </div>
+        <p style="text-align:center; margin-top:0.7rem; color:var(--green); font-size:0.92rem;">见证历史被写入链上的那一刻</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════ SLIDE 6: 六条核心原则 ════════════════ -->
+<section class="slide" id="s6">
   <div class="slide-content fade-in">
     <h2>六条核心原则</h2>
     <p class="sub">设计哲学：权力不应被购买，只能被赢得——贡献即信任，时间即证明</p>
@@ -823,8 +829,9 @@
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 4: 技术架构 A ════════════════ -->
-<section class="slide" id="s4">
+
+<!-- ════════════════ SLIDE 7: 技术架构 A ════════════════ -->
+<section class="slide" id="s7">
   <div class="slide-content fade-in">
     <h2>技术架构 — 技术栈与整体设计</h2>
     <p class="sub">Polkadot Asset Hub 原生 · 完全去中心化 · 合约逻辑自治</p>
@@ -903,8 +910,9 @@
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 5: 技术架构 B ════════════════ -->
-<section class="slide" id="s5">
+
+<!-- ════════════════ SLIDE 8: 技术架构 B ════════════════ -->
+<section class="slide" id="s8">
   <div class="slide-content fade-in">
     <h2>技术架构 — 合约调用流程与安全设计</h2>
     <div class="split">
@@ -958,8 +966,155 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 6: 质押与NFT ════════════════ -->
-<section class="slide" id="s6">
+
+<!-- ════════════════ SLIDE 9: 合约部署状态 ════════════════ -->
+<section class="slide" id="s9">
+  <div class="slide-content fade-in">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.6rem;">
+      <div>
+        <p style="color:var(--pink); letter-spacing:4px; font-size:0.75rem; font-weight:600; margin-bottom:0.5rem;">✦ 已部署 · PAS 测试网 ✦</p>
+        <h2 style="margin-bottom:0;">合约部署状态 — Chain ID 420420417</h2>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
+        <div style="background:rgba(63,224,160,0.1); border:1px solid rgba(63,224,160,0.35); border-radius:30px; padding:0.4rem 1.1rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); display:inline-block; animation:pulse2 2s ease-in-out infinite;"></span>
+          <span style="font-size:0.8rem; font-weight:700; color:var(--green);">LIVE · 2026-03-09 UTC</span>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
+          <span class="tag tag-green">✅ 64 测试通过</span>
+          <span class="tag tag-amber">💰 Treasury 5,000 PAS</span>
+          <span class="tag tag-pink">🔑 SEED_CREATOR_ROLE Renounced</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract table + stat column -->
+    <div style="display:grid; grid-template-columns:1fr 300px; gap:1.4rem; align-items:start;">
+
+      <!-- Left: contracts table -->
+      <div>
+        <table style="font-size:0.82rem;">
+          <tr>
+            <th style="width:36%;">合约</th>
+            <th>部署地址</th>
+            <th style="width:80px; text-align:center;">状态</th>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">PolkaInkRegistry</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">文档注册中心</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0xc3C208E3Eba8dC828e3426102AD678D0bFE15eFe" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xc3C208…15eFe</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">VersionStore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">calldata 版本存储</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0xb77Eb7703537f8f119C6a9F58Fe2D33BfA383dCd" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xb77Eb7…83dCd</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">GovernanceCore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">提案·投票·奖励</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x87Cb963B9A2e35DA5D8342Afa1Cd0D51b1F559aB" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x87Cb96…59aB</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">ArchiveCouncil</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">集体否决 5/7</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0xFC107cf84250C022eF13c6F8751AC5321bECD0fc" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xFC107c…D0fc</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">StakingManager</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">88 PAS 质押锁仓</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x286301d1585B40c5B88Ff0fbD86E7A70cE8a2443" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x286301…2443</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">NFTReward</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">3 种 Soulbound NFT</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x145EA0d74D31dDFC7ce1F95903d8eb9B0d8D72B3" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x145EA0…72B3</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--pink-light);">Treasury</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">奖励池 · 开放捐款</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x4c0CdB7a94cD0aF91460186F72F86297a3Ac7285" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x4c0CdB…7285</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--green);">TimelockController</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">48h 延迟·安全锚</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x33CC1AF7c7E88704c83bdED1270aa892813Fec61" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x33CC1A…ec61</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--green);">ProxyAdmin</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">UUPS 代理管理</div></td>
+            <td><a href="https://polkadot.testnet.routescan.io/address/0x4EBb5472bd5fFC619cA880447920584977E5fD68" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x4EBb54…fD68</a></td>
+            <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Right: stats + security callouts -->
+      <div style="display:flex; flex-direction:column; gap:0.9rem;">
+
+        <!-- Key stats -->
+        <div style="background:linear-gradient(135deg, rgba(230,0,122,0.12), rgba(100,0,200,0.08)); border:1px solid var(--border); border-radius:18px; padding:1.2rem; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+          <div style="text-align:center;">
+            <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">9</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">合约全部上链</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--green),#80ffcc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">64</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">测试全部通过</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:900; background:linear-gradient(135deg,var(--amber),#ffe0a0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">5K</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">PAS 国库已注资</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:900; background:linear-gradient(135deg,var(--purple),#ffffff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">4</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">种子文档已写入</div>
+          </div>
+        </div>
+
+        <!-- Security checklist -->
+        <div style="background:var(--bg3); border:1px solid rgba(63,224,160,0.2); border-radius:16px; padding:1.1rem;">
+          <div style="font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:0.75rem;">◎ 安全清单</div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
+              <span style="color:var(--text);">SEED_CREATOR_ROLE 已 renounce</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
+              <span style="color:var(--text);">Guardian NFT 无增发角色</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
+              <span style="color:var(--text);">48h Timelock 升级延迟</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
+              <span style="color:var(--text);">OpenZeppelin UUPS Proxy</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
+              <span style="color:var(--text);">部署后零特权管理员</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explorer link -->
+        <a href="https://polkadot.testnet.routescan.io/" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:0.6rem; background:var(--pink-dim); border:1px solid var(--border); border-radius:14px; padding:0.8rem 1rem; text-decoration:none; transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='rgba(230,0,122,0.25)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--pink-light)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span style="font-size:0.8rem; font-weight:700; color:var(--pink-light);">RouteScan 区块浏览器</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════ SLIDE 10: 成员资格 · 质押 · NFT ════════════════ -->
+<section class="slide" id="s10">
   <div class="slide-content fade-in">
     <h2>成员资格 · 质押 · NFT 体系</h2>
     <p class="sub">三种 NFT，全部通过链上行为获得，Demo 阶段均为 Soulbound</p>
@@ -1007,8 +1162,9 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 7: 治理机制 ════════════════ -->
-<section class="slide" id="s7">
+
+<!-- ════════════════ SLIDE 11: 治理机制 ════════════════ -->
+<section class="slide" id="s11">
   <div class="slide-content fade-in">
     <h2>治理机制 — 投票权重 · 提案流程</h2>
     <div class="split">
@@ -1060,8 +1216,9 @@ Guardian NFT：<span class="cm">无权重加成</span>
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 8: Archive Council ════════════════ -->
-<section class="slide" id="s8">
+
+<!-- ════════════════ SLIDE 12: Archive Council ════════════════ -->
+<section class="slide" id="s12">
   <div class="slide-content fade-in">
     <h2>Archive Council — 最后一道伦理防线</h2>
     <p class="sub">不是内容的主导者，是极端情况下的集体刹车</p>
@@ -1109,8 +1266,9 @@ Guardian NFT：<span class="cm">无权重加成</span>
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 9: 经济模型 ════════════════ -->
-<section class="slide" id="s9">
+
+<!-- ════════════════ SLIDE 13: 经济模型 ════════════════ -->
+<section class="slide" id="s13">
   <div class="slide-content fade-in">
     <h2>经济模型 v3.4 — 动态奖励 · Epoch 制度</h2>
     <p class="sub">仅 VersionUpdate 提案触发奖励分配 · 立场解耦 · 防扭曲</p>
@@ -1169,8 +1327,9 @@ Guardian NFT：<span class="cm">无权重加成</span>
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 10: 种子文档 ════════════════ -->
-<section class="slide" id="s10">
+
+<!-- ════════════════ SLIDE 14: 文档与版本模型 ════════════════ -->
+<section class="slide" id="s14">
   <div class="slide-content fade-in">
     <h2>文档与版本模型 · 种子文档规划</h2>
     <p class="sub">类 Git 线性历史 · 提案是 Pull Request · 合并即永久</p>
@@ -1222,8 +1381,9 @@ v3 修正细节（merge）
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 11: 路线图（含名人堂）════════════════ -->
-<section class="slide" id="s11">
+
+<!-- ════════════════ SLIDE 15: 路线图 ════════════════ -->
+<section class="slide" id="s15">
   <div class="slide-content fade-in">
     <h2>项目路线图 — 一步一步写入历史</h2>
     <div class="split">
@@ -1288,8 +1448,9 @@ v3 修正细节（merge）
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 12: 设计反思 ════════════════ -->
-<section class="slide" id="s12">
+
+<!-- ════════════════ SLIDE 16: 设计反思 ════════════════ -->
+<section class="slide" id="s16">
   <div class="slide-content fade-in">
     <h2>设计反思 — v1 → v2 → v3.4 的兴衰与重建</h2>
     <p class="sub">每一次版本迭代，都是对过度设计的一次修剪</p>
@@ -1334,8 +1495,9 @@ v3 修正细节（merge）
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 13: 生态影响力 ════════════════ -->
-<section class="slide" id="s13">
+
+<!-- ════════════════ SLIDE 17: 生态影响力 ════════════════ -->
+<section class="slide" id="s17">
   <div class="slide-content fade-in">
     <h2>PolkaInk 能为 Polkadot 带来什么？</h2>
     <p class="sub">链上历史协议 × 质押治理 × NFT 激励 — 预估生态增量</p>
@@ -1407,8 +1569,9 @@ v3 修正细节（merge）
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 14: 团队 ════════════════ -->
-<section class="slide" id="s14">
+
+<!-- ════════════════ SLIDE 18: 团队 ════════════════ -->
+<section class="slide" id="s18">
   <div class="slide-content fade-in" style="text-align:center;">
     <div style="margin-bottom:0.5rem;">
       <img src="https://arrowtower.netlify.app/ppt/polkaclaw.png" alt="PolkaClaw" style="height:60px; filter:drop-shadow(0 0 10px var(--pink));">
@@ -1430,8 +1593,9 @@ v3 修正细节（merge）
   </div>
 </section>
 
-<!-- ════════════════ SLIDE 15: 感谢 ════════════════ -->
-<section class="slide" id="s15">
+
+<!-- ════════════════ SLIDE 19: 感谢 ════════════════ -->
+<section class="slide" id="s19">
   <div class="slide-content fade-in" style="text-align:center;">
     <h2 style="justify-content:center; display:block; border-left:none; font-size:2.6rem;">感谢您 · Acknowledgements</h2>
     <div style="display:flex; justify-content:center; gap:2.5rem; flex-wrap:wrap; margin:2.5rem 0;">
@@ -1449,18 +1613,19 @@ v3 修正细节（merge）
     <p>感谢所有开发者和社区成员！</p>
     <div style="margin-top:2rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
       <a href="#" class="btn">🔗 体验测试网 Demo</a>
-      <a href="#" class="btn btn-outline">🗳️ 加入创世 DAO</a>
+      <a href="#" class="btn btn-outline">🗳️ 共创历史</a>
     </div>
     <p style="margin-top:2rem; color:var(--pink); font-family:'Syne',sans-serif; font-weight:700;">◎ PolkaInk · v3.4 · Write history on-chain. Memory that cannot be erased.</p>
   </div>
 </section>
+
 
 <!-- ════════════════ NAV ════════════════ -->
 <div class="navigation">
   <div class="nav-btn" id="prev-btn">←</div>
   <div class="nav-btn" id="next-btn">→</div>
 </div>
-<div class="slide-counter" id="slide-counter">1 / 17</div>
+<div class="slide-counter" id="slide-counter">1 / 19</div>
 
 <script>
 (function() {
