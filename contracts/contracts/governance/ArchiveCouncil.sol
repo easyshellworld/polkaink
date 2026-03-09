@@ -10,7 +10,7 @@ import "./interfaces/IGovernanceCore.sol";
 import "../core/interfaces/IPolkaInkRegistry.sol";
 import "../finance/interfaces/ITreasury.sol";
 
-/// @title ArchiveCouncil v3.3
+/// @title ArchiveCouncil v3.4
 /// @notice Genesis 7 members written in constructor; no setMember().
 ///         Fixed unconditional Council allowance per Epoch.
 ///         CouncilVetoed triggers REJECTION_COOLDOWN same as Rejected.

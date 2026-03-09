@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title IGovernanceCore v3.3
+/// @title IGovernanceCore v3.4
 interface IGovernanceCore {
 
     enum ProposalType {

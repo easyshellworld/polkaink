@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title VotingMath v3.3
+/// @title VotingMath v3.4
 ///
 /// weight = min(1e18 + boost, 2e18)
 /// boost  = B_hist + B_lock

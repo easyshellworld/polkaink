@@ -38,7 +38,12 @@ interface ITreasury {
     /// @notice GovernanceCore calls this on each vote cast for VersionUpdate proposals
     ///         to accumulate voter weights for proportional epoch reward distribution.
     ///         GOVERNANCE_ROLE only.
-    function recordEpochVoterWeight(uint256 epochId, address voter, uint256 weight) external;
+    function recordEpochVoterWeight(
+        uint256 epochId,
+        uint256 proposalId,
+        address voter,
+        uint256 weight
+    ) external;
 
     /// @notice ArchiveCouncil calls this to pay fixed council allowance (COUNCIL_ROLE)
     function distributeCouncilAllowance(address member, uint256 epochId) external;
@@ -52,9 +57,11 @@ interface ITreasury {
 
     // ─── Read Operations ───
     function rewardPoolBalance() external view returns (uint256);
+    function availableRewardPool() external view returns (uint256);
     function getEpochRecord(uint256 epochId) external view returns (EpochRecord memory);
     function pendingReward(address voter, uint256 epochId) external view returns (uint256);
     function epochStartTime() external view returns (uint256);
+    function EPOCH_DURATION() external view returns (uint256);
 
     // EPOCH_DURATION                = 30 days     / 1 hour (MVP)
     // PROPOSER_SHARE_BPS            = 5000  (50%)
@@ -66,7 +73,7 @@ interface ITreasury {
     event RewardPoolDeposited(address indexed from, uint256 amount);
     event ProposerRewarded(address indexed proposer, uint256 indexed proposalId, uint256 amount, uint256 voterCount);
     event RewardSkippedInsufficientPool(uint256 indexed proposalId, uint256 poolBalance);
-    event EpochFinalized(uint256 indexed epochId, uint256 totalVoterReward, uint256 voterCount);
+    event EpochFinalized(uint256 indexed epochId, uint256 totalVoterReward, uint256 proposalCount);
     event EpochRewardClaimed(address indexed voter, uint256 indexed epochId, uint256 amount);
     event CouncilAllowancePaid(address indexed member, uint256 indexed epochId, uint256 amount);
     event SpendExecuted(address indexed to, uint256 amount, SpendCategory category);

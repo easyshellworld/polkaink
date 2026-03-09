@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { deployFixture, stakeFor } from "../fixtures/deployFixture";
 
-describe("VersionStore v3.3", () => {
+describe("VersionStore v3.4", () => {
   describe("storeVersion", () => {
     it("should revert for unauthorized callers", async () => {
       const { contracts, actors } = await loadFixture(deployFixture);
@@ -24,6 +24,21 @@ describe("VersionStore v3.3", () => {
       const v = await contracts.versionStore.getVersion(1);
       expect(v.docId).to.equal(1n);
       expect(v.contentHash).to.equal(ethers.ZeroHash);
+    });
+
+    it("should link proposalId to version after proposeVersion", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+      await stakeFor(contracts.stakingManager, actors.author1);
+      await contracts.registry.connect(actors.author1).createDocument("Doc", [], "desc");
+      await contracts.registry.connect(actors.author1).proposeVersion(
+        1,
+        0,
+        ethers.keccak256(ethers.toUtf8Bytes("v1")),
+        "v1"
+      );
+
+      const v2 = await contracts.versionStore.getVersion(2);
+      expect(v2.proposalId).to.equal(1n);
     });
   });
 

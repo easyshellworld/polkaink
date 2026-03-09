@@ -182,7 +182,7 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         // Record voter weight for epoch reward distribution (VersionUpdate proposals only)
         if (p.proposalType == ProposalType.VersionUpdate) {
             uint256 epochId = (block.timestamp - _epochStartTime()) / _epochDuration();
-            treasury.recordEpochVoterWeight(epochId, msg.sender, weight);
+            treasury.recordEpochVoterWeight(epochId, proposalId, msg.sender, weight);
         }
 
         emit VoteCast(proposalId, msg.sender, choice, weight);
@@ -195,8 +195,8 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         return treasury.epochStartTime();
     }
 
-    function _epochDuration() internal pure returns (uint256) {
-        return 3600; // Must match Treasury.EPOCH_DURATION (MVP: 1 hour)
+    function _epochDuration() internal view returns (uint256) {
+        return treasury.EPOCH_DURATION();
     }
 
     function cancelProposal(uint256 proposalId) external {

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./interfaces/IVersionStore.sol";
 
-/// @title VersionStore v3.3
+/// @title VersionStore v3.4
 /// @notice Stores on-chain version metadata for all documents.
 ///         Only PolkaInkRegistry (WRITER_ROLE) can write.
 contract VersionStore is
@@ -64,6 +64,16 @@ contract VersionStore is
         _docVersions[docId].push(versionId);
 
         emit VersionStored(versionId, docId, parentVersionId, author, contentHash);
+    }
+
+    function linkProposal(uint256 versionId, uint256 proposalId) external onlyRole(WRITER_ROLE) {
+        Version storage v = _versions[versionId];
+        if (v.versionId == 0) revert VersionStore__VersionNotFound(versionId);
+        if (v.proposalId != 0) {
+            revert VersionStore__ProposalAlreadyLinked(versionId, v.proposalId);
+        }
+        v.proposalId = proposalId;
+        emit VersionProposalLinked(versionId, proposalId);
     }
 
     // ─── Read Operations ──────────────────────────────────────────────────

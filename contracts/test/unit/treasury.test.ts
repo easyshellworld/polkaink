@@ -92,7 +92,7 @@ describe("Treasury v3.4", () => {
       const { contracts, actors } = await loadFixture(deployFixture);
       await expect(
         (contracts.treasury as any).connect(actors.author1).recordEpochVoterWeight(
-          0, actors.author1.address, ethers.parseEther("1")
+          0, 1, actors.author1.address, ethers.parseEther("1")
         )
       ).to.be.reverted;
     });
@@ -206,6 +206,58 @@ describe("Treasury v3.4", () => {
       const v2Pending = await contracts.treasury.pendingReward(actors.voter2.address, 0);
 
       expect(v1Pending).to.be.gt(v2Pending, "higher weight voter should get more reward");
+    });
+
+    it("should enforce epoch minimum participation threshold (50%)", async () => {
+      const { contracts, actors } = await loadFixture(deployFixture);
+
+      await stakeFor(contracts.stakingManager, actors.author1, 12);
+      await stakeFor(contracts.stakingManager, actors.voter1, 24);
+      await stakeFor(contracts.stakingManager, actors.voter2, 6);
+      await stakeFor(contracts.stakingManager, actors.voter3, 6);
+
+      await contracts.registry.connect(actors.author1)
+        .createDocument("Part A", [], "desc");
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(1, 0, ethers.keccak256(ethers.toUtf8Bytes("a1")), "a1");
+      await contracts.governanceCore.connect(actors.voter1).vote(1, 0);
+      await contracts.governanceCore.connect(actors.voter2).vote(1, 0);
+      await time.increase(VOTING_PERIOD + 1);
+      await contracts.governanceCore.finalizeProposal(1);
+      await time.increase(COUNCIL_WINDOW + 1);
+      await contracts.governanceCore.executeProposal(1);
+
+      await contracts.registry.connect(actors.author1)
+        .createDocument("Part B", [], "desc");
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(2, 0, ethers.keccak256(ethers.toUtf8Bytes("b1")), "b1");
+      await contracts.governanceCore.connect(actors.voter1).vote(2, 0);
+      await contracts.governanceCore.connect(actors.voter3).vote(2, 0);
+      await time.increase(VOTING_PERIOD + 1);
+      await contracts.governanceCore.finalizeProposal(2);
+      await time.increase(COUNCIL_WINDOW + 1);
+      await contracts.governanceCore.executeProposal(2);
+
+      await contracts.registry.connect(actors.author1)
+        .createDocument("Part C", [], "desc");
+      await contracts.registry.connect(actors.author1)
+        .proposeVersion(3, 0, ethers.keccak256(ethers.toUtf8Bytes("c1")), "c1");
+      await contracts.governanceCore.connect(actors.voter1).vote(3, 0);
+      await contracts.governanceCore.connect(actors.voter3).vote(3, 0);
+      await time.increase(VOTING_PERIOD + 1);
+      await contracts.governanceCore.finalizeProposal(3);
+      await time.increase(COUNCIL_WINDOW + 1);
+      await contracts.governanceCore.executeProposal(3);
+
+      await time.increase(EPOCH_DURATION + 1);
+      await contracts.treasury.finalizeEpoch(0);
+
+      const v1Pending = await contracts.treasury.pendingReward(actors.voter1.address, 0);
+      const v2Pending = await contracts.treasury.pendingReward(actors.voter2.address, 0);
+
+      // v1 participated 3/3 proposals; v2 only 1/3 and should be excluded at 50% threshold.
+      expect(v1Pending).to.be.gt(0n);
+      expect(v2Pending).to.equal(0n);
     });
   });
 });

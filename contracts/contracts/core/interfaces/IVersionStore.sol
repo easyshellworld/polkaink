@@ -24,6 +24,7 @@ interface IVersionStore {
         uint256 txBlock,
         uint256 txIndex
     ) external returns (uint256 versionId);
+    function linkProposal(uint256 versionId, uint256 proposalId) external;
 
     function getVersion(uint256 versionId) external view returns (Version memory);
     function getVersionsByDoc(uint256 docId) external view returns (uint256[] memory versionIds);
@@ -37,7 +38,9 @@ interface IVersionStore {
         address indexed author,
         bytes32 contentHash
     );
+    event VersionProposalLinked(uint256 indexed versionId, uint256 indexed proposalId);
 
     error VersionStore__Unauthorized();
     error VersionStore__VersionNotFound(uint256 versionId);
+    error VersionStore__ProposalAlreadyLinked(uint256 versionId, uint256 existingProposalId);
 }

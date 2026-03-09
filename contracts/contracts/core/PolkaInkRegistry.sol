@@ -11,7 +11,7 @@ import "../governance/interfaces/IGovernanceCore.sol";
 import "../governance/interfaces/IStakingManager.sol";
 import "../token/interfaces/INFTReward.sol";
 
-/// @title PolkaInkRegistry v3.3
+/// @title PolkaInkRegistry v3.4
 /// @notice Core document lifecycle management.
 ///         createSeedDocument only writes title + tags; content is empty.
 ///         SEED_CREATOR_ROLE is renounced after all seed documents are created.
@@ -149,6 +149,7 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         proposalId = governanceCore.createProposalFor(
             msg.sender, docId, targetVersionId, parentVersionId, description
         );
+        versionStore.linkProposal(targetVersionId, proposalId);
 
         doc.latestProposalId = proposalId;
         _proposalDoc[proposalId]     = docId;

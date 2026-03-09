@@ -13,7 +13,7 @@
 [![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-UUPS-4E5EE4?logo=openzeppelin)](https://openzeppelin.com/)
 [![Hardhat](https://img.shields.io/badge/Hardhat-parity--polkadot-FFF100?logo=hardhat&logoColor=black)](https://hardhat.org/)
 
-[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 [![viem](https://img.shields.io/badge/viem-v2-5C3C8D)](https://viem.sh)
@@ -27,27 +27,26 @@
 
 ## 📖 PolkaInk 是什么？
 
-PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议**。它是一个永久的、以社区共识为基础的档案馆——每一次编辑都透明可溯、版本可控、不可篡改，以交易 calldata 的形式永久刻入 Polkadot Asset Hub 的区块数据之中。
+**PolkaInk 是运行在 Polkadot Asset Hub 上的链上 DAO 治理历史存档协议。** 它将 Polkadot 生态历史文档（Markdown 格式）以交易 **calldata** 的形式直接写入区块——没有数据库，没有云，没有 IPFS，只有链本身。
 
-没有数据库。没有云。没有 IPFS。只有链本身。
+参与门槛是质押（88 PAS），但质押只购买入场资格，买不来话语权。投票权重由贡献决定：你写入了多少被社区接受的历史、你锁仓了多长时间。权力无法被购买，只能被赢得。
 
-通过 PolkaInk 写入的每一个字，都以 calldata 的形式编码进 Polkadot Asset Hub 的区块——不依赖外部存储协议，不依赖任何团队，无法被删除，无法被篡改。当 AI 生成的虚假信息泛滥、中心化平台悄然改写历史时，PolkaInk 构筑起一道以人类共识为基础、AI 无法伪造的真相防线。
+通过 PolkaInk 写入的每一个字，都与承载它的区块等寿。当 AI 生成的虚假信息泛滥、中心化平台悄然改写历史的时代，PolkaInk 构筑起一道以人类共识为基础、任何权力皆无法抹去的真相防线。
 
-> 在熵增的时代，我们选择做熵减。
-
-**核心理念**：罗马的历史，应当刻进罗马人自己铸造的石柱上。Polkadot 的历史，属于 Polkadot——属于链上，属于永远。
+> 罗马的历史，应当刻进罗马人自己铸造的石柱上。  
+> Polkadot 的历史，属于 Polkadot——属于链上，属于永远。
 
 ---
 
 ## ✨ 核心特性
 
-- **📜 纯链上 Calldata 存储** — 文档内容以calldata 写入区块，与区块等寿，任何全节点均可验证。
-- **🗳️ DAO 链上治理** — 所有编辑、提案、审批均通过链上社区投票完成，全程透明，无需信任。
-- **🛡️ 档案守护委员会** — 7 人伦理委员会，仅拥有否决权；可守护历史，但永远无法主动改写。
-- **⏳ 48 小时 Timelock** — 所有治理操作须经过强制延迟，防止仓促或恶意变更。
-- **🏅 作者 NFT 奖励** — 贡献者通过验证的知识贡献，可获得链上 NFT 凭证。
-- **💰 社区 Treasury** — 由社区治理的资金库，用于协议持续发展与贡献者激励。
-- **🔄 UUPS 可升级架构** — 合约采用代理升级模式，协议可持续演进而不丢失历史数据。
+- **📜 纯链上 Calldata 存储** — 文档内容以 calldata 编码写入 Polkadot Asset Hub 区块，与区块等寿，任何全节点可离线独立验证，无需依赖任何外部服务。
+- **🗳️ 质押成员制 + DAO 治理** — 88 PAS 质押获得成员资格。投票权重由创作贡献（Creator NFT 数量）与锁仓时长共同决定，而非钱包余额。单人通过在数学上不可能（单人最大实际权重 1.80 < 通过门槛 2.00）。
+- **🛡️ Archive Council 伦理防线** — 7 位创世成员，集体否决权（5/7 多数），且无任何写入或改写权力。每次否决须附 ≥50 字节链上理由，永久公开可查。
+- **⏳ 48 小时 Timelock** — 所有治理升级须经强制延迟，防止仓促或恶意变更。
+- **🏅 Soulbound NFT 激励** — 三种链上 NFT：**Member**（质押入场）、**Creator**（贡献被接受的历史后自动铸造，无限叠加）、**Guardian**（创世 Council 构造函数直接 mint，无增发角色，无权重加成）。Demo 阶段均为 Soulbound。
+- **💰 开放 Treasury** — 任何人可捐款，Epoch 奖励（30 天周期）同时发放给提案人与投票者，且与投票立场解耦，保持判断独立性。
+- **🔒 零特权管理员** — 部署完成后协议中不存在任何特权管理员。`SEED_CREATOR_ROLE` 创建 4 个种子文档后立即 renounce；Guardian NFT 无 `GUARDIAN_MINTER_ROLE`；Council 创世成员地址写入构造函数，Phase 1 前无人可替换。
 - **🌐 多语言支持** — 界面支持 English、中文、Français、Русский、Español、العربية。
 
 ---
@@ -55,48 +54,55 @@ PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议
 ## 🏛️ 架构总览
 
 ```
-┌──────────────────────────────────────────────────────┐
-│       前端 · React 18 + Vite + TypeScript            │
-│     Tailwind CSS v4 · viem v2 · Zustand              │
-└───────────────────────┬──────────────────────────────┘
-                        │
-┌───────────────────────▼──────────────────────────────┐
-│           Polkadot Asset Hub · 智能合约层             │
-│                                                      │
-│  PolkaInkRegistry  VersionStore  GovernanceCore      │
-│  ArchiveCouncil    NFTReward     Treasury             │
-│  TimelockController              ProxyAdmin           │
-│                                                      │
-│           Markdown 内容 = 交易 calldata              │
-└───────────────────────┬──────────────────────────────┘
-                        │
-┌───────────────────────▼──────────────────────────────┐
-│      档案守护委员会（伦理守卫）                        │
-│      仅拥有否决权——历史无法被改写                     │
-└──────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│     前端 · React 19 + Vite + TypeScript                 │
+│  Tailwind CSS v4 · wagmi v2 · viem v2 · Zustand         │
+└──────────────────────────┬──────────────────────────────┘
+                           │  钱包连接
+┌──────────────────────────▼──────────────────────────────┐
+│   Polkadot Asset Hub · pallet-revive (REVM 兼容)         │
+│  Chain ID 420420417 · Solidity 0.8.28 · UUPS Proxy (OZ)  │
+│                                                         │
+│  PolkaInkRegistry   VersionStore    GovernanceCore      │
+│  ArchiveCouncil     NFTReward       Treasury             │
+│  StakingManager     VotingMath                          │
+│  TimelockController (48h 延迟)      ProxyAdmin           │
+│                                                         │
+│         Markdown 内容  =  交易 calldata                 │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────┐
+│  Archive Council — 7 成员 · 5/7 集体否决                 │
+│  可守护历史，永远无法改写历史                             │
+└─────────────────────────────────────────────────────────┘
 ```
 
 | 层级 | 技术栈 |
 |---|---|
-| 合约 | Solidity 0.8.28 / Hardhat / OpenZeppelin UUPS / @parity/hardhat-polkadot |
-| 前端 | React 18 + Vite + TypeScript + Tailwind CSS v4 + viem v2 |
+| 区块链 | Polkadot Asset Hub — pallet-revive + REVM |
+| 合约 | Solidity 0.8.28 · Hardhat · OpenZeppelin UUPS · @parity/hardhat-polkadot |
+| 前端 | React 19 · Vite · TypeScript · Tailwind CSS v4 · wagmi v2 · viem v2 |
 | 状态管理 | Zustand + React Query |
-| 多语言 | English / 中文 / Français / Русский / Español / العربية |
+| 国际化 | en / zh / fr / ru / es / ar（i18next） |
 
 ---
 
-## 📋 已部署合约（PAS 测试网 · Chain ID `420420417`）
+## 📋 已部署合约 — PAS 测试网 · Chain ID `420420417`
+
+> 部署时间：**2026-03-09 UTC**  
+> Treasury 注资 **5,000 PAS** · 已创建 4 条种子文档 · `SEED_CREATOR_ROLE` 已 renounce ✅
 
 | 合约 | 地址 |
 |---|---|
-| PolkaInkRegistry | [`0x959b25F190189e588DaC814a95fe13a97d5198A1`](https://polkadot.testnet.routescan.io/address/0x959b25F190189e588DaC814a95fe13a97d5198A1) |
-| VersionStore | [`0xBB4cccdDb9e3ba74Ae28A412d34801353D1e0Ad6`](https://polkadot.testnet.routescan.io/address/0xBB4cccdDb9e3ba74Ae28A412d34801353D1e0Ad6) |
-| GovernanceCore | [`0xae456115ce2897338FE22Cd342312D92D47821Fb`](https://polkadot.testnet.routescan.io/address/0xae456115ce2897338FE22Cd342312D92D47821Fb) |
-| ArchiveCouncil | [`0x12771dcae01DEba4757719f7D2bD06D235a9FaD8`](https://polkadot.testnet.routescan.io/address/0x12771dcae01DEba4757719f7D2bD06D235a9FaD8) |
-| NFTReward | [`0x58DC769015e5a6bAdC5C56519B5f74F851575bAe`](https://polkadot.testnet.routescan.io/address/0x58DC769015e5a6bAdC5C56519B5f74F851575bAe) |
-| Treasury | [`0x10F968271C18FF349a3a67FEE9141F7F4f42AD14`](https://polkadot.testnet.routescan.io/address/0x10F968271C18FF349a3a67FEE9141F7F4f42AD14) |
-| TimelockController | [`0x684018c8709105437c277Eec60953cF335EaB5D9`](https://polkadot.testnet.routescan.io/address/0x684018c8709105437c277Eec60953cF335EaB5D9) |
-| ProxyAdmin | [`0x646664752E351ecb1f4c3B627Ba7cd76F7fF294c`](https://polkadot.testnet.routescan.io/address/0x646664752E351ecb1f4c3B627Ba7cd76F7fF294c) |
+| PolkaInkRegistry | [`0xc3C208E3Eba8dC828e3426102AD678D0bFE15eFe`](https://polkadot.testnet.routescan.io/address/0xc3C208E3Eba8dC828e3426102AD678D0bFE15eFe) |
+| VersionStore | [`0xb77Eb7703537f8f119C6a9F58Fe2D33BfA383dCd`](https://polkadot.testnet.routescan.io/address/0xb77Eb7703537f8f119C6a9F58Fe2D33BfA383dCd) |
+| GovernanceCore | [`0x87Cb963B9A2e35DA5D8342Afa1Cd0D51b1F559aB`](https://polkadot.testnet.routescan.io/address/0x87Cb963B9A2e35DA5D8342Afa1Cd0D51b1F559aB) |
+| ArchiveCouncil | [`0xFC107cf84250C022eF13c6F8751AC5321bECD0fc`](https://polkadot.testnet.routescan.io/address/0xFC107cf84250C022eF13c6F8751AC5321bECD0fc) |
+| StakingManager | [`0x286301d1585B40c5B88Ff0fbD86E7A70cE8a2443`](https://polkadot.testnet.routescan.io/address/0x286301d1585B40c5B88Ff0fbD86E7A70cE8a2443) |
+| NFTReward | [`0x145EA0d74D31dDFC7ce1F95903d8eb9B0d8D72B3`](https://polkadot.testnet.routescan.io/address/0x145EA0d74D31dDFC7ce1F95903d8eb9B0d8D72B3) |
+| Treasury | [`0x4c0CdB7a94cD0aF91460186F72F86297a3Ac7285`](https://polkadot.testnet.routescan.io/address/0x4c0CdB7a94cD0aF91460186F72F86297a3Ac7285) |
+| TimelockController | [`0x33CC1AF7c7E88704c83bdED1270aa892813Fec61`](https://polkadot.testnet.routescan.io/address/0x33CC1AF7c7E88704c83bdED1270aa892813Fec61) |
+| ProxyAdmin | [`0x4EBb5472bd5fFC619cA880447920584977E5fD68`](https://polkadot.testnet.routescan.io/address/0x4EBb5472bd5fFC619cA880447920584977E5fD68) |
 
 ---
 
@@ -107,12 +113,15 @@ PolkaInk 是一个**基于 Polkadot 生态的链上 DAO 治理知识存档协议
 cd contracts && npm install
 npx hardhat compile
 
+# 运行测试（64 项全部通过）
+npx hardhat test
+
 # 前端
 cd frontend && npm install
 npm run dev        # http://localhost:5173
 ```
 
-> CI/CD 流水线、测试结果与部署工作流均通过 **GitHub Actions** 管理：
+> CI/CD 流水线与部署工作流均通过 **GitHub Actions** 管理：  
 > 👉 [查看 Actions](https://github.com/easyshellworld/polkaink/actions)
 
 ---
@@ -121,19 +130,19 @@ npm run dev        # http://localhost:5173
 
 ```
 contracts/
-  contracts/              # 8 个 Solidity 合约（UUPS 代理）
-  scripts/deploy/         # 编号部署脚本 + deploy_all.ts
-  test/                   # 单元测试 + 集成测试（64 项通过）
+  contracts/          # 9 个 Solidity 合约（UUPS 代理）
+  scripts/deploy/     # deploy_all.ts + 编号部署脚本
+  test/               # 单元测试 + 集成测试（64 项通过）
 frontend/
-  src/pages/              # Home、Library、Document、Create、Propose、Governance
-  src/hooks/              # useDocuments、useProposals、useVote、useMarkdownContent 等
-  src/lib/contracts/      # 多合约 ABI + 地址
-  public/locales/         # en, zh, fr, ru, es, ar
+  src/pages/          # Home、Library、Document、Create、Propose、Governance
+  src/hooks/          # useDocuments、useProposals、useVote、useMarkdownContent …
+  src/lib/contracts/  # 多合约 ABI + 部署地址
+  public/locales/     # en, zh, fr, ru, es, ar
 skills/
-  polkaink_agent_skill.md # AI Agent 可直接调用的技能文件
+  polkaink_agent_skill.md   # SKILL.md 格式 Agent 文件（兼容 Claude / Cursor / Copilot）
 docs/
-  dev_doc.md              # 设计规范文档
-  dev_log.md              # 开发日志
+  dev_doc.md          # 完整设计规范（v3.4）
+  dev_log.md          # 开发日志
 ```
 
 ---
@@ -142,23 +151,18 @@ docs/
 
 | 阶段 | 目标 |
 |---|---|
-| **Phase 0** | 合约架构 · PAS 测试网上线 · Treasury 申请 |
-| **Phase 1** | 主网上线 · Markdown 浏览器 · Calldata 验证工具 |
-| **Phase 2** | DAO + NFT 奖励 · 100 位创世历史作者 |
-| **Phase 3** | 开放 API · AI 摘要支持 · 与 Subscan 互通 |
-| **Phase 4** | Kusama 扩展 · 多 Parachain 历史档案 |
+| **Phase 0** ✅ | 9 合约架构完成 · PAS 测试网部署 · Treasury Grant 申请 |
+| **Phase 1** | 主网上线 · Markdown 浏览器 · Calldata 验证工具 · 6 语言 i18n |
+| **Phase 2** | 完整 DAO · Council 选举合约 · NFT 奖励体系激活 · Bug Bounty |
+| **Phase 3** | 开放 API · AI 辅助摘要（链下运行，链上存档）· Polkassembly 数据互通 |
+| **Phase 4** | Kusama 历史支持 · 多 Parachain 存档 · DeFi yield 补充国库 |
+| **Phase 5** | 接入 Polkadot Proof of Personhood · 零知识证明一人一基础权重 |
 
 ---
 
 ## 🤝 参与贡献
 
-我们欢迎一切形式的贡献：
-
-- 🐛 提交问题反馈
-- 💡 提出新功能建议
-- 📝 改进项目文档
-- 🔧 提交代码修复
-- 🌐 翻译文档
+欢迎一切形式的贡献：问题反馈、功能建议、文档改进、代码修复、翻译贡献。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ---
 
@@ -168,12 +172,13 @@ MIT 许可证 — 开源，永久。
 
 ---
 
-## 📞 联系方式
+## 📞 链接
 
-- **代码仓库**: [github.com/easyshellworld/polkaink](https://github.com/easyshellworld/polkaink)
-- **问题反馈**: [github.com/easyshellworld/polkaink/issues](https://github.com/easyshellworld/polkaink/issues)
-- **Agent 技能文件**: [`skills/polkaink_agent_skill.md`](skills/polkaink_agent_skill.md)
+- **代码仓库**：[github.com/easyshellworld/polkaink](https://github.com/easyshellworld/polkaink)
+- **问题反馈**：[github.com/easyshellworld/polkaink/issues](https://github.com/easyshellworld/polkaink/issues)
+- **测试网浏览器**：[polkadot.testnet.routescan.io](https://polkadot.testnet.routescan.io/)
+- **Agent 技能文件**：[`skills/polkaink_agent_skill.md`](skills/polkaink_agent_skill.md)
 
 ---
 
-**由 PolkaClaw 构建** — *把我们的历史写进链上，让记忆无法被删除。* 🦑✨
+**由 PolkaClaw 构建** — *历史，永刻链上。记忆，无法删除。* ◎

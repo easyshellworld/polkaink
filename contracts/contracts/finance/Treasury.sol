@@ -37,6 +37,7 @@ contract Treasury is
     uint256 public constant EPOCH_MIN_PARTICIPATION_BPS  = 5000;           // 50%
 
     uint256 private _rewardPool;
+    uint256 private _reservedRewards;
     uint256 private _epochStartTime;
 
     mapping(uint256 => EpochRecord)            private _epochRecords;
@@ -47,6 +48,10 @@ contract Treasury is
     mapping(uint256 => address[])              private _epochVoters;         // epochId => voter addresses
     mapping(uint256 => mapping(address => uint256)) private _epochVoterWeight; // epochId => voter => accumulated weight
     mapping(uint256 => uint256)                private _epochTotalVoterWeight; // epochId => total weight
+    mapping(uint256 => uint256)                private _epochEligibleProposalCount; // epochId => valid proposal count
+    mapping(uint256 => mapping(uint256 => bool)) private _epochProposalCounted; // epochId => proposalId => counted
+    mapping(uint256 => mapping(address => uint256)) private _epochVoterParticipationCount; // epochId => voter => voted proposals
+    mapping(uint256 => mapping(uint256 => mapping(address => bool))) private _epochProposalVoted; // epochId => proposalId => voter => voted
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() { _disableInitializers(); }
@@ -79,7 +84,8 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         uint256 proposalId,
         uint256 voterCount
     ) external onlyRole(GOVERNANCE_ROLE) nonReentrant returns (uint256 rewardPaid) {
-        uint256 reward = VotingMath.calculateProposalReward(voterCount, _rewardPool);
+        uint256 availablePool = _availableRewardPool();
+        uint256 reward = VotingMath.calculateProposalReward(voterCount, availablePool);
         if (reward == 0) {
             emit RewardSkippedInsufficientPool(proposalId, _rewardPool);
             return 0;
@@ -89,9 +95,9 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         uint256 voterShare    = (reward * VOTER_SHARE_BPS)    / 10_000;
         // Reserve portion (20%) remains in rewardPool implicitly
 
-        // Deduct both proposer and voter shares from rewardPool
-        // (voter share is held in pool but logically reserved for epoch distribution)
-        _rewardPool -= proposerShare + voterShare;
+        // Pay proposer now, reserve voter share until epoch finalization.
+        _rewardPool      -= proposerShare;
+        _reservedRewards += voterShare;
 
         // Record voter share for current epoch
         uint256 epochId = _currentEpochId();
@@ -101,10 +107,6 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         ep.endTime          = ep.startTime + EPOCH_DURATION;
         ep.totalVoterReward += voterShare;
         ep.proposalCount    += 1;
-
-        // Re-add voterShare back to rewardPool so it stays available until epoch finalization
-        // (will be deducted per-voter when _pendingRewards are populated in finalizeEpoch)
-        _rewardPool += voterShare;
 
         // Send proposer reward immediately
         (bool ok,) = proposer.call{value: proposerShare}("");
@@ -118,9 +120,18 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
     /// @dev GOVERNANCE_ROLE only. Deduplication: if voter already recorded in this epoch, weight is added.
     function recordEpochVoterWeight(
         uint256 epochId,
+        uint256 proposalId,
         address voter,
         uint256 weight
     ) external onlyRole(GOVERNANCE_ROLE) {
+        if (!_epochProposalCounted[epochId][proposalId]) {
+            _epochProposalCounted[epochId][proposalId] = true;
+            _epochEligibleProposalCount[epochId] += 1;
+        }
+        if (!_epochProposalVoted[epochId][proposalId][voter]) {
+            _epochProposalVoted[epochId][proposalId][voter] = true;
+            _epochVoterParticipationCount[epochId][voter] += 1;
+        }
         if (_epochVoterWeight[epochId][voter] == 0) {
             // First time this voter votes in this epoch — add to list
             _epochVoters[epochId].push(voter);
@@ -142,31 +153,58 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         // Distribute voter share proportionally by accumulated vote weight
         uint256 totalVoterReward = ep.totalVoterReward;
         uint256 totalWeight      = _epochTotalVoterWeight[epochId];
+        uint256 proposalCount    = _epochEligibleProposalCount[epochId];
+        uint256 requiredVotes    = proposalCount == 0
+            ? 0
+            : (proposalCount * EPOCH_MIN_PARTICIPATION_BPS + 9_999) / 10_000;
 
+        uint256 distributed = 0;
         if (totalVoterReward > 0 && totalWeight > 0) {
             address[] storage voters = _epochVoters[epochId];
-            uint256 distributed = 0;
             uint256 len = voters.length;
+            uint256 qualifiedWeight = 0;
+
             for (uint256 i = 0; i < len; i++) {
                 address voter = voters[i];
-                uint256 voterWeight = _epochVoterWeight[epochId][voter];
-                if (voterWeight == 0) continue;
-                uint256 share;
-                if (i == len - 1) {
-                    // Last voter gets the remainder to avoid dust from rounding
-                    share = totalVoterReward - distributed;
-                } else {
-                    share = (totalVoterReward * voterWeight) / totalWeight;
+                uint256 participated = _epochVoterParticipationCount[epochId][voter];
+                if (requiredVotes > 0 && participated < requiredVotes) continue;
+                qualifiedWeight += _epochVoterWeight[epochId][voter];
+            }
+
+            if (qualifiedWeight > 0) {
+                for (uint256 i = 0; i < len; i++) {
+                    address voter = voters[i];
+                    uint256 participated = _epochVoterParticipationCount[epochId][voter];
+                    if (requiredVotes > 0 && participated < requiredVotes) continue;
+                    uint256 voterWeight = _epochVoterWeight[epochId][voter];
+                    if (voterWeight == 0) continue;
+
+                    uint256 share;
+                    share = (totalVoterReward * voterWeight) / qualifiedWeight;
+                    if (share > 0) {
+                        _pendingRewards[epochId][voter] += share;
+                        distributed += share;
+                    }
                 }
-                if (share > 0) {
-                    _pendingRewards[epochId][voter] += share;
-                    distributed += share;
-                    // Deduct from rewardPool as it is now earmarked
-                    if (_rewardPool >= share) {
-                        _rewardPool -= share;
+
+                // Allocate exact remainder to the last qualifying voter to avoid dust.
+                if (distributed < totalVoterReward) {
+                    for (uint256 i = len; i > 0; i--) {
+                        address voter = voters[i - 1];
+                        uint256 participated = _epochVoterParticipationCount[epochId][voter];
+                        if (requiredVotes > 0 && participated < requiredVotes) continue;
+                        _pendingRewards[epochId][voter] += (totalVoterReward - distributed);
+                        distributed = totalVoterReward;
+                        break;
                     }
                 }
             }
+        }
+
+        if (totalVoterReward > 0) {
+            require(_reservedRewards >= totalVoterReward, "Treasury: reserved underflow");
+            _reservedRewards -= totalVoterReward;
+            _reservedRewards += distributed;
         }
 
         emit EpochFinalized(epochId, totalVoterReward, ep.proposalCount);
@@ -176,9 +214,13 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         uint256 amount = _pendingRewards[epochId][msg.sender];
         if (amount == 0)
             revert Treasury__NothingToClaim(msg.sender, epochId);
+        if (_rewardPool < amount)
+            revert Treasury__InsufficientBalance(_rewardPool, amount);
 
         _pendingRewards[epochId][msg.sender] = 0;
-        // Note: rewardPool was already deducted during finalizeEpoch for earmarked rewards
+        require(_reservedRewards >= amount, "Treasury: reserved underflow");
+        _reservedRewards -= amount;
+        _rewardPool -= amount;
 
         (bool ok,) = msg.sender.call{value: amount}("");
         require(ok, "Treasury: claim transfer failed");
@@ -194,8 +236,9 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         require(!_allowanceClaimed[epochId][member], "Treasury: already claimed");
 
         uint256 amount = COUNCIL_ALLOWANCE_PER_MEMBER;
-        if (_rewardPool < amount)
-            revert Treasury__InsufficientBalance(_rewardPool, amount);
+        uint256 available = _availableRewardPool();
+        if (available < amount)
+            revert Treasury__InsufficientBalance(available, amount);
 
         _rewardPool -= amount;
         (bool ok,) = member.call{value: amount}("");
@@ -211,9 +254,11 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
         SpendCategory category,
         string calldata memo
     ) external onlyRole(SPEND_ROLE) nonReentrant {
-        if (address(this).balance < amount)
-            revert Treasury__InsufficientBalance(address(this).balance, amount);
+        uint256 available = _availableRewardPool();
+        if (available < amount)
+            revert Treasury__InsufficientBalance(available, amount);
 
+        _rewardPool -= amount;
         (bool ok,) = to.call{value: amount}("");
         require(ok, "Treasury: spend transfer failed");
 
@@ -224,6 +269,10 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
 
     function rewardPoolBalance() external view returns (uint256) {
         return _rewardPool;
+    }
+
+    function availableRewardPool() external view returns (uint256) {
+        return _availableRewardPool();
     }
 
     function getEpochRecord(uint256 epochId) external view returns (EpochRecord memory) {
@@ -242,6 +291,11 @@ _grantRole(DEFAULT_ADMIN_ROLE, admin);
 
     function _currentEpochId() internal view returns (uint256) {
         return (block.timestamp - _epochStartTime) / EPOCH_DURATION;
+    }
+
+    function _availableRewardPool() internal view returns (uint256) {
+        if (_rewardPool <= _reservedRewards) return 0;
+        return _rewardPool - _reservedRewards;
     }
 
     function _authorizeUpgrade(address) internal override onlyRole(UPGRADER_ROLE) {}

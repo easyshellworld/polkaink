@@ -58,3 +58,6 @@
 * Frontend 地址与 ABI 同步到 2026-03-08 新部署（含 `ArchiveCouncil`），治理状态枚举/过滤对齐 v3.4，Document/Proposal Markdown 读取与展示链路修复
 * Frontend 文档页增强：版本树 + Diff 视图；Council 页交互增强（成员抽屉、allowance 状态）；`88 DOT` 文案清理为 `88 PAS`
 * Frontend 本地验证：`npm test -- --runInBand` 通过（5 suites, 37 tests），`npm run build` 通过
+## 20260309
+* Frontend: Council page now passes the completed epoch, block claim until isClaimable, and surfaces claimable epoch info; governance detail exposes a Council veto panel with reason/description validation.
+* Frontend: Document page limits the sidebar tree to merged versions and surfaces the pending proposal card (status badge, voting & Council windows, markdown preview + direct link).
