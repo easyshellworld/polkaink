@@ -61,3 +61,6 @@
 ## 20260309
 * Frontend: Council page now passes the completed epoch, block claim until isClaimable, and surfaces claimable epoch info; governance detail exposes a Council veto panel with reason/description validation.
 * Frontend: Document page limits the sidebar tree to merged versions and surfaces the pending proposal card (status badge, voting & Council windows, markdown preview + direct link).
+## 20260311
+* Frontend: 修复治理提案详情页 (#governance/:id) 渲染问题 - 将所有 React Hooks 移至组件顶部，避免在条件返回语句之后调用
+* CI: 修复 .github/workflows/ci.yml 配置问题 - 添加 package-lock.json 检查、移除 npm ci --force、使用固定版本 anvil-polkadot v0.2.7、修正测试结果上传路径

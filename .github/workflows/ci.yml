@@ -31,8 +31,15 @@ jobs:
           cache: npm
           cache-dependency-path: contracts/package-lock.json
 
+      - name: Check for package-lock.json
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "⚠️ package-lock.json not found, generating from package.json"
+            npm install --package-lock-only
+          fi
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Compile contracts
         run: npx hardhat compile
@@ -50,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: contracts-test-results
-          path: contracts/test-results
+          path: test-results
           if-no-files-found: warn
 
   # ─── Contracts: test on Polkadot node ────────────────────────────────────
@@ -74,11 +81,22 @@ jobs:
           cache: npm
           cache-dependency-path: contracts/package-lock.json
 
+      - name: Check for package-lock.json
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "⚠️ package-lock.json not found, generating from package.json"
+            npm install --package-lock-only
+          fi
+
       - name: Install dependencies
-        run: npm ci --force
+        run: npm install
 
       - name: Download / Prepare anvil-polkadot node
-        run: bash scripts/setup-node.sh
+        run: |
+          mkdir -p bin
+          curl -fSL -o bin/anvil-polkadot \
+            https://github.com/paritytech/hardhat-polkadot/releases/download/v0.2.7/anvil-polkadot-linux-x64
+          chmod +x bin/anvil-polkadot
 
       - name: Polkadot node smoke test (gating)
         run: |
@@ -125,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: contracts-polkadot-test-results
-          path: contracts/test-results-polkadot
+          path: test-results-polkadot
           if-no-files-found: warn
 
   # ─── Frontend: lint + type-check + build ────────────────────────────────
