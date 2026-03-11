@@ -57,6 +57,13 @@ export default function ProposalDetailPage() {
   const { data: isCouncilMember } = useIsCouncilMember(address);
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  const [vetoReason, setVetoReason] = useState(0);
+  const [vetoDescription, setVetoDescription] = useState('');
+  const [castingVeto, setCastingVeto] = useState(false);
+  const vetoDescriptionBytes = useMemo(
+    () => new TextEncoder().encode(vetoDescription).length,
+    [vetoDescription],
+  );
   const typeLabels = useMemo<Record<number, string>>(() => ({
     0: t('governance.type_version', 'Version Update'),
     1: t('governance.type_upgrade', 'Upgrade Contract'),
@@ -203,13 +210,6 @@ export default function ProposalDetailPage() {
   const canCouncilVeto = Boolean(isCouncilMember && isApproved && Number(p.councilWindowEnd) > now);
 
   const shareUrl = `${window.location.href}${address ? `${window.location.search ? '&' : '?'}ref=${address}` : ''}`;
-  const [vetoReason, setVetoReason] = useState(0);
-  const [vetoDescription, setVetoDescription] = useState('');
-  const [castingVeto, setCastingVeto] = useState(false);
-  const vetoDescriptionBytes = useMemo(
-    () => new TextEncoder().encode(vetoDescription).length,
-    [vetoDescription],
-  );
 
   return (
     <PageWrapper>
