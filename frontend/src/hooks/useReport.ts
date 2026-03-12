@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { readContract, writeContract, waitForTx, TX_GAS } from '../lib/contracts';
 import { useWalletStore } from '../store/walletStore';
 import { useNotificationStore } from '../store/notificationStore';
+import i18n from '../lib/i18n';
 
 export function useReportStatus(docId: number | undefined) {
   return useQuery({
@@ -40,14 +41,14 @@ export function useReport() {
     setSubmitting(true);
     const nid = `report-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Reporting document...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.reporting', 'Reporting document...') });
       const hash = await writeContract(walletClient, 'ReportManager', 'report', [BigInt(docId)], { gas: TX_GAS });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Report submitted!' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.report_submitted', 'Report submitted!') });
       queryClient.invalidateQueries({ queryKey: ['reportStatus', docId] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Report failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.report_failed', 'Report failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
@@ -58,14 +59,14 @@ export function useReport() {
     setSubmitting(true);
     const nid = `revote-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Casting re-vote...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.casting_revote', 'Casting re-vote...') });
       const hash = await writeContract(walletClient, 'ReportManager', 'revote', [BigInt(docId), support], { gas: TX_GAS });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Re-vote cast!' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.revote_success', 'Re-vote cast!') });
       queryClient.invalidateQueries({ queryKey: ['reportStatus', docId] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Re-vote failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.revote_failed', 'Re-vote failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
@@ -76,15 +77,15 @@ export function useReport() {
     setSubmitting(true);
     const nid = `finalize-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Finalizing report...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.finalizing', 'Finalizing report...') });
       const hash = await writeContract(walletClient, 'ReportManager', 'finalize', [BigInt(docId)], { gas: TX_GAS });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Report finalized!' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.finalize_success', 'Report finalized!') });
       queryClient.invalidateQueries({ queryKey: ['reportStatus', docId] });
       queryClient.invalidateQueries({ queryKey: ['document', docId] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Finalize failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.finalize_failed', 'Finalize failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }

@@ -1,9 +1,11 @@
+import i18n from './i18n';
+
 export function shortenAddress(addr: string): string {
   return addr.slice(0, 6) + '...' + addr.slice(-4);
 }
 
 export function formatDate(timestamp: bigint | number): string {
-  return new Date(Number(timestamp) * 1000).toLocaleDateString('en-US', {
+  return new Date(Number(timestamp) * 1000).toLocaleDateString(i18n.language || 'en', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -13,12 +15,12 @@ export function formatDate(timestamp: bigint | number): string {
 export function timeRemaining(endTime: bigint): string {
   const now = Math.floor(Date.now() / 1000);
   const diff = Number(endTime) - now;
-  if (diff <= 0) return 'Ended';
+  if (diff <= 0) return i18n.t('common.ended', 'Ended');
   const days = Math.floor(diff / 86400);
   const hours = Math.floor((diff % 86400) / 3600);
-  if (days > 0) return `${days}d ${hours}h remaining`;
+  if (days > 0) return i18n.t('common.time_dh', { days, hours, defaultValue: '{{days}}d {{hours}}h' });
   const mins = Math.floor((diff % 3600) / 60);
-  return `${hours}h ${mins}m remaining`;
+  return i18n.t('common.time_hm', { hours, mins, defaultValue: '{{hours}}h {{mins}}m' });
 }
 
 export function getProposalSummary(description: string): string {

@@ -25,8 +25,8 @@ export function StakeInput({ value, onChange, minStake, balance }: StakeInputPro
         <span className="text-sm font-medium">PAS</span>
       </div>
       <div className="text-xs text-[var(--color-text-secondary)] flex justify-between">
-        <span>Min: {minStake} PAS</span>
-        <span>Balance: {balance} PAS</span>
+        <span>{t('propose.min_stake', 'Min')}: {minStake} PAS</span>
+        <span>{t('propose.balance', 'Balance')}: {balance} PAS</span>
       </div>
     </div>
   );

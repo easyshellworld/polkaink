@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface VersionSelectorProps {
   versions: number[];
   currentVersion: number;
@@ -5,6 +7,7 @@ interface VersionSelectorProps {
 }
 
 export function VersionSelector({ versions, currentVersion, onSelect }: VersionSelectorProps) {
+  const { t } = useTranslation();
   return (
     <select
       value={currentVersion}
@@ -13,7 +16,7 @@ export function VersionSelector({ versions, currentVersion, onSelect }: VersionS
     >
       {versions.map((v) => (
         <option key={v} value={v}>
-          v{v} {v === currentVersion ? '(current)' : ''}
+          v{v} {v === currentVersion ? `(${t('document.current', 'current')})` : ''}
         </option>
       ))}
     </select>

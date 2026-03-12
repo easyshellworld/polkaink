@@ -20,19 +20,19 @@ export function DocSidebar({ author, version, createdAt, updatedAt, tags }: DocS
         <h3 className="text-sm font-semibold mb-3">{t('document.info')}</h3>
         <dl className="text-sm space-y-2">
           <div className="flex justify-between">
-            <dt className="text-[var(--color-text-secondary)]">Version</dt>
+            <dt className="text-[var(--color-text-secondary)]">{t('document.version', 'Version')}</dt>
             <dd className="font-medium">v{version}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[var(--color-text-secondary)]">Author</dt>
+            <dt className="text-[var(--color-text-secondary)]">{t('document.author', 'Author')}</dt>
             <dd className="font-medium">{shortenAddress(author)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[var(--color-text-secondary)]">Created</dt>
+            <dt className="text-[var(--color-text-secondary)]">{t('document.created', 'Created')}</dt>
             <dd>{formatDate(createdAt)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[var(--color-text-secondary)]">Updated</dt>
+            <dt className="text-[var(--color-text-secondary)]">{t('document.updated', 'Updated')}</dt>
             <dd>{formatDate(updatedAt)}</dd>
           </div>
         </dl>
@@ -40,7 +40,7 @@ export function DocSidebar({ author, version, createdAt, updatedAt, tags }: DocS
 
       {tags.length > 0 && (
         <Card>
-          <h3 className="text-sm font-semibold mb-2">Tags</h3>
+          <h3 className="text-sm font-semibold mb-2">{t('document.tags', 'Tags')}</h3>
           <div className="flex flex-wrap gap-1">
             {tags.map((tag) => (
               <Badge key={tag} variant="primary">{tag}</Badge>

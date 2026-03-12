@@ -4,7 +4,6 @@ import { readContract } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { BalanceCard } from './BalanceCard';
 import { SpendHistory } from './SpendHistory';
-import { RewardPool } from './RewardPool';
 import { DonateCard } from './DonateCard';
 
 export default function TreasuryPage() {
@@ -21,7 +20,6 @@ export default function TreasuryPage() {
       <h1 className="text-2xl font-bold mb-6">{t('nav.treasury')}</h1>
       <BalanceCard />
       <DonateCard rewardPoolBalance={poolBalance ?? 0n} />
-      <RewardPool />
       <SpendHistory />
     </PageWrapper>
   );

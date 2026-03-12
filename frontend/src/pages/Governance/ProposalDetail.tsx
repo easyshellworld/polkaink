@@ -21,6 +21,7 @@ import { VotingPowerDisplay } from '../../components/governance/VotingPowerDispl
 import { Skeleton } from '../../components/ui/Skeleton';
 import { shortenAddress, timeRemaining, getProposalSummary } from '../../lib/utils';
 import { ShareButton } from '../../components/ui/ShareButton';
+import i18n from '../../lib/i18n';
 
 function fmtScore(score: bigint): string {
   const n = Number(score) / 1e18;
@@ -31,12 +32,12 @@ function fmtScore(score: bigint): string {
 function formatEta(targetSec: number): string {
   const nowSec = Math.floor(Date.now() / 1000);
   const remain = targetSec - nowSec;
-  if (remain <= 0) return 'Ready';
+  if (remain <= 0) return i18n.t('common.ready', 'Ready');
   const h = Math.floor(remain / 3600);
   const m = Math.floor((remain % 3600) / 60);
   const s = remain % 60;
-  if (h > 0) return `${h}h ${m}m ${s}s`;
-  return `${m}m ${s}s`;
+  if (h > 0) return i18n.t('common.time_hms', { h, m, s, defaultValue: '{{h}}h {{m}}m {{s}}s' });
+  return i18n.t('common.time_ms', { m, s, defaultValue: '{{m}}m {{s}}s' });
 }
 
 export default function ProposalDetailPage() {
@@ -239,7 +240,7 @@ export default function ProposalDetailPage() {
           <ShareButton
             url={shareUrl}
             title={`PolkaInk Proposal #${Number(p.id)}`}
-            text="Check out this governance proposal on PolkaInk"
+            text={t('governance.share_text', 'Check out this governance proposal on PolkaInk')}
           />
         </div>
 

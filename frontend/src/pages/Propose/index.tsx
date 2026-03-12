@@ -76,7 +76,7 @@ export default function ProposePage() {
       navigate('/governance');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      updateNotification(nid, { type: 'error', message: `Failed: ${msg}` });
+      updateNotification(nid, { type: 'error', message: `${t('common.failed', 'Failed')}: ${msg}` });
     } finally {
       setSubmitting(false);
     }

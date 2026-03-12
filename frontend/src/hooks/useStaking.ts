@@ -4,6 +4,7 @@ import { parseEther } from 'viem';
 import { readContract, writeContract, waitForTx, TX_GAS } from '../lib/contracts';
 import { useWalletStore } from '../store/walletStore';
 import { useNotificationStore } from '../store/notificationStore';
+import i18n from '../lib/i18n';
 
 const STAKE_AMOUNT = parseEther('88');
 
@@ -60,18 +61,18 @@ export function useStake() {
     setSubmitting(true);
     const nid = `stake-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Staking 88 PAS...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.staking', 'Staking 88 PAS...') });
       const hash = await writeContract(walletClient, 'StakingManager', 'stake', [lockMonths], {
         value: STAKE_AMOUNT, gas: TX_GAS,
       });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Staked successfully!' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.staked_success', 'Staked successfully!') });
       queryClient.invalidateQueries({ queryKey: ['stakeInfo'] });
       queryClient.invalidateQueries({ queryKey: ['isMember'] });
       queryClient.invalidateQueries({ queryKey: ['totalMembers'] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Stake failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.stake_failed', 'Stake failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
@@ -91,15 +92,15 @@ export function useUnstake() {
     setSubmitting(true);
     const nid = `unstake-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Unstaking...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.unstaking', 'Unstaking...') });
       const hash = await writeContract(walletClient, 'StakingManager', 'unstake', [], { gas: TX_GAS });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Unstaked successfully!' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.unstaked_success', 'Unstaked successfully!') });
       queryClient.invalidateQueries({ queryKey: ['stakeInfo'] });
       queryClient.invalidateQueries({ queryKey: ['isMember'] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Unstake failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.unstake_failed', 'Unstake failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
@@ -110,15 +111,15 @@ export function useUnstake() {
     setSubmitting(true);
     const nid = `early-unstake-${Date.now()}`;
     try {
-      addNotification({ id: nid, type: 'pending', message: 'Early unstaking (8.8 PAS penalty)...' });
+      addNotification({ id: nid, type: 'pending', message: i18n.t('notify.early_unstaking', 'Early unstaking (8.8 PAS penalty)...') });
       const hash = await writeContract(walletClient, 'StakingManager', 'earlyUnstake', [], { gas: TX_GAS });
-      updateNotification(nid, { message: 'Waiting for confirmation...' });
+      updateNotification(nid, { message: i18n.t('notify.waiting_confirm', 'Waiting for confirmation...') });
       await waitForTx(hash);
-      updateNotification(nid, { type: 'success', message: 'Early unstake complete! 8.8 PAS penalty applied.' });
+      updateNotification(nid, { type: 'success', message: i18n.t('notify.early_unstake_success', 'Early unstake complete! 8.8 PAS penalty applied.') });
       queryClient.invalidateQueries({ queryKey: ['stakeInfo'] });
       queryClient.invalidateQueries({ queryKey: ['isMember'] });
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Early unstake failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: i18n.t('notify.early_unstake_failed', 'Early unstake failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }

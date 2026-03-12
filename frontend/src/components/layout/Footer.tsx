@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PAS_NETWORK, getContractAddress } from '../../lib/contracts/addresses';
 
 const DONATE_ADDRESSES = [
-  { chain: 'Polkadot (SS58)', address: '5FhEszW3yVUwPTbLjjVgHqyAese8zoaxHJbjbqzQDhecmfg3' },
+  { chainKey: 'footer.chain_polkadot', chainDefault: 'Polkadot (SS58)', address: '5FhEszW3yVUwPTbLjjVgHqyAese8zoaxHJbjbqzQDhecmfg3' },
 ];
 
 export function Footer() {
+  const { t } = useTranslation();
   const contractAddr = getContractAddress('PolkaInkRegistry');
   const [showDonate, setShowDonate] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -28,17 +30,17 @@ export function Footer() {
               <span className="text-lg font-bold"><span className="text-[var(--color-primary)]">Polka</span>Ink</span>
             </div>
             <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-              On-chain Polkadot history preservation protocol. Immutable, community-governed, forever.
+              {t('footer.desc', 'PolkaInk is a decentralized archive protocol. Documents are written on-chain, governed by DAO voting, and protected by ethics council.')}
             </p>
             <p className="mt-3 text-xs text-[var(--color-text-secondary)]">
-              Built by{' '}
+              {t('footer.built_by', 'Built by')}{' '}
               <Link to="/polkaclaw" className="font-semibold text-[var(--color-primary)] hover:underline">PolkaClaw</Link>
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="text-sm font-semibold mb-3">Links</h4>
+            <h4 className="text-sm font-semibold mb-3">{t('footer.links', 'Links')}</h4>
             <div className="flex flex-col gap-2 text-sm text-[var(--color-text-secondary)]">
               <a
                 href="https://github.com/easyshellworld/polkaink"
@@ -55,7 +57,7 @@ export function Footer() {
                 rel="noopener"
                 className="hover:text-[var(--color-text)] transition-colors"
               >
-                Blockchain Explorer
+                {t('footer.explorer', 'Blockchain Explorer')}
               </a>
               <a
                 href={`${PAS_NETWORK.explorer}/address/${contractAddr}`}
@@ -63,7 +65,7 @@ export function Footer() {
                 rel="noopener"
                 className="hover:text-[var(--color-text)] transition-colors"
               >
-                Registry Contract
+                {t('footer.registry', 'Registry Contract')}
               </a>
               {showEmail ? (
                 <a
@@ -78,7 +80,7 @@ export function Footer() {
                   className="inline-flex items-center gap-1 hover:text-[var(--color-text)] transition-colors text-left"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  Contact Email
+                  {t('footer.contact', 'Contact Email')}
                 </button>
               )}
             </div>
@@ -86,30 +88,30 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-sm font-semibold mb-3">Support the Project</h4>
+            <h4 className="text-sm font-semibold mb-3">{t('footer.support', 'Support the Project')}</h4>
             <button
               onClick={() => setShowDonate(!showDonate)}
               className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-[var(--color-primary)]/25 hover:scale-105 active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-              ThankU
+              {t('footer.thank_u', 'ThankU')}
             </button>
 
             {showDonate && (
               <div className="mt-3 space-y-2 animate-fade-in">
-                {DONATE_ADDRESSES.map(({ chain, address }) => (
+                {DONATE_ADDRESSES.map(({ chainKey, chainDefault, address }) => (
                   <div
-                    key={chain}
+                    key={chainKey}
                     className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-2.5 text-xs"
                   >
-                    <div className="font-medium text-[var(--color-text-secondary)] mb-1">{chain}</div>
+                    <div className="font-medium text-[var(--color-text-secondary)] mb-1">{t(chainKey, chainDefault)}</div>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 break-all text-[var(--color-text)]">{address}</code>
                       <button
                         onClick={() => handleCopy(address)}
                         className="shrink-0 rounded-md px-2 py-1 text-[10px] font-medium bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors"
                       >
-                        {copied === address ? '✓' : 'Copy'}
+                        {copied === address ? '✓' : t('footer.copy', 'Copy')}
                       </button>
                     </div>
                   </div>
@@ -120,11 +122,11 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center text-xs text-[var(--color-text-secondary)]">
-          © 2026 PolkaInk · Built on{' '}
+          © 2026 PolkaInk · {t('footer.built_on', 'Built on')}{' '}
           <a href={PAS_NETWORK.explorer} target="_blank" rel="noopener" className="text-[var(--color-primary)] hover:underline">
             Polkadot Hub
           </a>
-          {' '}· Powered by Calldata Storage · All content on-chain
+          {' '}· {t('footer.powered', 'Powered by Calldata Storage')} · {t('footer.all_onchain', 'All content on-chain')}
         </div>
       </div>
     </footer>

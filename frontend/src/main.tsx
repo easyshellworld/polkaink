@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<div className="flex h-screen items-center justify-center text-lg">Loading...</div>}>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center text-lg" />}>
         <App />
       </Suspense>
     </QueryClientProvider>

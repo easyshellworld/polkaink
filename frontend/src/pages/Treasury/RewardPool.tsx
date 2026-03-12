@@ -25,9 +25,9 @@ export function RewardPool() {
         <div className={`text-2xl font-bold ${isPaused ? 'text-amber-500' : 'text-[var(--color-success)]'}`}>
           {formatEther(poolBalance ?? 0n)} PAS
         </div>
-        <div className="text-xs text-[var(--color-text-secondary)]">Reward Pool Balance</div>
+        <div className="text-xs text-[var(--color-text-secondary)]">{t('treasury.reward_pool_balance', 'Reward Pool Balance')}</div>
         {isPaused && (
-          <div className="mt-2 text-xs text-amber-600">Rewards paused until pool reaches 50 PAS.</div>
+          <div className="mt-2 text-xs text-amber-600">{t('treasury.rewards_paused', 'Rewards paused until pool reaches 50 PAS.')}</div>
         )}
       </div>
     </Card>

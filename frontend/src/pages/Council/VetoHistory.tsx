@@ -28,7 +28,7 @@ export function VetoHistory() {
                 <StatusBadge status={p.status} />
                 <span className="text-sm">#{Number(p.id)}</span>
                 <span className="text-sm text-[var(--color-text-secondary)] truncate">
-                  {p.description || 'Version Update Proposal'}
+                  {p.description || t('governance.version_update', 'Version Update Proposal')}
                 </span>
               </div>
             </Link>

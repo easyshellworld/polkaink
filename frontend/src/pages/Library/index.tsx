@@ -40,9 +40,14 @@ export default function LibraryPage() {
     setPage(0);
   };
 
+  const executedDocs = useMemo(
+    () => allDocs.filter((d) => Number(d.currentVersionId) > 0),
+    [allDocs]
+  );
+
   const filtered = selectedTags.length > 0
-    ? allDocs.filter((d) => selectedTags.some((tag) => d.tags.includes(tag)))
-    : allDocs;
+    ? executedDocs.filter((d) => selectedTags.some((tag) => d.tags.includes(tag)))
+    : executedDocs;
 
   const total = filtered.length;
   const totalPages = Math.ceil(total / perPage);
@@ -71,7 +76,7 @@ export default function LibraryPage() {
               }`}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-              Filter
+              {t('library.filter', 'Filter')}
               {selectedTags.length > 0 && (
                 <span className="ml-1 rounded-full bg-[var(--color-primary)] text-white text-xs w-5 h-5 flex items-center justify-center">
                   {selectedTags.length}
@@ -107,7 +112,7 @@ export default function LibraryPage() {
                       onClick={() => { setSelectedTags([]); setPage(0); }}
                       className="w-full px-4 py-2 text-xs text-[var(--color-primary)] hover:bg-[var(--color-surface-alt)] transition-colors text-left"
                     >
-                      Clear all
+                      {t('library.clear_all', 'Clear all')}
                     </button>
                   </>
                 )}

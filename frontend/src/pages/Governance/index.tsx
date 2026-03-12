@@ -10,7 +10,7 @@ import { ProposalCard } from './ProposalCard';
 import type { ProposalData } from '../../hooks/useProposals';
 
 const STATUS_FILTERS = [
-  { key: -1, label: 'All' },
+  { key: -1, label: 'governance.filter_all' },
   { key: 0, label: 'governance.status_active' },
   { key: 1, label: 'governance.status_passed' },
   { key: 2, label: 'governance.status_vetoed' },
@@ -82,7 +82,7 @@ export default function GovernancePage() {
                 : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
             }`}
           >
-            {key === -1 ? 'All' : t(label)}
+            {t(label)}
           </button>
         ))}
       </div>

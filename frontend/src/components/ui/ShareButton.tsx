@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ShareButtonProps {
   url: string;
@@ -12,6 +13,7 @@ function isMobileDevice(): boolean {
 }
 
 export function ShareButton({ url, title, text }: ShareButtonProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const links = useMemo(() => {
@@ -53,7 +55,7 @@ export function ShareButton({ url, title, text }: ShareButtonProps) {
           onClick={handleNativeShare}
           className="inline-flex items-center rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
         >
-          Share
+          {t('common.share', 'Share')}
         </button>
       )}
       <a
@@ -76,7 +78,7 @@ export function ShareButton({ url, title, text }: ShareButtonProps) {
         onClick={handleCopy}
         className="inline-flex items-center rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
       >
-        {copied ? 'Copied' : 'Copy'}
+        {copied ? t('common.copied', 'Copied') : t('common.copy', 'Copy')}
       </button>
     </div>
   );

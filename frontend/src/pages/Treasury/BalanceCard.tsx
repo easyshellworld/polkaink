@@ -35,7 +35,7 @@ export function BalanceCard() {
         {data ? parseFloat(data.nativeBalance).toFixed(4) : '0'} PAS
       </div>
       <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-        Reward Pool: {data ? parseFloat(data.rewardPool).toFixed(4) : '0'} PAS
+        {t('treasury.reward_pool_label', 'Reward Pool')}: {data ? parseFloat(data.rewardPool).toFixed(4) : '0'} PAS
       </p>
     </Card>
   );

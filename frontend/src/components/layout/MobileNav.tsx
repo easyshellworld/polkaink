@@ -2,7 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const navItems = [
-  { path: '/', key: 'nav.home', also: [] as string[] },
   { path: '/library', key: 'nav.library', also: ['/document', '/propose'] },
   { path: '/governance', key: 'nav.governance', also: [] as string[] },
   { path: '/create', key: 'nav.create', also: [] as string[] },
@@ -16,7 +15,7 @@ export function MobileNav() {
     <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-sm md:hidden">
       {navItems.map(({ path, key, also }) => {
         const active = location.pathname === path
-          || (path !== '/' && location.pathname.startsWith(path))
+          || location.pathname.startsWith(path + '/')
           || also.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
         return (
           <Link

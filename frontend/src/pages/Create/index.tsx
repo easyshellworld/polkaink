@@ -72,7 +72,7 @@ export default function CreatePage() {
         navigate('/library');
       }
     } catch (err) {
-      updateNotification(nid, { type: 'error', message: 'Failed: ' + (err as Error).message });
+      updateNotification(nid, { type: 'error', message: t('common.failed', 'Failed') + ': ' + (err as Error).message });
     } finally {
       setSubmitting(false);
     }
@@ -114,8 +114,7 @@ export default function CreatePage() {
 
   return (
     <PageWrapper>
-      <h1 className="text-2xl font-bold mb-2">{t('create.title')}</h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-6">{t('create.subtitle')}</p>
+      <h1 className="text-2xl font-bold mb-6">{t('create.title')}</h1>
 
       <Card padding="lg">
         <div className="space-y-5">

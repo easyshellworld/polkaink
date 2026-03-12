@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Badge } from '../../components/ui/Badge';
 
 interface TagCloudProps {
@@ -7,6 +8,7 @@ interface TagCloudProps {
 }
 
 export function TagCloud({ tags, selectedTag, onSelectTag }: TagCloudProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-wrap gap-2 mb-4">
       <button
@@ -17,7 +19,7 @@ export function TagCloud({ tags, selectedTag, onSelectTag }: TagCloudProps) {
             : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)]'
         }`}
       >
-        All
+        {t('common.all', 'All')}
       </button>
       {tags.map((tag) => (
         <button key={tag} onClick={() => onSelectTag(tag)}>

@@ -8,13 +8,13 @@ import { ContributionStats } from './ContributionStats';
 import { ProposalHistory } from './ProposalHistory';
 
 export default function ProfilePage() {
-  const { t: _t } = useTranslation();
+  const { t } = useTranslation();
   const { address } = useParams<{ address: string }>();
 
   if (!address) {
     return (
       <PageWrapper className="text-center py-16">
-        <h2 className="text-lg font-semibold">No address provided</h2>
+        <h2 className="text-lg font-semibold">{t('profile.no_address', 'No address provided')}</h2>
       </PageWrapper>
     );
   }

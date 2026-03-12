@@ -1,25 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 
-const TEAM = [
-  {
-    name: 'Alice',
-    role: 'Product / Governance Design',
-    desc: 'Fullstack dev, Love Web3, Tech enthusiastic',
-    avatar: 'https://arrowtower.netlify.app/ppt/alice.jpg',
-    github: 'https://github.com/easyshellworld',
-    handle: '@easyshellworld',
-  },
-  {
-    name: 'Jolin',
-    role: 'Smart Contract / Frontend',
-    desc: 'Fullstack dev, Big fan of Anthropic\'s latest model, Exploring UX -> AX',
-    avatar: 'https://arrowtower.netlify.app/ppt/jolin.jpg',
-    github: 'https://github.com/MJLNSN',
-    handle: '@MJLNSN',
-  },
-];
-
 export default function PolkaClawPage() {
+  const { t } = useTranslation();
+
+  const TEAM = [
+    {
+      name: 'Alice',
+      role: t('polkaclaw.role_alice', 'Product | Governance Design'),
+      desc: t('polkaclaw.desc_alice', 'Fullstack dev, Love Web3, Tech enthusiastic'),
+      avatar: 'https://arrowtower.netlify.app/ppt/alice.jpg',
+      github: 'https://github.com/easyshellworld',
+      handle: '@easyshellworld',
+    },
+    {
+      name: 'Jolin',
+      role: t('polkaclaw.role_jolin', 'UI | UX | AX'),
+      desc: t('polkaclaw.desc_jolin', "Fullstack dev, Big fan of Anthropic's latest model, Exploring UX -> AX"),
+      avatar: 'https://arrowtower.netlify.app/ppt/jolin.jpg',
+      github: 'https://github.com/MJLNSN',
+      handle: '@MJLNSN',
+    },
+  ];
+
   return (
     <PageWrapper>
       <div className="max-w-2xl mx-auto text-center py-8 animate-fade-in">
@@ -32,10 +35,10 @@ export default function PolkaClawPage() {
           <span className="text-[var(--color-primary)]">Polka</span>Claw
         </h1>
         <p className="text-[var(--color-text-secondary)] mb-1 text-sm">
-          A team of two full-stack developers who believe in AI and blockchain.
+          {t('polkaclaw.team_desc', 'A team of two full-stack developers who believe in AI and blockchain.')}
         </p>
         <p className="text-xs text-[var(--color-text-secondary)] mb-10">
-          AI-driven development · Polkadot ecosystem · Love & Peace
+          {t('polkaclaw.tagline', 'AI-driven development · Polkadot ecosystem · Love & Peace')}
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2">
@@ -60,28 +63,6 @@ export default function PolkaClawPage() {
           ))}
         </div>
 
-        <div className="mt-12 rounded-xl bg-[var(--color-surface-alt)] p-6 text-sm text-[var(--color-text-secondary)]">
-          <p className="mb-2">PolkaClaw — PolkaInk 的创始团队</p>
-          <p>基于 Polkadot Hub · DAO 治理 · 永久存储</p>
-          <div className="flex justify-center gap-4 mt-4">
-            <a
-              href="https://github.com/easyshellworld/polkaink"
-              target="_blank"
-              rel="noopener"
-              className="text-[var(--color-primary)] hover:underline text-xs"
-            >
-              GitHub Repo
-            </a>
-            <a
-              href="/ppt.html"
-              target="_blank"
-              rel="noopener"
-              className="text-[var(--color-primary)] hover:underline text-xs"
-            >
-              Pitch Deck
-            </a>
-          </div>
-        </div>
       </div>
     </PageWrapper>
   );

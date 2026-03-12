@@ -12,21 +12,22 @@ import {
   useUnstake,
 } from '../../hooks/useStaking';
 import { useWalletStore } from '../../store/walletStore';
+import i18n from '../../lib/i18n';
 
 const LOCK_PERIODS = [3, 6, 12, 24] as const;
 
 function formatCountdown(lockEndSec: number): string {
   const now = Math.floor(Date.now() / 1000);
   const remaining = lockEndSec - now;
-  if (remaining <= 0) return 'Unlocked';
+  if (remaining <= 0) return i18n.t('staking.unlocked', 'Unlocked');
   const d = Math.floor(remaining / 86400);
   const h = Math.floor((remaining % 86400) / 3600);
   const m = Math.floor((remaining % 3600) / 60);
   const s = remaining % 60;
-  if (d > 0) return `${d}d ${h}h ${m}m ${s}s`;
-  if (h > 0) return `${h}h ${m}m ${s}s`;
-  if (m > 0) return `${m}m ${s}s`;
-  return `${s}s`;
+  if (d > 0) return i18n.t('common.time_dhms', { d, h, m, s, defaultValue: '{{d}}d {{h}}h {{m}}m {{s}}s' });
+  if (h > 0) return i18n.t('common.time_hms', { h, m, s, defaultValue: '{{h}}h {{m}}m {{s}}s' });
+  if (m > 0) return i18n.t('common.time_ms', { m, s, defaultValue: '{{m}}m {{s}}s' });
+  return i18n.t('common.time_s', { s, defaultValue: '{{s}}s' });
 }
 
 export default function StakingPage() {

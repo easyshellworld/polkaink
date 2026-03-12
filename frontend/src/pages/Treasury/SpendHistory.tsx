@@ -79,20 +79,20 @@ export function SpendHistory() {
     <Card>
       <h2 className="text-sm font-semibold mb-4">{t('treasury.epoch_summary', 'Epoch Reward Summary')}</h2>
       {!data ? (
-        <p className="text-sm text-[var(--color-text-secondary)]">No epoch data available.</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">{t('treasury.no_epoch_data', 'No epoch data available.')}</p>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
-          {[{ label: 'Current', record: data.current, id: data.epochId }, { label: 'Previous', record: data.previous, id: data.epochId - 1n }].map((item) => (
+          {[{ label: t('treasury.epoch_current', 'Current'), record: data.current, id: data.epochId }, { label: t('treasury.epoch_previous', 'Previous'), record: data.previous, id: data.epochId - 1n }].map((item) => (
             <div key={item.label} className="rounded-lg bg-[var(--color-surface-alt)] p-3">
               <div className="text-xs text-[var(--color-text-secondary)]">{item.label} Epoch #{item.id >= 0n ? item.id.toString() : '—'}</div>
               {item.record ? (
                 <>
-                  <div className="mt-1 text-sm">Proposals: {item.record.proposalCount.toString()}</div>
-                  <div className="text-sm">Voter rewards: {formatEther(item.record.totalVoterReward)} PAS</div>
-                  <div className="text-xs text-[var(--color-text-secondary)]">{item.record.finalized ? 'Finalized' : 'In progress'}</div>
+                  <div className="mt-1 text-sm">{t('treasury.proposals', 'Proposals')}: {item.record.proposalCount.toString()}</div>
+                  <div className="text-sm">{t('treasury.voter_rewards', 'Voter rewards')}: {formatEther(item.record.totalVoterReward)} PAS</div>
+                  <div className="text-xs text-[var(--color-text-secondary)]">{item.record.finalized ? t('treasury.finalized', 'Finalized') : t('treasury.in_progress', 'In progress')}</div>
                 </>
               ) : (
-                <div className="mt-1 text-sm text-[var(--color-text-secondary)]">No data</div>
+                <div className="mt-1 text-sm text-[var(--color-text-secondary)]">{t('treasury.no_data', 'No data')}</div>
               )}
             </div>
           ))}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface VersionNode {
   id: number;
   parentId: number | null;
@@ -15,9 +17,10 @@ interface VersionTreeProps {
 }
 
 export function VersionTree({ versions, onSelect, selectedId }: VersionTreeProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <h3 className="mb-2 text-sm font-semibold">Version Tree</h3>
+      <h3 className="mb-2 text-sm font-semibold">{t('document.version_tree', 'Version Tree')}</h3>
       <div className="font-mono text-xs">
         {versions.map((v, i) => {
           const isLast = i === versions.length - 1;
@@ -51,7 +54,7 @@ export function VersionTree({ versions, onSelect, selectedId }: VersionTreeProps
                   )}
                   <span className="truncate text-[var(--color-text-secondary)]">
                     v{v.id}
-                    {v.proposalId ? ` · Proposal #${v.proposalId}` : ' · Seed'}
+                    {v.proposalId ? ` · ${t('document.proposal_num', 'Proposal')} #${v.proposalId}` : ` · ${t('document.seed', 'Seed')}`}
                   </span>
                 </div>
                 <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[var(--color-text-secondary)]">

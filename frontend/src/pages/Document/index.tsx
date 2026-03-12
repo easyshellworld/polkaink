@@ -210,7 +210,7 @@ export default function DocumentPage() {
             </div>
             <div>
               <span className="text-[var(--color-text-secondary)]">{t('document.size')}:</span>{' '}
-              {selectedVersionMeta ? Number(selectedVersionMeta.contentLength) : version.contentLength} bytes
+              {selectedVersionMeta ? Number(selectedVersionMeta.contentLength) : version.contentLength} {t('document.bytes', 'bytes')}
             </div>
             <div>
               <span className="text-[var(--color-text-secondary)]">{t('document.versions')}:</span>{' '}
@@ -343,19 +343,15 @@ export default function DocumentPage() {
               selectedId={currentVersionId}
               onSelect={(vid) => setSelectedVersionId(vid)}
             />
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3 w-full"
-              onClick={() => setShowDiff((prev) => !prev)}
-              disabled={!diffBaseId}
-            >
-              {showDiff ? 'View Content' : 'View Diff'}
-            </Button>
-            {!diffBaseId && (
-              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-                Diff requires a parent version.
-              </p>
+            {diffBaseId && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3 w-full"
+                onClick={() => setShowDiff((prev) => !prev)}
+              >
+                {showDiff ? t('document.view_content', 'View Content') : t('document.view_diff', 'View Diff')}
+              </Button>
             )}
           </Card>
         </div>
