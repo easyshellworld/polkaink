@@ -8,6 +8,7 @@ import { useDocument } from '../../hooks/useDocuments';
 import { useVersion, useVersionHistory, type VersionData } from '../../hooks/useVersionStore';
 import { useMarkdownContent, useProposalMarkdown, useVersionMarkdown } from '../../hooks/useMarkdownContent';
 import { useProposal } from '../../hooks/useProposals';
+import { useDynamicReward } from '../../hooks/useDynamicReward';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -38,6 +39,7 @@ export default function DocumentPage() {
   const { data: versionIds } = useVersionHistory(docId);
   const { data: fallbackMarkdown, isLoading: fallbackLoading } = useMarkdownContent(docId);
   const { data: creationTxHash } = useDocCreationTx(docId);
+  const { data: rewardStatus } = useDynamicReward();
 
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
   const [showDiff, setShowDiff] = useState(false);
@@ -49,10 +51,9 @@ export default function DocumentPage() {
   const currentVersionIdNumber = doc && Number(doc.currentVersionId) > 0 ? Number(doc.currentVersionId) : undefined;
   const visibleVersionIds = useMemo(() => {
     if (!currentVersionIdNumber) {
-      return normalizedIds;
+      return [];
     }
-    const merged = normalizedIds.filter((id) => id <= currentVersionIdNumber);
-    return merged.length ? merged : normalizedIds;
+    return normalizedIds.filter((id) => id <= currentVersionIdNumber);
   }, [normalizedIds, currentVersionIdNumber]);
 
   useEffect(() => {
@@ -105,6 +106,11 @@ export default function DocumentPage() {
   const pendingProposalId = doc && Number(doc.latestProposalId) > 0 ? Number(doc.latestProposalId) : undefined;
   const { data: pendingProposal } = useProposal(pendingProposalId);
   const { data: pendingProposalMarkdown, isLoading: pendingMdLoading } = useProposalMarkdown(pendingProposal?.targetVersionId);
+  
+  const isExecutedVersion = useMemo(() => {
+    if (!currentVersionId) return false;
+    return visibleVersionIds.includes(currentVersionId);
+  }, [currentVersionId, visibleVersionIds]);
 
   const builtVersionNodes = useMemo(() => {
     if (!versionDetails) return [];
@@ -239,15 +245,15 @@ export default function DocumentPage() {
               oldLabel={`v${diffBaseId}`}
               newLabel={`v${currentVersionId ?? 'N/A'}`}
             />
-          ) : renderMarkdown ? (
-            <div className="markdown-body">
-              {!hasVersion && (
-                <div className="mb-4 rounded-lg border border-[var(--color-primary-20)] bg-[var(--color-primary-10)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
-                  {t('document.pending_governance', 'This content is from a pending proposal and has not been merged through governance yet.')}
-                </div>
-              )}
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{renderMarkdown}</ReactMarkdown>
-            </div>
+           ) : renderMarkdown && isExecutedVersion ? (
+             <div className="markdown-body">
+               <ReactMarkdown remarkPlugins={[remarkGfm]}>{renderMarkdown}</ReactMarkdown>
+             </div>
+           ) : renderMarkdown && !isExecutedVersion ? (
+             <div className="py-8 text-center text-[var(--color-text-secondary)]">
+               <p className="text-sm">{t('document.content_not_executed', 'This content is from a proposal that has not been executed through governance.')}</p>
+               <p className="mt-1 text-xs">{t('document.wait_for_execution', 'Please wait for the proposal to be executed before viewing this content.')}</p>
+             </div>
           ) : isSeedV1 ? (
             <div className="py-8 text-center text-[var(--color-text-secondary)]">
               <p className="text-sm">{t('document.seed_empty_title', 'Seed Document - Awaiting Content')}</p>
@@ -269,22 +275,29 @@ export default function DocumentPage() {
 
         <div className="space-y-4">
           <Card padding="lg" className="h-fit animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold">{t('document.pending_proposal_title', 'Pending Proposal')}</h3>
-              {pendingProposal && pendingProposalId ? (
-                <Link
-                  to={`/governance/${pendingProposalId}`}
-                  className="text-xs text-[var(--color-primary)] hover:underline"
-                >
-                  {t('document.view_proposal', 'View Proposal')}
-                </Link>
-              ) : (
-                <span className="text-xs text-[var(--color-text-secondary)]">
-                  {t('document.pending_proposal_none_small', 'No proposal')}
-                </span>
-              )}
-            </div>
-            {pendingProposal ? (
+             <div className="flex items-center justify-between mb-3">
+               <h3 className="text-sm font-semibold">{t('document.pending_proposal_title', 'Pending Proposal')}</h3>
+               {pendingProposal && pendingProposalId ? (
+                 <Link
+                   to={`/governance/${pendingProposalId}`}
+                   className="text-xs text-[var(--color-primary)] hover:underline"
+                 >
+                   {t('document.view_proposal', 'View Proposal')}
+                 </Link>
+               ) : (
+                 <span className="text-xs text-[var(--color-text-secondary)]">
+                   {t('document.pending_proposal_none_small', 'No proposal')}
+                 </span>
+               )}
+             </div>
+             
+             {rewardStatus?.isPaused && (
+               <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700 font-medium">
+                 {t('document.rewards_paused', 'Rewards are currently paused due to low reward pool balance.')}
+               </div>
+             )}
+             
+             {pendingProposal ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-secondary)]">
                   <StatusBadge status={Number(pendingProposal.status)} />
@@ -322,11 +335,11 @@ export default function DocumentPage() {
                     </span>
                   )}
                 </div>
-                <Button
+                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full text-xs"
-                  onClick={() => pendingProposalId && window.location.assign(`/governance/${pendingProposalId}`)}
+                  onClick={() => pendingProposalId && navigate(`/governance/${pendingProposalId}`)}
                 >
                   {t('document.open_proposal', 'Open Proposal')}
                 </Button>

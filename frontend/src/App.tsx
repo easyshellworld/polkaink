@@ -39,7 +39,6 @@ function AppContent() {
             <Route path="/document/:id" element={<DocumentPage />} />
             <Route path="/create" element={<CreatePage />} />
             <Route path="/propose/:docId" element={<ProposePage />} />
-            <Route path="/document/:docId/propose" element={<ProposePage />} />
             <Route path="/governance" element={<GovernancePage />} />
             <Route path="/governance/:id" element={<ProposalDetailPage />} />
             <Route path="/profile/:address" element={<ProfilePage />} />

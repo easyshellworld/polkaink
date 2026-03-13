@@ -11,6 +11,7 @@ const config: Config = {
   moduleNameMapper: {
     '\\.(css|less|scss)$': 'identity-obj-proxy',
     '\\.json$': '<rootDir>/src/__mocks__/jsonMock.js',
+    '^.*/i18n$': '<rootDir>/src/__mocks__/i18n.ts',
   },
   setupFiles: ['<rootDir>/src/__mocks__/setup.ts'],
   testMatch: ['<rootDir>/src/**/*.test.{ts,tsx}'],

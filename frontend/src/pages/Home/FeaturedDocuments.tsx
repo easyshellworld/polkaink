@@ -11,7 +11,10 @@ export function FeaturedDocuments() {
   const allDocs = data?.documents ?? [];
 
   const documents = allDocs
-    .filter((d) => Number(d.currentVersionId) > 0)
+    .filter((d) => {
+      if (d.isSeed) return Number(d.currentVersionId) > 1;
+      return Number(d.currentVersionId) > 0;
+    })
     .slice(0, 4);
 
   if (documents.length === 0) return null;

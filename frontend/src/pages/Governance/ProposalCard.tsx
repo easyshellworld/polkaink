@@ -26,15 +26,10 @@ export function ProposalCard({ proposal: p }: { proposal: ProposalData }) {
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-all duration-200 group-hover:border-[var(--color-primary)] group-hover:shadow-lg group-hover:shadow-[var(--color-primary)]/8 group-hover:-translate-y-0.5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <StatusBadge status={p.status} />
-              {p.status === 2 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                  {t('governance.status_vetoed', 'Council Vetoed')}
-                </span>
-              )}
-              <span className="text-xs font-medium text-[var(--color-text-secondary)]">#{Number(p.id)}</span>
-            </div>
+             <div className="flex items-center gap-2 mb-1.5">
+               <StatusBadge status={p.status} />
+               <span className="text-xs font-medium text-[var(--color-text-secondary)]">#{Number(p.id)}</span>
+             </div>
             <p className="font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors">
               {title}
             </p>

@@ -7,11 +7,14 @@ import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Pagination } from '../../components/ui/Pagination';
 import { DocumentCard } from './DocumentCard';
+import { FilterBar } from './FilterBar';
 
 export default function LibraryPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const perPage = 10;
@@ -40,14 +43,25 @@ export default function LibraryPage() {
     setPage(0);
   };
 
-  const executedDocs = useMemo(
-    () => allDocs.filter((d) => Number(d.currentVersionId) > 0),
-    [allDocs]
-  );
-
-  const filtered = selectedTags.length > 0
-    ? executedDocs.filter((d) => selectedTags.some((tag) => d.tags.includes(tag)))
-    : executedDocs;
+  const filtered = useMemo(() => {
+    let docs = allDocs;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      docs = docs.filter(
+        (d) =>
+          d.title.toLowerCase().includes(q) ||
+          d.tags.some((tag) => tag.toLowerCase().includes(q)) ||
+          d.author.toLowerCase().includes(q)
+      );
+    }
+    if (selectedTags.length > 0) {
+      docs = docs.filter((d) => selectedTags.some((tag) => d.tags.includes(tag)));
+    }
+    if (sortBy === 'versions') {
+      docs = [...docs].sort((a, b) => Number(b.currentVersionId) - Number(a.currentVersionId));
+    }
+    return docs;
+  }, [allDocs, search, selectedTags, sortBy]);
 
   const total = filtered.length;
   const totalPages = Math.ceil(total / perPage);
@@ -63,6 +77,13 @@ export default function LibraryPage() {
           </Button>
         </Link>
       </div>
+
+      <FilterBar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(0); }}
+        sortBy={sortBy}
+        onSortChange={(v) => { setSortBy(v); setPage(0); }}
+      />
 
       <div className="flex items-center gap-3 mb-5">
         {allTags.length > 0 && (

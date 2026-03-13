@@ -92,6 +92,8 @@
     "no_version_title": "Pas de version fusionnée",
     "no_version_desc": "Ce document a été créé mais aucune version n'a passé la gouvernance.",
     "pending_governance": "Ce contenu provient d'une proposition en attente — pas encore fusionné via la gouvernance.",
+    "content_not_executed": "Ce contenu provient d'une proposition qui n'a pas encore été exécutée via la gouvernance.",
+    "wait_for_execution": "Veuillez attendre l'exécution de la proposition avant de visualiser ce contenu.",
     "no_content": "Aucun contenu n'a été proposé pour ce document.",
     "propose_first": "Écrire la Première Version",
     "awaiting_version": "En attente de la première version approuvée par la gouvernance.",

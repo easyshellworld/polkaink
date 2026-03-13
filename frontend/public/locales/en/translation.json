@@ -95,6 +95,8 @@
     "no_content": "No content has been proposed for this document yet.",
     "propose_first": "Write First Version",
     "awaiting_version": "Awaiting first version to pass governance.",
+    "content_not_executed": "This content is from a proposal that has not been executed through governance.",
+    "wait_for_execution": "Please wait for the proposal to be executed before viewing this content.",
     "version_tree": "Version Tree",
     "seed_badge": "Seed",
     "version": "Version",

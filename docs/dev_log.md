@@ -64,3 +64,8 @@
 ## 20260311
 * Frontend: 修复治理提案详情页 (#governance/:id) 渲染问题 - 将所有 React Hooks 移至组件顶部，避免在条件返回语句之后调用
 * CI: 修复 .github/workflows/ci.yml 配置问题 - 添加 package-lock.json 检查、移除 npm ci --force、使用固定版本 anvil-polkadot v0.2.7、修正测试结果上传路径
+## 20260313
+* Frontend: 优化 useDocuments.ts 分页逻辑，集成 useDynamicReward 钩子
+* UI: 改进文档版本树显示，增强治理提案卡片交互
+* i18n: 更新多语言翻译文件 (ar/en/es/fr/kr/ru/zh-CN/zh)
+* CI: 精简 GitHub Actions 工作流配置

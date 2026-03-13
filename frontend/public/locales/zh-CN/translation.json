@@ -92,6 +92,8 @@
     "no_version_title": "尚无合并版本",
     "no_version_desc": "文档已创建，但尚未有版本通过治理投票。",
     "pending_governance": "此内容来自待审提案，尚未通过治理合并。",
+    "content_not_executed": "此内容来自尚未通过治理执行的提案。",
+    "wait_for_execution": "请等待提案执行后再查看此内容。",
     "no_content": "该文档尚未提交任何内容。",
     "propose_first": "撰写第一个版本",
     "awaiting_version": "等待第一个版本通过治理。",

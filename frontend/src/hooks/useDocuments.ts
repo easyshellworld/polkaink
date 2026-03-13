@@ -34,20 +34,47 @@ export function useDocuments(page: number, perPage = 10) {
         currentVersionId: bigint;
         latestProposalId: bigint;
       }>, bigint];
-      const docs = docsRaw.map((doc) => ({
-        id: doc.docId,
-        docId: doc.docId,
-        title: doc.title,
-        tags: doc.tags,
-        author: doc.author,
-        createdAt: doc.createdAt,
-        updatedAt: doc.createdAt,
-        status: doc.status,
-        isSeed: doc.isSeed,
-        currentVersionId: doc.currentVersionId,
-        latestProposalId: doc.latestProposalId,
-      }));
-      const sorted = [...docs].sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
+      
+      const docsWithVersions = await Promise.all(
+        docsRaw.map(async (doc) => {
+          let updatedAt = doc.createdAt;
+          
+          if (doc.currentVersionId > 0n) {
+            try {
+              const version = await readContract('VersionStore', 'getVersion', [doc.currentVersionId]) as {
+                versionId: bigint;
+                docId: bigint;
+                parentVersionId: bigint;
+                author: string;
+                proposalId: bigint;
+                contentHash: string;
+                txBlock: bigint;
+                txIndex: bigint;
+                timestamp: bigint;
+              };
+              updatedAt = version.timestamp;
+            } catch (error) {
+              console.error(`Failed to fetch version ${doc.currentVersionId}:`, error);
+            }
+          }
+          
+          return {
+            id: doc.docId,
+            docId: doc.docId,
+            title: doc.title,
+            tags: doc.tags,
+            author: doc.author,
+            createdAt: doc.createdAt,
+            updatedAt,
+            status: doc.status,
+            isSeed: doc.isSeed,
+            currentVersionId: doc.currentVersionId,
+            latestProposalId: doc.latestProposalId,
+          };
+        })
+      );
+      
+      const sorted = [...docsWithVersions].sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
       return {
         documents: sorted,
         total: Number(total),
@@ -72,6 +99,27 @@ export function useDocument(id: number | undefined) {
         currentVersionId: bigint;
         latestProposalId: bigint;
       };
+      
+      let updatedAt = raw.createdAt;
+      if (raw.currentVersionId > 0n) {
+        try {
+          const version = await readContract('VersionStore', 'getVersion', [raw.currentVersionId]) as {
+            versionId: bigint;
+            docId: bigint;
+            parentVersionId: bigint;
+            author: string;
+            proposalId: bigint;
+            contentHash: string;
+            txBlock: bigint;
+            txIndex: bigint;
+            timestamp: bigint;
+          };
+          updatedAt = version.timestamp;
+        } catch (error) {
+          console.error(`Failed to fetch version ${raw.currentVersionId}:`, error);
+        }
+      }
+      
       return {
         id: raw.docId,
         docId: raw.docId,
@@ -79,7 +127,7 @@ export function useDocument(id: number | undefined) {
         tags: raw.tags,
         author: raw.author,
         createdAt: raw.createdAt,
-        updatedAt: raw.createdAt,
+        updatedAt,
         status: raw.status,
         isSeed: raw.isSeed,
         currentVersionId: raw.currentVersionId,

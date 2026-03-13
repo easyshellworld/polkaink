@@ -92,6 +92,8 @@
     "no_version_title": "Sin versión fusionada aún",
     "no_version_desc": "Este documento ha sido creado pero ninguna versión ha pasado la gobernanza aún.",
     "pending_governance": "Este contenido es de una propuesta pendiente — aún no fusionado mediante gobernanza.",
+    "content_not_executed": "Este contenido es de una propuesta que no ha sido ejecutada mediante gobernanza.",
+    "wait_for_execution": "Por favor, espera a que la propuesta sea ejecutada antes de ver este contenido.",
     "no_content": "No se ha propuesto contenido para este documento aún.",
     "propose_first": "Escribir primera versión",
     "awaiting_version": "Esperando la primera versión que pase la gobernanza.",

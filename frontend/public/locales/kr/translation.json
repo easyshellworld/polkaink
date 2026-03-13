@@ -92,6 +92,8 @@
     "no_version_title": "아직 병합된 버전이 없습니다",
     "no_version_desc": "문서가 생성되었지만 아직 거버넌스를 통과한 버전이 없습니다.",
     "pending_governance": "이 콘텐츠는 대기 중인 제안에서 가져온 것으로, 아직 거버넌스를 통해 병합되지 않았습니다.",
+    "content_not_executed": "이 콘텐츠는 아직 거버넌스를 통해 실행되지 않은 제안에서 가져온 것입니다.",
+    "wait_for_execution": "이 콘텐츠를 보기 전에 제안이 실행되기를 기다려주세요.",
     "no_content": "이 문서에 아직 제출된 콘텐츠가 없습니다.",
     "propose_first": "첫 번째 버전 작성하기",
     "awaiting_version": "첫 번째 버전이 거버넌스를 통과하기를 기다리고 있습니다.",

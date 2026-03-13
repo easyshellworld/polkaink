@@ -12,6 +12,7 @@ import { useMembership } from '../../hooks/useMembership';
 import { writeContract, waitForTx } from '../../lib/contracts';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Button } from '../../components/ui/Button';
+import { ShareButton } from '../../components/ui/ShareButton';
 
 export default function ProposePage() {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ export default function ProposePage() {
   const [description, setDescription] = useState('');
   const [preview, setPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [successProposalId, setSuccessProposalId] = useState<number | null>(null);
 
   const handleSubmit = async () => {
     if (!walletClient || !doc) {
@@ -72,8 +74,24 @@ export default function ProposePage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['proposals'] }),
         queryClient.invalidateQueries({ queryKey: ['recentProposals'] }),
+        queryClient.invalidateQueries({ queryKey: ['documents'] }),
+        queryClient.invalidateQueries({ queryKey: ['document', numDocId] }),
       ]);
-      navigate('/governance');
+      
+      const logs = receipt.logs || [];
+      const proposalCreatedLog = logs.find((log) => 
+        log.topics && log.topics[0] === '0x2d0d3c5a5ff7a4444b2d3c5c5c3c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c'
+      );
+      
+      let proposalId = null;
+      if (proposalCreatedLog && proposalCreatedLog.topics && proposalCreatedLog.topics.length >= 2) {
+        const topic = proposalCreatedLog.topics[2];
+        if (topic) {
+          proposalId = parseInt(topic, 16);
+        }
+      }
+      
+      setSuccessProposalId(proposalId);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       updateNotification(nid, { type: 'error', message: `${t('common.failed', 'Failed')}: ${msg}` });
@@ -81,6 +99,36 @@ export default function ProposePage() {
       setSubmitting(false);
     }
   };
+
+  if (successProposalId) {
+    const shareUrl = `${window.location.origin}/#/governance/${successProposalId}${
+      address ? `?ref=${address}` : ''
+    }`;
+    return (
+      <PageWrapper>
+        <div className="text-center py-12">
+          <h2 className="text-xl font-bold mb-2">
+            {t('propose.tx_success_title', 'Proposal Submitted!')}
+          </h2>
+          <p className="text-[var(--color-text-secondary)] mb-6">
+            {t('propose.tx_success_desc', 'Your proposal is now live for community voting.')}
+          </p>
+          <ShareButton
+            url={shareUrl}
+            title={t('propose.share_title', 'I submitted a proposal on PolkaInk')}
+            text={t('propose.share_text', 'Vote on this governance proposal')}
+          />
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => navigate('/governance')}
+          >
+            {t('propose.view_governance', 'View All Proposals')}
+          </Button>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>

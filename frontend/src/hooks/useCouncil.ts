@@ -54,7 +54,7 @@ export function useCouncilAllowanceStatus(address: string | null) {
 
       const [epochStartTime, epochDuration] = await Promise.all([
         readContract('Treasury', 'epochStartTime').catch(() => 0n),
-        readContract('ArchiveCouncil', 'EPOCH_DURATION').catch(() => 0n),
+        readContract('Treasury', 'EPOCH_DURATION').catch(() => 0n),
       ]);
 
       const start = Number(epochStartTime as bigint);

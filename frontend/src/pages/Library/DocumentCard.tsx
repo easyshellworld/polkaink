@@ -5,10 +5,9 @@ import { Card } from '../../components/ui/Card';
 import { shortenAddress, formatDate } from '../../lib/utils';
 import type { DocumentData } from '../../hooks/useDocuments';
 
-const STATUS_VARIANTS: Record<number, 'success' | 'neutral' | 'error'> = {
+const STATUS_VARIANTS: Record<number, 'success' | 'warning'> = {
   0: 'success',
-  1: 'neutral',
-  2: 'error',
+  1: 'warning',
 };
 
 export function DocumentCard({ doc }: { doc: DocumentData }) {
@@ -46,7 +45,7 @@ export function DocumentCard({ doc }: { doc: DocumentData }) {
             )}
           </div>
           <Badge variant={STATUS_VARIANTS[doc.status] ?? 'neutral'} pill>
-            {t(`status.${doc.status === 0 ? 'active' : doc.status === 1 ? 'archived' : 'disputed'}`)}
+             {t(`status.${doc.status === 0 ? 'active' : 'frozen'}`)}
           </Badge>
         </div>
       </Card>

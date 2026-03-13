@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { readContract } from '../../lib/contracts';
+import { useDynamicReward } from '../../hooks/useDynamicReward';
 import { PageWrapper } from '../../components/layout/PageWrapper';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Pagination } from '../../components/ui/Pagination';
@@ -24,6 +25,8 @@ export default function GovernancePage() {
   const [page, setPage] = useState(0);
   const [filter, setFilter] = useState(-1);
   const perPage = 10;
+
+  const { data: rewardStatus } = useDynamicReward();
 
   const { data, isLoading } = useQuery({
     queryKey: ['proposals', filter, page, perPage],
@@ -85,7 +88,13 @@ export default function GovernancePage() {
             {t(label)}
           </button>
         ))}
-      </div>
+       </div>
+
+      {rewardStatus?.isPaused && (
+        <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber (700">
+          {t('governance.rewards_paused', 'Rewards are currently paused due to low reward pool balance.')}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-3">
