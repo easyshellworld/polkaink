@@ -1,0 +1,39 @@
+{
+  "name": "polkaink",
+  "version": "1.0.0",
+  "description": "On-Chain Polkadot History Preservation Protocol",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:polkadot": "POLKADOT_NODE=true hardhat test",
+    "setup:node": "bash scripts/setup-node.sh",
+    "deploy:testnet": "hardhat run scripts/deploy.ts --network polkadotTestnet",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost"
+  },
+  "keywords": [
+    "polkadot",
+    "blockchain",
+    "history",
+    "dao",
+    "smart-contracts"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "5.1.0",
+    "@openzeppelin/contracts-upgradeable": "5.1.0",
+    "@openzeppelin/hardhat-upgrades": "^3.9.1",
+    "@parity/hardhat-polkadot": "^0.2.7",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.4.0",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}

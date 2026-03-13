@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build artifacts
+artifacts/
+cache/
+typechain-types/
+frontend/dist/
+frontend/dist-ssr/
+
+# Local node binaries (downloaded by scripts/setup-node.sh)
+bin/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Generated deployment output
+deployed-addresses.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Editor & OS
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.sw?
+*.local
+
+# Coverage & reports
+coverage/
+coverage.json
+gasReporterOutput.json
+[empty]
