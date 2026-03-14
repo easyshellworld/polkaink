@@ -38,6 +38,17 @@ Every word committed through PolkaInk is as permanent as the block that holds it
 
 ---
 
+## 🔗 Project Resources
+
+| Resource | Link |
+|---|---|
+| 🌐 **Live Demo** | [polkaink.netlify.app](https://polkaink.netlify.app/) |
+| 📊 **Pitch Deck** | [polkaink.netlify.app/ppt.html](https://polkaink.netlify.app/ppt.html) |
+| 🎬 **Demo Video** | [YouTube — Coming Soon](https://www.youtube.com/watch?v=polkaink-demo-placeholder) |
+| 📐 **Design Document** | [polkaink\_dev\_doc\_v3\_4.md](docs/polkaink_dev_doc_v3_4.md) |
+
+---
+
 ## ✨ Core Features
 
 - **📜 Calldata-Native Storage** — Document content is encoded as calldata directly into Polkadot Asset Hub blocks. Permanent as the chain itself; verifiable by any full node offline, no external service required.
@@ -162,7 +173,7 @@ docs/
 
 ## 🤝 Contributing
 
-All contributions are welcome: bug reports, feature proposals, documentation improvements, code fixes, and translations. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+All contributions are welcome: bug reports, feature proposals, documentation improvements, code fixes, and translations.
 
 ---
 

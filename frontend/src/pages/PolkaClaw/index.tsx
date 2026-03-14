@@ -21,6 +21,14 @@ export default function PolkaClawPage() {
       github: 'https://github.com/MJLNSN',
       handle: '@MJLNSN',
     },
+    {
+      name: 'Quentin',
+      role: t('polkaclaw.role_quentin', 'QA Testing | DevOps'),
+      desc: t('polkaclaw.desc_quentin', 'Quality-first mindset, infrastructure automation, keeping the pipeline green'),
+      avatar: 'https://duk.tw/Ni8GQw.jpg',
+      github: 'https://github.com/JonathanQUANLEE',
+      handle: '@JonathanQUANLEE',
+    },
   ];
 
   return (
@@ -35,13 +43,13 @@ export default function PolkaClawPage() {
           <span className="text-[var(--color-primary)]">Polka</span>Claw
         </h1>
         <p className="text-[var(--color-text-secondary)] mb-1 text-sm">
-          {t('polkaclaw.team_desc', 'A team of two full-stack developers who believe in AI and blockchain.')}
+          {t('polkaclaw.team_desc', 'A team of three builders who believe in AI and blockchain.')}
         </p>
         <p className="text-xs text-[var(--color-text-secondary)] mb-10">
           {t('polkaclaw.tagline', 'AI-driven development · Polkadot ecosystem · Love & Peace')}
         </p>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-3">
           {TEAM.map((m) => (
             <a
               key={m.handle}

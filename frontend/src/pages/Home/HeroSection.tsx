@@ -25,13 +25,14 @@ export function HeroSection() {
         {t('home.hero_desc')}
       </p>
       <div className="mt-8 flex justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
-        <Link to="/create">
+        {/* New Document button temporarily hidden */}
+        {/* <Link to="/create">
           <Button variant="primary" size="lg" className="hover-lift hover-glow">
             {t('home.cta_propose')}
           </Button>
-        </Link>
+        </Link> */}
         <Link to="/library">
-          <Button variant="outline" size="lg" className="hover-lift">
+          <Button variant="primary" size="lg" className="hover-lift hover-glow">
             {t('home.cta_explore')}
           </Button>
         </Link>

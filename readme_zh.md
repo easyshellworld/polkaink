@@ -38,6 +38,17 @@
 
 ---
 
+## 🔗 项目资源
+
+| 资源 | 链接 |
+|---|---|
+| 🌐 **在线 Demo** | [polkaink.netlify.app](https://polkaink.netlify.app/) |
+| 📊 **项目 PPT** | [polkaink.netlify.app/ppt.html](https://polkaink.netlify.app/ppt.html) |
+| 🎬 **演示视频** | [YouTube — 即将上线](https://www.youtube.com/watch?v=polkaink-demo-placeholder) |
+| 📐 **项目设计书** | [polkaink\_dev\_doc\_v3\_4.md](docs/polkaink_dev_doc_v3_4.md) |
+
+---
+
 ## ✨ 核心特性
 
 - **📜 纯链上 Calldata 存储** — 文档内容以 calldata 编码写入 Polkadot Asset Hub 区块，与区块等寿，任何全节点可离线独立验证，无需依赖任何外部服务。
@@ -162,7 +173,7 @@ docs/
 
 ## 🤝 参与贡献
 
-欢迎一切形式的贡献：问题反馈、功能建议、文档改进、代码修复、翻译贡献。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎一切形式的贡献：问题反馈、功能建议、文档改进、代码修复、翻译贡献。
 
 ---
 
