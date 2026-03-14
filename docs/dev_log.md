@@ -77,4 +77,13 @@
   - 调整 Home 页面组件顺序，将 FeaturedDocuments 移到 LatestProposals 之前
   - 移除 Library 页面的 New Document 按钮
   - 创建完整的 FAQ 页面组件 (src/pages/FAQ/index.tsx)
-
+* Frontend: 修复 Document 页面 Version Tree 过滤逻辑错误
+  - **问题**: Version Tree 错误显示失败/否决提案版本
+  - **根因**: 使用版本ID数字比较 (`id <= currentVersionIdNumber`) 而非祖先链追踪
+  - **解决方案**: 
+    1. 修改 `versionDetails` 查询使用 `normalizedIds` 替代 `visibleVersionIds`
+    2. 重写 `visibleVersionIds` 过滤逻辑，基于 `parentVersionId` 祖先链追踪
+    3. 在 `builtVersionNodes` 中添加安全过滤，确保只显示已执行版本
+  - **验证**: TypeScript编译、ESLint、项目构建、37个单元测试全部通过
+  - **文件**: 仅修改 `frontend/src/pages/Document/index.tsx`
+ 
