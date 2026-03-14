@@ -17,6 +17,7 @@ const CouncilPage = lazy(() => import('./pages/Council'));
 const TreasuryPage = lazy(() => import('./pages/Treasury'));
 const StakingPage = lazy(() => import('./pages/Staking'));
 const PolkaClawPage = lazy(() => import('./pages/PolkaClaw'));
+const FAQPage = lazy(() => import('./pages/FAQ'));
 
 function PageFallback() {
   return (
@@ -46,6 +47,7 @@ function AppContent() {
             <Route path="/treasury" element={<TreasuryPage />} />
             <Route path="/staking" element={<StakingPage />} />
             <Route path="/polkaclaw" element={<PolkaClawPage />} />
+            <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </Suspense>
       </main>

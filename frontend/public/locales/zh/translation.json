@@ -11,7 +11,8 @@
     "profile": "个人中心",
     "home": "首页",
     "about_team": "关于团队",
-    "agent_skill": "Agent Skill"
+    "agent_skill": "Agent Skill",
+    "faq": "常见问题"
   },
   "home": {
     "hero_title_1": "记录历史，",
@@ -478,6 +479,88 @@
     "donation_submitted": "捐赠已提交。",
     "claiming_allowance": "正在领取委员会津贴...",
     "allowance_claimed": "委员会津贴已领取。"
+  },
+  "faq": {
+    "page_title": "常见问题",
+    "page_subtitle": "关于 PolkaInk 你想知道的一切",
+    "group_about": "关于 PolkaInk",
+    "group_start": "开始使用",
+    "group_docs": "文档与提案",
+    "group_governance": "治理与投票",
+    "group_nft": "NFT 与会员",
+    "group_tech": "技术问题",
+
+    "q_what_is": "什么是 PolkaInk？",
+    "a_what_is": "PolkaInk 是运行在 Polkadot Asset Hub 上的去中心化链上档案协议。社区可以将 Polkadot 生态历史——重要事件、治理决策、关键里程碑——通过 calldata 永久写入区块链。一旦写入，任何人都无法抹去。",
+
+    "q_why_needed": "为什么 Polkadot 需要链上档案？",
+    "a_why_needed": "生态记忆分散在 GitHub、博客、论坛和社交媒体上，这些内容随时可能被删除、修改或下线。AI 生成的\"历史\"正在污染真实的早期记录。PolkaInk 通过将官方记录变为不可篡改且经社区验证的内容来解决这一问题。",
+
+    "q_public_good": "PolkaInk 是公共物品吗？",
+    "a_public_good": "是的。PolkaInk 没有股东，没有私人利益方，完全由社区 DAO 治理，服务于整个 Polkadot 生态。就像公路、图书馆——它存在，所有人受益，没有人独占它。",
+
+    "q_who_runs": "谁在控制 PolkaInk？",
+    "a_who_runs": "没有人。部署完成后，所有管理员权限已被放弃。协议完全由智能合约逻辑自治运行。即使是创始团队 PolkaClaw，部署后也没有任何特权。",
+
+    "q_get_started": "如何开始使用？",
+    "a_get_started": "将 MetaMask 钱包连接到 Polkadot Asset Hub（链 ID：420420417）。你可以直接浏览文档库阅读所有文档，无需账户。如果想贡献内容或参与投票，需要质押 88 PAS 成为会员。",
+
+    "q_need_token": "我需要 PAS 代币吗？",
+    "a_need_token": "任何交易都需要少量 PAS 作为 gas 费。成为会员需要质押 88 PAS，解质押时全额返还（提前解质押有固定罚款 8.8 PAS）。测试网 PAS 可从官方水龙头 faucet.polkadot.io 免费获取。",
+
+    "q_need_membership": "阅读文档需要成为会员吗？",
+    "a_need_membership": "不需要。任何人都可以直接浏览文档库并阅读所有链上文档，无需钱包也无需会员资格。会员资格仅在投票或提交提案时才需要。",
+
+    "q_how_contribute": "我如何向文档贡献内容？",
+    "a_how_contribute": "在文档库中打开任意种子文档，点击「提交提案」。编写你的 Markdown 内容并提交为版本提案——无需额外的注册步骤。提案进入 7 天社区投票期，通过后你的内容将被永久合并到链上。",
+
+    "q_what_is_proposal": "什么是版本提案？",
+    "a_what_is_proposal": "版本提案是你提交用于更新现有文档的 Markdown 内容。提交版本提案**不需要质押任何代币**。社区成员在 7 天内进行赞成/反对/弃权投票。若加权得分超过阈值且参与率达标，提案通过，内容将永久写入链上。",
+
+    "q_proposal_not_passed": "提案未通过会怎样？",
+    "a_proposal_not_passed": "版本提案不需要质押，因此没有什么可损失的。唯一的后果是 72 小时冷却期，在此期间无法对同一文档再次提交提案。冷却结束后可以修改内容重新提交。",
+
+    "q_council_vetoed": "如果 Archive Council 否决了我的提案怎么办？",
+    "a_council_vetoed": "否决需要 7 名委员中的 5 名同意，且每次否决必须附上至少 50 字节的链上理由，永久公开可查。后果与普通被拒绝相同——触发 72 小时冷却期。委员会只能以特定伦理理由行使否决权（虚假历史、仇恨言论、恶意代码、法律风险），不能以内容有争议为由阻止合法提案。",
+
+    "q_how_vote": "投票是如何运作的？",
+    "a_how_vote": "会员可对活跃提案投赞成、反对或弃权。投票权重由基础值（1.0）、锁定期加成和 Creator NFT 贡献加成共同决定。任何单个地址的权重上限（公式最大值）为 1.80，低于通过阈值 2.0——因此没有任何单个钱包能独自通过一项提案。投赞成和投反对的 Epoch 奖励完全相同，你的利益不与投票立场绑定。",
+
+    "q_voting_power": "我的投票权重由什么决定？",
+    "a_voting_power": "权重 = min(1.0 + B_hist + B_lock, 2.0)。B_hist 来自持有的 Creator NFT 数量（对数计算，上限 +0.40）。B_lock 来自质押锁定时长（24 个月达到上限 +0.40）。硬上限为 2.0，但任何单个投票者的公式最大值为 1.80，始终低于提案通过阈值。",
+
+    "q_what_is_council": "什么是 Archive Council（档案委员会）？",
+    "a_what_is_council": "Archive Council 是由 7 名成员组成的伦理委员会，拥有有限的否决权。他们可以阻止包含可验证虚假历史、仇恨言论、恶意合约升级代码或存在法律风险的提案。每次否决都必须在链上公开注明至少 50 字节的理由，永久可查。他们不能以内容有争议或个人不认同为由行使否决权。",
+
+    "q_council_corrupt": "如果委员会行为恶意怎么办？",
+    "a_council_corrupt": "委员会否决需要 7 名成员中的 5 名同意，任何单个委员无法单独行动。每次否决均永久记录在链上并附有强制说明。Phase 1 之后，委员会成员将由社区 DAO 选举产生并可被替换。协议在设计上确保没有任何单一行为者——包括委员会——能单独行使权力。",
+
+    "q_proposal_reward": "提案通过后我能获得什么奖励？",
+    "a_proposal_reward": "版本提案执行后，系统从国库奖励池中计算动态奖励：基础 50 PAS 加每位投票者 1 PAS，上限为奖励池余额的 10% 或 200 PAS（取较小值）。奖励的 50% 立即发放给提案人，30% 进入本 Epoch 投票者奖励池，20% 留存于奖励池。若奖励池余额低于 50 PAS，则跳过奖励分配，提案照常合并。",
+
+    "q_member_nft": "什么是 Member NFT？",
+    "a_member_nft": "Member NFT 是你的会员证明。通过质押 88 PAS 获得，赋予你参与治理投票的资格。它不会空投——必须通过质押赚取。它是灵魂绑定的，不可转让。",
+
+    "q_creator_nft": "什么是 Creator NFT？",
+    "a_creator_nft": "当你的版本提案通过治理被合并到链上时，系统自动铸造一枚 Creator NFT 给你。每通过一个提案获得一枚，可叠加。持有更多 Creator NFT 会增加投票权重加成（B_hist），最高 +0.40。它是灵魂绑定的。",
+
+    "q_guardian_nft": "什么是 Guardian NFT？",
+    "a_guardian_nft": "Guardian NFT 在协议创世时由构造函数直接铸造，分配给 7 名 Archive Council 成员。全球仅有 7 枚，系统中不存在铸造角色，永远无法追加铸造。Guardian NFT 不提供任何投票权重加成，仅作为创世委员会成员的身份标识。",
+
+    "q_why_calldata": "为什么用 calldata 而不是合约存储来保存文档？",
+    "a_why_calldata": "Calldata 是嵌入区块本身的原始交易数据——不是智能合约的状态变量，不存在于任何服务器上。每个全节点都持有它。只要链存在，它就存在。与 IPFS（节点可能下线）或 GitHub（可被删除）不同，calldata 无法被任何人移除。",
+
+    "q_ipfs_github": "为什么不用 IPFS 或 GitHub？",
+    "a_ipfs_github": "GitHub 是中心化平台，内容可被删除或审查。IPFS 内容在 pin 节点下线后会变得无法访问。PolkaInk 的内容嵌入在 Polkadot 区块中，可由任何全节点独立验证，无论在线还是离线，无需信任任何第三方服务。",
+
+    "q_verify": "如何验证文档是否真实？",
+    "a_verify": "每个文档版本都链接到特定的链上区块号和交易哈希。你可以在 RouteScan 浏览器上查询该区块，获取原始 calldata，并自行验证内容哈希。整个验证过程完全无需信任任何 PolkaInk 服务。",
+
+    "q_onchain_cost": "提交版本提案需要多少费用？",
+    "a_onchain_cost": "提交版本提案只需支付交易 gas 费，通常只是极少量 PAS（按 calldata 字节数计费，几 KB 的 Markdown 文档仅需极小的费用）。版本提案**不需要质押**。会员资格所需的 88 PAS 质押是独立的、可全额返还的押金。",
+
+    "q_roadmap": "路线图是什么？",
+    "a_roadmap": "Phase 1（当前）：测试网上线，核心档案协议运行——9 个合约、完整 DAO 治理、Archive Council。Phase 2：主网迁移、完整 Archive Council 选举制度、高级治理功能。Phase 3：开放 API、AI 文档摘要、Proof-of-Personhood 集成（从根本上防止女巫攻击），以及年度名人堂——每年评选 10 位生态贡献者并给予奖励。"
   },
   "polkaclaw": {
     "team_desc": "一个相信 AI 与区块链的两人全栈开发团队。",

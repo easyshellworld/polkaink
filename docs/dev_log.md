@@ -69,3 +69,12 @@
 * UI: 改进文档版本树显示，增强治理提案卡片交互
 * i18n: 更新多语言翻译文件 (ar/en/es/fr/kr/ru/zh-CN/zh)
 * CI: 精简 GitHub Actions 工作流配置
+## 20260314
+* Frontend: 完成前端修订
+  - 在 App.tsx 中添加 `/faq` 路由
+  - 修改 Header.tsx 导航项，将 Create 替换为 FAQ
+  - 修改 MobileNav.tsx 导航项，将 Create 替换为 FAQ  
+  - 调整 Home 页面组件顺序，将 FeaturedDocuments 移到 LatestProposals 之前
+  - 移除 Library 页面的 New Document 按钮
+  - 创建完整的 FAQ 页面组件 (src/pages/FAQ/index.tsx)
+

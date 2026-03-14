@@ -11,7 +11,8 @@
     "profile": "Profile",
     "home": "Home",
     "about_team": "About Team",
-    "agent_skill": "Agent Skill"
+    "agent_skill": "Agent Skill",
+    "faq": "FAQ"
   },
   "home": {
     "hero_title_1": "History, now",
@@ -469,6 +470,88 @@
     "donation_submitted": "Donation submitted.",
     "claiming_allowance": "Claiming council allowance...",
     "allowance_claimed": "Council allowance claimed."
+  },
+  "faq": {
+    "page_title": "FAQ",
+    "page_subtitle": "Everything you need to know about PolkaInk",
+    "group_about": "About PolkaInk",
+    "group_start": "Getting Started",
+    "group_docs": "Documents & Proposals",
+    "group_governance": "Governance & Voting",
+    "group_nft": "NFTs & Membership",
+    "group_tech": "Technical",
+
+    "q_what_is": "What is PolkaInk?",
+    "a_what_is": "PolkaInk is a decentralized on-chain archive protocol running on Polkadot Asset Hub. It lets the community permanently record Polkadot ecosystem history — events, governance decisions, key milestones — directly into the blockchain via calldata. Once written, no one can erase it.",
+
+    "q_why_needed": "Why does Polkadot need an on-chain archive?",
+    "a_why_needed": "Ecosystem memory is scattered across GitHub, blog posts, forum threads, and social media — all of which can be deleted, edited, or taken offline. AI-generated 'history' increasingly pollutes authentic records. PolkaInk solves this by making the official record immutable and community-verified.",
+
+    "q_public_good": "Is PolkaInk a public good?",
+    "a_public_good": "Yes. PolkaInk has no shareholders and no private beneficiaries. It is governed entirely by its community DAO and serves the whole Polkadot ecosystem. Like a library or a public road — it exists for everyone and is owned by no one.",
+
+    "q_who_runs": "Who controls PolkaInk?",
+    "a_who_runs": "No one. After deployment, all admin keys were renounced. The protocol runs entirely on smart contract logic. Even the founding team (PolkaClaw) has no special privileges post-deployment.",
+
+    "q_get_started": "How do I get started?",
+    "a_get_started": "Connect your MetaMask wallet to Polkadot Asset Hub (Chain ID: 420420417). You can browse the Library and read all documents without any account. To contribute content or vote, stake 88 PAS to become a Member.",
+
+    "q_need_token": "Do I need PAS tokens?",
+    "a_need_token": "You need a small amount of PAS for gas fees on any transaction. To become a Member and participate in governance, you stake 88 PAS — this is returned in full when you unstake (minus a fixed penalty only for early unstaking). Testnet PAS is available for free at faucet.polkadot.io.",
+
+    "q_need_membership": "Do I need to be a Member to read documents?",
+    "a_need_membership": "No. Anyone can browse the Library and read all on-chain documents without a wallet or membership. Membership is only required to vote or submit proposals.",
+
+    "q_how_contribute": "How do I contribute content to a document?",
+    "a_how_contribute": "Open any seed document in the Library, then click 'Propose Update'. Write your Markdown content and submit it as a version proposal — no separate registration step needed. The proposal enters a 7-day community voting period, and if approved, your content is permanently merged on-chain.",
+
+    "q_what_is_proposal": "What is a version proposal?",
+    "a_what_is_proposal": "A version proposal is a Markdown document submitted to update an existing document. Submitting a version proposal requires no stake. Community members vote Yes, No, or Abstain over 7 days. If the weighted vote score exceeds the threshold and participation is sufficient, the proposal passes and the content is permanently written on-chain.",
+
+    "q_proposal_not_passed": "What happens if my proposal is not approved?",
+    "a_proposal_not_passed": "Version proposals require no stake, so there is nothing to lose. The only consequence is a 72-hour cooldown, during which you cannot submit another proposal for the same document. After the cooldown, you are free to revise and resubmit.",
+
+    "q_council_vetoed": "What if the Archive Council vetoes my proposal?",
+    "a_council_vetoed": "A veto requires 5 of the 7 Council members to agree, and every veto must include a mandatory on-chain reason of at least 50 bytes. The result is a 72-hour cooldown — the same as a regular rejection. The Council can only veto for specific ethical reasons (false history, hate speech, malicious code, legal risk) — they cannot block legitimate but controversial content.",
+
+    "q_how_vote": "How does voting work?",
+    "a_how_vote": "Members vote Yes, No, or Abstain on active proposals. Your vote weight is a formula combining your base weight (1.0), a lock-period bonus, and a contribution bonus from Creator NFTs. No single address can ever reach the passing threshold of 2.0 alone — the formula maximum for any single voter is 1.80. Both Yes and No votes earn equal epoch rewards, so your incentives are never tied to a specific outcome.",
+
+    "q_voting_power": "What determines my voting power?",
+    "a_voting_power": "Weight = min(1.0 + B_hist + B_lock, 2.0). B_hist comes from the number of Creator NFTs you hold (log scale, max +0.40). B_lock comes from how long you lock your stake (max +0.40 at 24 months). The hard cap is 2.0, but the practical maximum any single voter can reach is 1.80 — always below the 2.0 passing threshold.",
+
+    "q_what_is_council": "What is the Archive Council?",
+    "a_what_is_council": "The Archive Council is a 7-member ethics committee with limited veto power. They can block proposals that contain verifiable false history, hate speech, malicious contract upgrade code, or content creating legal risk. Every veto requires a public on-chain reason of at least 50 bytes — permanently recorded and publicly verifiable. They cannot block content simply because it is controversial or they disagree with it.",
+
+    "q_council_corrupt": "What if the Council acts maliciously?",
+    "a_council_corrupt": "The veto requires 5 of 7 members to agree — no single Council member can act alone. Every veto is permanently recorded on-chain with a mandatory reason. After Phase 1, Council members are elected by the community DAO and can be replaced. The protocol is designed so no single actor, including the Council, can act unilaterally.",
+
+    "q_proposal_reward": "What reward do I get if my proposal passes?",
+    "a_proposal_reward": "When a version proposal is executed, a dynamic reward is calculated from the Treasury reward pool: base 50 PAS plus 1 PAS per voter, capped at the lower of 10% of the pool or 200 PAS. Of that reward: 50% goes to the proposer immediately, 30% goes into the epoch voter reward pool, and 20% remains in the pool. If the pool balance is below 50 PAS, rewards are skipped and the proposal still merges normally.",
+
+    "q_member_nft": "What is the Member NFT?",
+    "a_member_nft": "The Member NFT is your proof of membership. You earn it by staking 88 PAS. It grants you voting rights in governance. It is not airdropped — it must be earned by staking. It is soulbound and non-transferable.",
+
+    "q_creator_nft": "What is the Creator NFT?",
+    "a_creator_nft": "The Creator NFT is minted automatically when your version proposal is merged on-chain by governance. Each accepted proposal earns one. Holding more Creator NFTs increases your voting weight bonus (B_hist), up to a maximum of +0.40. It is soulbound.",
+
+    "q_guardian_nft": "What is the Guardian NFT?",
+    "a_guardian_nft": "Guardian NFTs were minted at protocol genesis and assigned to the 7 Archive Council members. Only 7 exist and no more can ever be minted — there is no minter role. They carry no voting weight bonus. They serve as identity markers for the genesis Council.",
+
+    "q_why_calldata": "Why store documents as calldata instead of contract storage?",
+    "a_why_calldata": "Calldata is raw transaction data embedded in a block itself — not a smart contract state variable, not a file on a server. Every full node stores it. It survives as long as the chain survives. Unlike IPFS (nodes can go offline) or GitHub (can be deleted or censored), calldata cannot be removed by anyone.",
+
+    "q_ipfs_github": "Why not use IPFS or GitHub?",
+    "a_ipfs_github": "GitHub is a centralized platform — content can be deleted or censored at any time. IPFS content becomes inaccessible if the pinning nodes go offline. PolkaInk content is embedded in Polkadot blocks and is independently verifiable by any full node, online or offline, without trusting any third party.",
+
+    "q_verify": "How can I verify that a document is authentic?",
+    "a_verify": "Every document version is linked to a specific on-chain block number and transaction hash. You can look up the block on the RouteScan explorer, retrieve the raw calldata, and verify the content hash yourself. The verification is fully trustless and requires no connection to any PolkaInk service.",
+
+    "q_onchain_cost": "What does it cost to submit a version proposal?",
+    "a_onchain_cost": "Submitting a version proposal costs only the transaction gas fee, which is a small fraction of a PAS token depending on the Markdown content size (charged per byte of calldata). There is no proposal stake for version updates. The 88 PAS membership stake is a separate, fully refundable deposit.",
+
+    "q_roadmap": "What is the roadmap?",
+    "a_roadmap": "Phase 1 (current): Testnet launch with core archive protocol — 9 contracts, full DAO governance, Archive Council. Phase 2: Mainnet migration, full Archive Council elections, advanced governance. Phase 3: Open API, AI-powered document summaries, Proof-of-Personhood integration to prevent sybil attacks, and the annual Hall of Fame — recognizing the top 10 ecosystem contributors each year."
   },
   "polkaclaw": {
     "team_desc": "A team of two full-stack developers who believe in AI and blockchain.",

@@ -9,10 +9,10 @@ export default function HomePage() {
     <div>
       <HeroSection />
       <StatsBar />
-      <LatestProposals />
       <div className="mx-auto max-w-4xl px-4">
         <FeaturedDocuments />
       </div>
+      <LatestProposals />
       <Footer />
     </div>
   );

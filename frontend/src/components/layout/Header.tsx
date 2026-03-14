@@ -10,7 +10,7 @@ const navItems = [
   { path: '/council', key: 'nav.council', also: [] as string[] },
   { path: '/treasury', key: 'nav.treasury', also: [] as string[] },
   { path: '/staking', key: 'nav.staking', also: [] as string[] },
-  { path: '/create', key: 'nav.create', also: [] as string[] },
+  { path: '/faq', key: 'nav.faq', also: [] as string[] },
 ];
 
 function LogoMenu() {
