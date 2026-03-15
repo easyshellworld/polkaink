@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>PolkaInk · 创世共识 v3.4</title>
+  <title>PolkaInk · Genesis Consensus v3.4</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --pink: #E6007A;
@@ -28,7 +28,7 @@
 
     body {
       background: var(--bg);
-      font-family: "Noto Sans SC", sans-serif;
+      font-family: "Inter", sans-serif;
       color: var(--text);
       overflow-x: hidden;
     }
@@ -47,7 +47,6 @@
     }
     .slide.active { display: flex; }
 
-    /* ── Background decoration ── */
     .slide::before {
       content: '';
       position: absolute;
@@ -58,7 +57,6 @@
       pointer-events: none;
     }
 
-    /* Grid texture */
     .slide::after {
       content: '';
       position: absolute;
@@ -113,21 +111,21 @@
 
     h3 {
       font-family: "Syne", sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--pink);
       margin-bottom: 0.6rem;
     }
 
     p, li {
-      font-size: 1.05rem;
+      font-size: 1.0rem;
       color: var(--text);
       line-height: 1.7;
       margin-bottom: 0.8rem;
     }
 
     .sub {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       color: var(--purple);
       margin-bottom: 1.5rem;
       font-weight: 400;
@@ -266,7 +264,7 @@
       border-left: 4px solid var(--pink);
       border-radius: 0 14px 14px 0;
       padding: 1.4rem 1.8rem;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: var(--text);
       font-style: italic;
       margin: 1.5rem 0;
@@ -446,14 +444,12 @@
       z-index: 200;
     }
 
-    /* ── Slide-in animation ── */
     @keyframes slideUp {
       from { opacity:0; transform: translateY(28px); }
       to   { opacity:1; transform: translateY(0); }
     }
     .fade-in { animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards; }
 
-    /* ── Cover-specific ── */
     @keyframes pulse1 { 0%,100%{transform:scale(1) translate(0,0);} 50%{transform:scale(1.12) translate(22px,16px);} }
     @keyframes pulse2 { 0%,100%{transform:scale(1) translate(0,0);} 50%{transform:scale(1.09) translate(-16px,-22px);} }
     @keyframes glow-flicker { 0%,100%{opacity:1;} 50%{opacity:0.82;} }
@@ -524,7 +520,6 @@
       margin-bottom: 1rem;
     }
 
-    /* ── Responsive ── */
     @media (max-width: 768px) {
       .arch-contracts { grid-template-columns: repeat(2, 1fr); }
       .flow-item { min-width: 100px; }
@@ -532,7 +527,6 @@
       td, th { padding: 0.6rem 0.7rem; }
     }
 
-    /* ── Polkadot logo mark ── */
     .logo-mark {
       font-family: "Syne", sans-serif;
       font-size: 1.1rem;
@@ -541,11 +535,9 @@
       letter-spacing: -0.02em;
     }
 
-    /* split layout */
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
     @media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
 
-    /* divider */
     .divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
 
     .pink { color: var(--pink); }
@@ -559,7 +551,7 @@
 <body>
 
 
-<!-- ════════════════ SLIDE 1: 封面 ════════════════ -->
+<!-- ════════════════ SLIDE 1: Cover ════════════════ -->
 <section class="slide active" id="s1" style="background: radial-gradient(ellipse at 20% 30%, #2a0d1f 0%, #0f0b1e 40%, #080812 100%); overflow:hidden;">
   <div style="position:absolute; top:-10%; left:-5%; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, rgba(230,0,122,0.18) 0%, transparent 70%); animation:pulse1 6s ease-in-out infinite; pointer-events:none;"></div>
   <div style="position:absolute; bottom:-15%; right:-5%; width:620px; height:620px; border-radius:50%; background:radial-gradient(circle, rgba(180,0,200,0.10) 0%, transparent 70%); animation:pulse2 8s ease-in-out infinite; pointer-events:none;"></div>
@@ -576,40 +568,40 @@
     </div>
     <!-- Title -->
     <div style="font-family:'Syne',sans-serif; font-size:clamp(3rem,6vw,4.4rem); font-weight:900; letter-spacing:-0.03em; line-height:1; margin-bottom:0.5rem; background:linear-gradient(135deg,#ffffff 0%,#ffb3d9 60%,#E6007A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 28px rgba(230,0,122,0.5));">PolkaInk</div>
-    <div style="font-size:0.9rem; letter-spacing:3px; text-transform:uppercase; color:rgba(221,179,255,0.7); margin-bottom:2.4rem; font-weight:500;">链上历史存档协议 · Polkadot · v3.4</div>
+    <div style="font-size:0.9rem; letter-spacing:3px; text-transform:uppercase; color:rgba(221,179,255,0.7); margin-bottom:2.4rem; font-weight:500;">On-Chain History Archive Protocol · Polkadot · v3.4</div>
     <!-- Headline -->
     <div style="margin-bottom:2.6rem;">
-      <div style="font-size:0.9rem; letter-spacing:5px; text-transform:uppercase; color:#E6007A; margin-bottom:0.8rem; font-weight:600; opacity:0.9;">✦ 创世共识 ✦</div>
+      <div style="font-size:0.9rem; letter-spacing:5px; text-transform:uppercase; color:#E6007A; margin-bottom:0.8rem; font-weight:600; opacity:0.9;">✦ Genesis Consensus ✦</div>
       <div style="position:relative; display:inline-block;">
         <span style="font-family:'Syne',sans-serif; font-size:clamp(2rem,4vw,3.4rem); font-weight:800; line-height:1.15; letter-spacing:-0.02em; color:#ffffff; display:block;">History, now it's all</span>
         <span style="font-family:'Syne',sans-serif; font-size:clamp(2.4rem,5vw,4rem); font-weight:900; letter-spacing:0.04em; display:block; background: linear-gradient(90deg, #ff4db8 0%, #E6007A 40%, #ff80c8 80%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(230,0,122,0.7)); text-transform: uppercase; line-height: 1.1;">ON-CHAIN</span>
-        <span style="display:block; font-size:1.3rem; color:#ddb3ff; margin-top:0.5rem; font-weight:500; letter-spacing:0.02em;">历史，永刻链上</span>
+        <span style="display:block; font-size:1.2rem; color:#ddb3ff; margin-top:0.5rem; font-weight:500; letter-spacing:0.02em;">Written on-chain. Permanent. Immutable.</span>
       </div>
     </div>
     <!-- Scrolling ticker -->
     <div style="width:min(620px,90vw); overflow:hidden; margin-bottom:2.6rem; border-top:1px solid rgba(230,0,122,0.2); border-bottom:1px solid rgba(230,0,122,0.2); padding:0.5rem 0;">
       <div style="display:flex;">
-        <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;">◎ 永久存档 &nbsp;·&nbsp; 可验证 &nbsp;·&nbsp; 不可删除 &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO治理 &nbsp;·&nbsp; NFT &nbsp;·&nbsp; 线性历史 &nbsp;·&nbsp; 创世共识 &nbsp;·&nbsp; 完全去中心化 &nbsp;·&nbsp; 永久存档 &nbsp;·&nbsp; 可验证 &nbsp;·&nbsp; 不可删除 &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp;</div>
-        <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;" aria-hidden="true">◎ 永久存档 &nbsp;·&nbsp; 可验证 &nbsp;·&nbsp; 不可删除 &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO治理 &nbsp;·&nbsp; NFT &nbsp;·&nbsp; 线性历史 &nbsp;·&nbsp; 创世共识 &nbsp;·&nbsp; 完全去中心化 &nbsp;·&nbsp; 永久存档 &nbsp;·&nbsp; 可验证 &nbsp;·&nbsp; 不可删除 &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp;</div>
+        <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;">◎ PERMANENT ARCHIVE &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; IMMUTABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO GOVERNANCE &nbsp;·&nbsp; NFT &nbsp;·&nbsp; LINEAR HISTORY &nbsp;·&nbsp; GENESIS CONSENSUS &nbsp;·&nbsp; FULLY DECENTRALIZED &nbsp;·&nbsp; PERMANENT ARCHIVE &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; IMMUTABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp;</div>
+        <div class="chain-ticker" style="color:rgba(230,0,122,0.55); font-size:0.72rem; letter-spacing:3px; font-weight:600;" aria-hidden="true">◎ PERMANENT ARCHIVE &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; IMMUTABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp; POLKADOT &nbsp;·&nbsp; DAO GOVERNANCE &nbsp;·&nbsp; NFT &nbsp;·&nbsp; LINEAR HISTORY &nbsp;·&nbsp; GENESIS CONSENSUS &nbsp;·&nbsp; FULLY DECENTRALIZED &nbsp;·&nbsp; PERMANENT ARCHIVE &nbsp;·&nbsp; VERIFIABLE &nbsp;·&nbsp; IMMUTABLE &nbsp;·&nbsp; ON-CHAIN &nbsp;·&nbsp;</div>
       </div>
     </div>
     <!-- Tags -->
     <div style="display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:center; margin-bottom:2.8rem;">
       <div style="background:rgba(230,0,122,0.12); border:1px solid rgba(230,0,122,0.4); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ffb3d9; font-weight:600;">⛓ Polkadot Hub</div>
-      <div style="background:rgba(230,0,122,0.12); border:1px solid rgba(230,0,122,0.4); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ffb3d9; font-weight:600;">🗳 DAO 治理 · 5% 参与率</div>
-      <div style="background:rgba(221,179,255,0.10); border:1px solid rgba(221,179,255,0.35); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ddb3ff; font-weight:600;">♾ 永久存储</div>
-      <div style="background:rgba(63,224,160,0.08); border:1px solid rgba(63,224,160,0.3); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#3fe0a0; font-weight:600;">🌐 完全去中心化</div>
+      <div style="background:rgba(230,0,122,0.12); border:1px solid rgba(230,0,122,0.4); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ffb3d9; font-weight:600;">🗳 DAO Governance · 5% Quorum</div>
+      <div style="background:rgba(221,179,255,0.10); border:1px solid rgba(221,179,255,0.35); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#ddb3ff; font-weight:600;">♾ Permanent Storage</div>
+      <div style="background:rgba(63,224,160,0.08); border:1px solid rgba(63,224,160,0.3); border-radius:30px; padding:0.5rem 1.2rem; font-size:0.85rem; color:#3fe0a0; font-weight:600;">🌐 Fully Decentralized</div>
     </div>
-    <div><span class="btn" onclick="window._nextSlide && window._nextSlide()">探索 →</span></div>
+    <div><span class="btn" onclick="window._nextSlide && window._nextSlide()">Explore →</span></div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 2: 高概念开场 ════════════════ -->
+<!-- ════════════════ SLIDE 2: High-Concept Opening ════════════════ -->
 <section class="slide" id="s2">
   <div class="slide-content fade-in">
-    <p style="color:var(--pink); letter-spacing:4px; margin-bottom:1.5rem; font-weight:600;">✦ 创世共识 ✦</p>
-    <h1 style="font-size:clamp(2.4rem,5vw,4.6rem); line-height:1.12; margin-bottom:2rem;">"当一条链的历史<br>开始被遗忘，<br>它的未来就已经死了。"</h1>
+    <p style="color:var(--pink); letter-spacing:4px; margin-bottom:1.5rem; font-weight:600;">✦ Genesis Consensus ✦</p>
+    <h1 style="font-size:clamp(2.2rem,4.5vw,4.2rem); line-height:1.12; margin-bottom:2rem;">"When a chain's history<br>is forgotten,<br>its future is already dead."</h1>
     <svg width="320" height="90" viewBox="0 0 320 90" style="margin-bottom:1.5rem;">
       <circle cx="50"  cy="36" r="20" fill="#E6007A" opacity="1"/>
       <circle cx="110" cy="26" r="10" fill="#E6007A" opacity="0.55"/>
@@ -618,60 +610,58 @@
       <circle cx="190" cy="62" r="6"  fill="#E6007A" opacity="0.18"/>
       <line x1="50" y1="36" x2="110" y2="26" stroke="rgba(230,0,122,0.3)" stroke-width="1.5"/>
       <line x1="110" y1="26" x2="155" y2="46" stroke="rgba(230,0,122,0.2)" stroke-width="1.5"/>
-      <text x="0" y="85" fill="rgba(255,255,255,0.6)" font-size="13" font-family="sans-serif">Polkadot 诞生于 2020。你还记得为什么吗？</text>
+      <text x="0" y="85" fill="rgba(255,255,255,0.6)" font-size="13" font-family="sans-serif">Polkadot launched in 2020. Do you remember why?</text>
     </svg>
     <div class="split" style="gap:2.5rem; margin-top:0.5rem;">
       <div>
-        <p><span style="color:var(--pink); font-weight:700;">Polkadot</span> 曾经是一个革命性的愿景：用 Relay Chain 连接所有链，用 XCM 让价值自由流动。</p>
-        <p>Gavin Wood 写下的是<strong>创世共识</strong>：链与链之间应当互联互信。</p>
+        <p><span style="color:var(--pink); font-weight:700;">Polkadot</span> was once a revolutionary vision: connect all chains via the Relay Chain, let value flow freely through XCM.</p>
+        <p>Gavin Wood wrote the <strong>Genesis Consensus</strong>: chains should interconnect and trust each other.</p>
       </div>
       <div>
-        <div class="quote" style="font-size:1rem; margin:0;">然而今天：生态项目各自为营，社区共识涣散，历史文档散落，AI 生成的"历史"正在污染早期记忆。<br><br><strong style="color:var(--pink);">失去历史的共识，只剩形态，没有灵魂。</strong></div>
+        <div class="quote" style="font-size:0.98rem; margin:0;">Today: ecosystem projects operate in silos, community consensus has fragmented, historical documents are scattered, and AI-generated "history" is polluting early memories.<br><br><strong style="color:var(--pink);">A consensus without history is mere form — without soul.</strong></div>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 3: PolkaInk 是什么 ════════════════ -->
+<!-- ════════════════ SLIDE 3: What is PolkaInk ════════════════ -->
 <section class="slide" id="s3">
   <div class="slide-content fade-in">
 
-    <!-- 顶部标语 -->
+    <!-- Top tagline -->
     <div style="margin-bottom:1.6rem;">
-      <p style="color:var(--pink); letter-spacing:4px; font-size:0.8rem; font-weight:600; margin-bottom:0.9rem;">✦ 一句话 ✦</p>
-      <div style="font-family:'Syne',sans-serif; font-size:clamp(1.55rem,2.8vw,2.3rem); font-weight:800; line-height:1.2; letter-spacing:-0.01em; background:linear-gradient(135deg,#fff 0%,#ffb3d9 55%,#E6007A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
-        PolkaInk 是运行在 Polkadot Asset Hub 上的<br>链上历史存档协议——让 Polkadot 生态的记忆，永刻链上，无法被删除。
+      <p style="color:var(--pink); letter-spacing:4px; font-size:0.8rem; font-weight:600; margin-bottom:0.9rem;">✦ In One Sentence ✦</p>
+      <div style="font-family:'Syne',sans-serif; font-size:clamp(1.45rem,2.6vw,2.2rem); font-weight:800; line-height:1.25; letter-spacing:-0.01em; background:linear-gradient(135deg,#fff 0%,#ffb3d9 55%,#E6007A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+        PolkaInk is an on-chain history archive protocol running on Polkadot Asset Hub —<br>letting the Polkadot ecosystem's memory be written on-chain, permanently and irrevocably.
       </div>
     </div>
 
-    <!-- 左右布局：简介 + 徽章 -->
+    <!-- Two-column layout -->
     <div style="display:grid; grid-template-columns:1fr 1.15fr; gap:1.8rem; align-items:start;">
 
-      <!-- 左：一段话 -->
+      <!-- Left: Description -->
       <div>
-        <p style="font-size:0.72rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:0.8rem;">◎ 项目简介</p>
-        <p style="font-size:1rem; line-height:1.85; color:var(--text);">
-          PolkaInk 以交易 <strong style="color:var(--pink);">calldata</strong> 为存储媒介，将 Polkadot 生态历史文档（Markdown）直接写入区块——无数据库、无云服务、无单点失败。内容通过<strong>质押成员制 + 社区投票</strong>达成共识后上链，由 Archive Council 守护内容伦理底线，并以三种链上 Soulbound NFT 激励真实贡献者。
+        <p style="font-size:0.72rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:0.8rem;">◎ Project Overview</p>
+        <p style="font-size:0.98rem; line-height:1.85; color:var(--text);">
+          PolkaInk uses transaction <strong style="color:var(--pink);">calldata</strong> as its storage medium, writing Polkadot ecosystem history documents (Markdown) directly into blocks — no databases, no cloud services, no single points of failure. Content reaches consensus through <strong>staked membership + community voting</strong> before going on-chain, with the Archive Council guarding ethical boundaries, and three types of on-chain Soulbound NFTs incentivizing genuine contributors.
         </p>
-        <p style="font-size:1rem; line-height:1.85; color:var(--text); margin-top:0.5rem;">
-          历史一旦写入，任何全节点皆可独立验证，<span style="color:var(--purple); font-weight:600;">任何权力皆无法将其抹去。</span>
+        <p style="font-size:0.98rem; line-height:1.85; color:var(--text); margin-top:0.5rem;">
+          Once written, every full node can independently verify the history. <span style="color:var(--purple); font-weight:600;">No power can erase it.</span>
         </p>
-        <!-- 核心 tag 行 -->
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
           <span class="tag tag-pink">⛓ Polkadot Asset Hub</span>
-          <span class="tag tag-green">♾ calldata 永久存档</span>
-          <span class="tag tag-amber">🗳️ DAO 治理 · 5% 参与率</span>
+          <span class="tag tag-green">♾ Calldata Permanent Archive</span>
+          <span class="tag tag-amber">🗳️ DAO · 5% Quorum</span>
           <span class="tag tag-purple">🎨 Soulbound NFT</span>
-          <span class="tag tag-green">🌐 完全去中心化</span>
+          <span class="tag tag-green">🌐 Fully Decentralized</span>
         </div>
       </div>
 
-      <!-- 右：徽章面板 -->
+      <!-- Right: Badge panel -->
       <div style="background:rgba(10,10,22,0.85); border:1px solid rgba(230,0,122,0.18); border-radius:18px; padding:1.3rem 1.4rem;">
-        <p style="font-size:0.68rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:1.1rem;">◎ Open Source · 技术徽章</p>
+        <p style="font-size:0.68rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:1.1rem;">◎ Open Source · Tech Badges</p>
 
-        <!-- Repo -->
         <div style="margin-bottom:0.9rem;">
           <p style="font-size:0.65rem; color:rgba(136,136,170,0.6); letter-spacing:2px; font-weight:700; margin-bottom:0.45rem; text-transform:uppercase;">Repository</p>
           <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
@@ -683,7 +673,6 @@
           </div>
         </div>
 
-        <!-- Chain / Contract -->
         <div style="margin-bottom:0.9rem;">
           <p style="font-size:0.65rem; color:rgba(136,136,170,0.6); letter-spacing:2px; font-weight:700; margin-bottom:0.45rem; text-transform:uppercase;">Chain · Contract</p>
           <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
@@ -694,7 +683,6 @@
           </div>
         </div>
 
-        <!-- Frontend -->
         <div style="margin-bottom:0.9rem;">
           <p style="font-size:0.65rem; color:rgba(136,136,170,0.6); letter-spacing:2px; font-weight:700; margin-bottom:0.45rem; text-transform:uppercase;">Frontend</p>
           <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
@@ -705,7 +693,6 @@
           </div>
         </div>
 
-        <!-- CI/CD -->
         <div>
           <p style="font-size:0.65rem; color:rgba(136,136,170,0.6); letter-spacing:2px; font-weight:700; margin-bottom:0.45rem; text-transform:uppercase;">CI / CD · Status</p>
           <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
@@ -715,136 +702,128 @@
           </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 4: 没有数据库，只有链 ════════════════ -->
+<!-- ════════════════ SLIDE 4: No Database, Only the Chain ════════════════ -->
 <section class="slide" id="s4">
   <div class="slide-content fade-in" style="text-align:center;">
-    <h2 style="justify-content:center; display:block; border-left:none; font-size:clamp(2rem,4vw,3.2rem); color:#fff;">没有数据库。没有云。<br><span style="color:var(--pink);">只有链本身。</span></h2>
-    <p style="color:var(--muted); font-size:1rem; margin:1rem auto 1.8rem; max-width:560px;">Markdown 内容通过 calldata 直接写入 Polkadot 区块，任何全节点可独立验证，永久存在。</p>
-    <table style="max-width:860px; margin:0 auto 1.5rem;">
-      <tr><th>方案</th><th>存储位置</th><th>删除风险</th><th>篡改风险</th><th>离线验证</th></tr>
+    <h2 style="justify-content:center; display:block; border-left:none; font-size:clamp(2rem,4vw,3.2rem); color:#fff;">No database. No cloud.<br><span style="color:var(--pink);">Only the chain itself.</span></h2>
+    <p style="color:var(--muted); font-size:0.98rem; margin:1rem auto 1.8rem; max-width:600px;">Markdown content is written directly into Polkadot blocks via calldata. Any full node can independently verify it. It exists permanently.</p>
+    <table style="max-width:880px; margin:0 auto 1.5rem;">
+      <tr><th>Solution</th><th>Storage Location</th><th>Deletion Risk</th><th>Tampering Risk</th><th>Offline Verification</th></tr>
       <tr>
-        <td>GitHub / 论坛</td><td style="color:var(--muted);">中心化服务器</td>
-        <td class="no">随时删除</td><td class="no">随时篡改</td><td class="no">❌</td>
+        <td>GitHub / Forum</td><td style="color:var(--muted);">Centralized server</td>
+        <td class="no">Deletable anytime</td><td class="no">Editable anytime</td><td class="no">❌</td>
       </tr>
       <tr>
-        <td>IPFS + 合约哈希</td><td style="color:var(--muted);">链下 P2P</td>
-        <td class="warn">节点下线失效</td><td class="warn">CID 可替换</td><td class="warn">需 Pin</td>
+        <td>IPFS + Contract Hash</td><td style="color:var(--muted);">Off-chain P2P</td>
+        <td class="warn">Lost if nodes go offline</td><td class="warn">CID replaceable</td><td class="warn">Requires pinning</td>
       </tr>
       <tr>
         <td><strong style="color:var(--pink);">PolkaInk · calldata</strong></td>
-        <td><strong>Polkadot 区块本身</strong></td>
-        <td class="yes">❌ 无法删除</td><td class="yes">❌ 无法篡改</td><td class="yes">✅ 任何全节点</td>
+        <td><strong>Polkadot blocks</strong></td>
+        <td class="yes">❌ Cannot be deleted</td><td class="yes">❌ Cannot be tampered</td><td class="yes">✅ Any full node</td>
       </tr>
     </table>
     <div style="display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin-top:0.5rem;">
-      <span class="tag tag-pink">🔒 calldata 永久性</span>
-      <span class="tag tag-green">🗳️ 社区共识决定内容</span>
-      <span class="tag tag-amber">🛡️ Archive Council 底线防线</span>
+      <span class="tag tag-pink">🔒 Calldata Permanence</span>
+      <span class="tag tag-green">🗳️ Community Consensus Determines Content</span>
+      <span class="tag tag-amber">🛡️ Archive Council as Last Line of Defense</span>
     </div>
-    <div class="quote" style="margin-top:1.5rem; font-size:1rem; text-align:center;">
-      是的，calldata 存储成本高昂——但 Polkadot 自己的历史，值得写在 Polkadot 自己的链上。<br>
-      <span style="color:var(--pink); font-weight:700; font-size:0.95rem;">其他东西都可以存数据，只有这条链存得起这份骄傲。</span>
+    <div class="quote" style="margin-top:1.5rem; font-size:0.98rem; text-align:center;">
+      Yes, calldata storage is expensive — but Polkadot's own history deserves to be written on Polkadot's own chain.<br>
+      <span style="color:var(--pink); font-weight:700; font-size:0.95rem;">Other systems can store data. Only this chain can store pride.</span>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 5: 视频演示 ════════════════ -->
+<!-- ════════════════ SLIDE 5: Video Demo ════════════════ -->
 <section class="slide" id="s5">
   <div class="slide-content fade-in">
-    <h2>从问题到答案，一段视频说清楚</h2>
+    <h2>The Problem and the Answer — Explained in Two Videos</h2>
     <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1.2rem; align-items:stretch;">
       <div style="flex:1; min-width:260px;">
-        <p style="color:#ff7b8c; font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第一章 · 问题</p>
+        <p style="color:#ff7b8c; font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">Chapter I · The Problem</p>
         <div class="video-placeholder" style="min-height:200px; margin:0;">
           <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">维基「已删除」· AI 给出错误历史<br>GitHub 文档「last edited 3 days ago」</p>
+          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">Demo Video (To Be Recorded)</p>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">Wiki article marked "Deleted" · AI gives wrong history<br>GitHub doc says "last edited 3 days ago"</p>
         </div>
-        <p style="text-align:center; margin-top:0.7rem; color:#ff7b8c; font-size:0.92rem;">你以为的历史，其实可以被改写</p>
+        <p style="text-align:center; margin-top:0.7rem; color:#ff7b8c; font-size:0.92rem;">The history you trust can be rewritten</p>
       </div>
       <div style="display:flex; align-items:center; padding:0 0.3rem;">
         <div style="width:2px; background:linear-gradient(to bottom, transparent, var(--pink), transparent); min-height:180px;"></div>
       </div>
       <div style="flex:1; min-width:260px;">
-        <p style="color:var(--green); font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">第二章 · 答案</p>
+        <p style="color:var(--green); font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; text-align:center; letter-spacing:2px;">Chapter II · The Answer</p>
         <div class="video-placeholder" style="min-height:200px; margin:0; border-color:rgba(63,224,160,0.5);">
           <div class="play-icon" style="background:var(--green); box-shadow:0 0 30px rgba(63,224,160,0.4);"><svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19 8,5"/></svg></div>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">搜索 → 提案 → 投票 → 上链<br>通过，铸造 Creator NFT</p>
+          <p style="font-size:1rem; margin:0.4rem 0 0.2rem;">Demo Video (To Be Recorded)</p>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0; line-height:1.6;">Search → Propose → Vote → On-chain<br>Approved, Creator NFT minted</p>
         </div>
-        <p style="text-align:center; margin-top:0.7rem; color:var(--green); font-size:0.92rem;">见证历史被写入链上的那一刻</p>
+        <p style="text-align:center; margin-top:0.7rem; color:var(--green); font-size:0.92rem;">Witness history being written on-chain</p>
       </div>
-    </div>
-    <div style="margin-top:2rem; text-align:center;">
-      <a href="https://www.youtube.com/watch?v=polkaink-demo-placeholder" target="_blank" rel="noopener"
-        style="display:inline-flex; align-items:center; gap:0.6rem; background:#FF0000; color:#fff; font-weight:700; font-size:1rem; padding:0.65rem 1.6rem; border-radius:12px; text-decoration:none; box-shadow:0 0 20px rgba(255,0,0,0.35); transition:transform 0.2s, box-shadow 0.2s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 30px rgba(255,0,0,0.5)';"
-        onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(255,0,0,0.35)';">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
-        ▶ 在 YouTube 观看演示
-      </a>
-      <p style="margin-top:0.6rem; font-size:0.8rem; color:var(--muted);">https://www.youtube.com/watch?v=polkaink-demo-placeholder</p>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 6: 六条核心原则 ════════════════ -->
+<!-- ════════════════ SLIDE 6: Six Core Principles ════════════════ -->
 <section class="slide" id="s6">
   <div class="slide-content fade-in">
-    <h2>六条核心原则</h2>
-    <p class="sub">设计哲学：权力不应被购买，只能被赢得——贡献即信任，时间即证明</p>
+    <h2>Six Core Principles</h2>
+    <p class="sub">Design philosophy: power should not be bought, only earned — contribution is trust, time is proof</p>
     <div class="cards cards-3">
       <div class="card card-accent">
-        <h3>⚖️ 质押入场，贡献加权</h3>
-        <p>88 PAS 是参与资格，不是话语权筹码。投票权重取决于写了多少被接受的内容、锁仓了多长时间。</p>
+        <h3>⚖️ Stake to Enter, Contribution Weighted</h3>
+        <p>88 PAS is the participation threshold, not a power chip. Voting weight depends on how much accepted content you've written and how long you've locked.</p>
       </div>
       <div class="card card-green">
-        <h3>📖 线性历史，不可篡改</h3>
-        <p>提案是 Pull Request，投票通过即合并，内容永久写入链上 calldata。没有撤销，只有继续书写。</p>
+        <h3>📖 Linear History, Immutable</h3>
+        <p>Proposals are Pull Requests; approved votes merge permanently into on-chain calldata. There is no undo — only continued writing.</p>
       </div>
       <div class="card card-accent">
-        <h3>🚫 单人不可通过</h3>
-        <p>权重硬上限 cap=2.00=T。单人最大实际权重 1.80，任何人单独投 YES 永远不足以通过提案。</p>
+        <h3>🚫 No Single-Person Approval</h3>
+        <p>Weight hard cap: cap=2.00=T. A single person's max effective weight is 1.80. No individual can ever unilaterally pass a proposal.</p>
       </div>
       <div class="card card-green">
-        <h3>🌐 贡献对等，平权基底</h3>
-        <p>写作贡献 B_hist 与锁仓贡献 B_lock 上限相同，均为 +0.40。无哪种贡献设计成碾压另一种。</p>
+        <h3>🌐 Equal Contribution, Equal Foundation</h3>
+        <p>Writing contribution B_hist and lock-up contribution B_lock share the same ceiling of +0.40. Neither is designed to dominate the other.</p>
       </div>
       <div class="card card-amber">
-        <h3>🛡️ 集体守护，透明否决</h3>
-        <p>Archive Council 只在必要时踩刹车，每次否决必须附上链上理由，永久可查。</p>
+        <h3>🛡️ Collective Protection, Transparent Veto</h3>
+        <p>The Archive Council only applies the brakes when necessary. Every veto must include an on-chain reason, permanently auditable.</p>
       </div>
       <div class="card card-purple">
-        <h3>💰 激励参与，不扭曲投票</h3>
-        <p>投票奖励通过 30 天 Epoch 发放，投 YES 或 NO 均可获奖，奖励与立场解耦，保持判断独立性。</p>
+        <h3>💰 Incentivize Participation, Not Bias</h3>
+        <p>Voting rewards are distributed via 30-day Epochs. YES or NO votes both qualify. Rewards are decoupled from stance — keeping judgment independent.</p>
       </div>
     </div>
-    <!-- PoP 角注 -->
+    <!-- PoP footnote -->
     <div style="margin-top:1.2rem; background:linear-gradient(135deg, rgba(63,224,160,0.07), rgba(221,179,255,0.06)); border:1px solid rgba(63,224,160,0.25); border-radius:14px; padding:0.9rem 1.3rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
       <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
         <span style="font-size:1.2rem;">🪪</span>
         <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:0.85rem; color:var(--green);">Proof of Personhood</span>
-        <span class="tag tag-green" style="font-size:0.7rem; padding:0.15rem 0.55rem;">Polkadot 原生</span>
+        <span class="tag tag-green" style="font-size:0.7rem; padding:0.15rem 0.55rem;">Polkadot Native</span>
       </div>
-      <p style="margin:0; font-size:0.82rem; color:var(--muted); flex:1; min-width:240px;">当前防女巫机制：88 PAS 质押门槛 + 单人权重上限 1.80 &lt; T。<strong style="color:var(--text);">未来方向：</strong>接入 Polkadot Proof of Personhood（PoP），以链上唯一真人身份替代或补充质押准入，实现更公平的一人一基础权重，从根本上消除多账号操控风险。</p>
+      <p style="margin:0; font-size:0.82rem; color:var(--muted); flex:1; min-width:240px;">Current Sybil resistance: 88 PAS stake threshold + single-person weight cap 1.80 &lt; T. <strong style="color:var(--text);">Future direction:</strong> integrate Polkadot Proof of Personhood (PoP) to replace or supplement stake-based entry with verified on-chain identity — enabling fairer one-person-one-base-weight and fundamentally eliminating multi-account manipulation risk.</p>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 7: 技术架构 A ════════════════ -->
+<!-- ════════════════ SLIDE 7: Technical Architecture A ════════════════ -->
 <section class="slide" id="s7">
   <div class="slide-content fade-in">
-    <h2>技术架构 — 技术栈与整体设计</h2>
-    <p class="sub">Polkadot Asset Hub 原生 · 完全去中心化 · 合约逻辑自治</p>
+    <h2>Technical Architecture — Stack & Overall Design</h2>
+    <p class="sub">Polkadot Asset Hub native · Fully decentralized · Self-governing contract logic</p>
     <div class="arch-diagram">
-      <!-- 前端层 -->
+      <!-- Frontend layer -->
       <div class="arch-layer" style="background:rgba(230,0,122,0.08); border-color:rgba(230,0,122,0.3);">
         <span class="arch-label" style="color:var(--pink);">FRONTEND</span>
         <span class="arch-pill tag-pink">React 18 + Vite 5 + TypeScript</span>
@@ -855,7 +834,7 @@
         <span class="arch-pill tag-pink">Zustand + React Query</span>
       </div>
       <div style="text-align:center; color:var(--muted); font-size:0.8rem; margin:-0.2rem 0; letter-spacing:0.05em;">↕  wagmi + viem · Wallet  ↕</div>
-      <!-- Asset Hub 层 -->
+      <!-- Asset Hub layer -->
       <div class="arch-layer" style="background:rgba(63,224,160,0.05); border-color:rgba(63,224,160,0.2); margin-top:0.4rem;">
         <span class="arch-label" style="color:var(--green);">POLKADOT ASSET HUB</span>
         <span class="arch-pill tag-green">pallet-revive</span>
@@ -864,110 +843,110 @@
         <span class="arch-pill tag-green">Solidity 0.8.28</span>
         <span class="arch-pill tag-green">UUPS Proxy (OZ)</span>
       </div>
-      <!-- 合约矩阵 -->
-      <div style="margin: 0.6rem 0 0.3rem; font-size:0.7rem; color:var(--muted); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">10 合约模块</div>
+      <!-- Contract matrix -->
+      <div style="margin: 0.6rem 0 0.3rem; font-size:0.7rem; color:var(--muted); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">10 Contract Modules</div>
       <div class="arch-contracts">
         <div class="contract-box">
           <div class="cname">PolkaInkRegistry</div>
-          <div class="cdesc">文档生命周期<br>种子文档管理</div>
+          <div class="cdesc">Document lifecycle<br>Seed document management</div>
         </div>
         <div class="contract-box">
           <div class="cname">VersionStore</div>
-          <div class="cdesc">calldata 版本存储<br>parentVersionId DAG</div>
+          <div class="cdesc">calldata version storage<br>parentVersionId DAG</div>
         </div>
         <div class="contract-box">
           <div class="cname">GovernanceCore</div>
-          <div class="cdesc">提案·投票·奖励<br>参与率 ≥5% 门槛</div>
+          <div class="cdesc">Proposal · Vote · Reward<br>≥5% quorum threshold</div>
         </div>
         <div class="contract-box">
           <div class="cname">ArchiveCouncil</div>
-          <div class="cdesc">集体 veto 5/7<br>紧急冻结+DAO确认</div>
+          <div class="cdesc">Collective veto 5/7<br>Emergency freeze + DAO confirm</div>
         </div>
         <div class="contract-box">
           <div class="cname">StakingManager</div>
-          <div class="cdesc">88 PAS 质押锁仓<br>3/6/12/24mo 选项</div>
+          <div class="cdesc">88 PAS stake lock<br>3/6/12/24mo options</div>
         </div>
         <div class="contract-box">
           <div class="cname">NFTReward</div>
-          <div class="cdesc">3种 Soulbound NFT<br>Guardian 构造函数 mint</div>
+          <div class="cdesc">3 Soulbound NFT types<br>Guardian minted in constructor</div>
         </div>
         <div class="contract-box">
           <div class="cname">Treasury</div>
-          <div class="cdesc">rewardPool · Epoch奖励<br>开放捐款无限制</div>
+          <div class="cdesc">rewardPool · Epoch rewards<br>Open donations, no limit</div>
         </div>
         <div class="contract-box">
           <div class="cname">VotingMath</div>
-          <div class="cdesc">权重计算 Library<br>B_hist + B_lock</div>
+          <div class="cdesc">Weight calculation library<br>B_hist + B_lock</div>
         </div>
         <div class="contract-box" style="border-color:rgba(63,224,160,0.35);">
           <div class="cname" style="color:var(--green);">TimelockController</div>
-          <div class="cdesc">48h 延迟执行<br>不可升级·安全锚</div>
+          <div class="cdesc">48h delayed execution<br>Non-upgradeable · Security anchor</div>
         </div>
         <div class="contract-box" style="border-color:rgba(63,224,160,0.35);">
           <div class="cname" style="color:var(--green);">ProxyAdmin</div>
-          <div class="cdesc">UUPS 代理管理<br>不可升级</div>
+          <div class="cdesc">UUPS proxy management<br>Non-upgradeable</div>
         </div>
       </div>
-      <!-- 零管理员 -->
+      <!-- Zero admin -->
       <div style="margin-top:0.8rem; display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
-        <span style="background:rgba(63,224,160,0.1); border:1px solid rgba(63,224,160,0.3); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--green);">✅ 部署完成后：完全去中心化，合约逻辑自治</span>
-        <span style="background:var(--pink-dim); border:1px solid var(--border); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--pink-light);">SEED_CREATOR_ROLE 创建种子文档后立即 renounce，此后任何人无权创建种子文档</span>
-        <span style="background:rgba(245,169,127,0.1); border:1px solid rgba(245,169,127,0.25); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--amber);">calldata 永久上链 · 任何全节点可独立验证</span>
+        <span style="background:rgba(63,224,160,0.1); border:1px solid rgba(63,224,160,0.3); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--green);">✅ Post-deploy: Fully decentralized, contract logic self-governing</span>
+        <span style="background:var(--pink-dim); border:1px solid var(--border); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--pink-light);">SEED_CREATOR_ROLE is renounced immediately after seed docs are created — no one can create seed documents thereafter</span>
+        <span style="background:rgba(245,169,127,0.1); border:1px solid rgba(245,169,127,0.25); border-radius:8px; padding:0.4rem 0.8rem; font-size:0.78rem; color:var(--amber);">calldata permanently on-chain · Independently verifiable by any full node</span>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 8: 技术架构 B ════════════════ -->
+<!-- ════════════════ SLIDE 8: Technical Architecture B ════════════════ -->
 <section class="slide" id="s8">
   <div class="slide-content fade-in">
-    <h2>技术架构 — 合约调用流程与安全设计</h2>
+    <h2>Technical Architecture — Call Flow & Security Design</h2>
     <div class="split">
       <div>
-        <h3>核心调用链路</h3>
-        <div class="code-block"><span class="ck">// 提案完整生命周期</span>
-用户 → StakingManager.stake(lockMonths)
+        <h3>Core Call Chain</h3>
+        <div class="code-block"><span class="ck">// Full proposal lifecycle</span>
+User → StakingManager.stake(lockMonths)
   → NFTReward.mintMemberNFT()
 
-用户 → Registry.proposeVersion(docId, hash)
+User → Registry.proposeVersion(docId, hash)
   → VersionStore.storeVersion()
   → GovernanceCore.createProposalFor()
 
-用户 → GovernanceCore.vote(proposalId, choice)
+User → GovernanceCore.vote(proposalId, choice)
   → VotingMath.calculateWeight()
 
-任何人 → GovernanceCore.finalizeProposal()
-  → [Approved] 开启 24h Council 窗口
+Anyone → GovernanceCore.finalizeProposal()
+  → [Approved] Opens 24h Council window
 
-Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
+Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 to veto]</span>
 
-任何人 → GovernanceCore.executeProposal()
+Anyone → GovernanceCore.executeProposal()
   → Registry.mergeProposal()
   → NFTReward.mintCreatorNFT()
   → Treasury.distributeProposerReward()
-      <span class="ck">// 50% → 提案人  30% → Epoch池  20% → 留存</span></div>
+      <span class="ck">// 50% → Proposer  30% → Epoch pool  20% → Retained</span></div>
       </div>
       <div>
-        <h3>安全设计矩阵</h3>
+        <h3>Security Design Matrix</h3>
         <table>
-          <tr><th>威胁</th><th>防护</th></tr>
-          <tr><td>闪电贷操控</td><td class="green">锁仓 3-24 个月</td></tr>
-          <tr><td>女巫攻击</td><td class="green">88 PAS 门槛 + 5% 参与率</td></tr>
-          <tr><td>单人通过</td><td class="green">cap=2.00，实际最高 1.80 &lt; T</td></tr>
-          <tr><td>无意义刷提案</td><td class="green">Rejected/Vetoed 后 72h 冷却</td></tr>
-          <tr><td>Council 滥权</td><td class="green">≥50 bytes 链上理由强制</td></tr>
-          <tr><td>Guardian 增发</td><td class="green">无 GUARDIAN_MINTER_ROLE</td></tr>
-          <tr><td>合约升级滥用</td><td class="green">Timelock 48h + DAO 投票</td></tr>
-          <tr><td>中心化管理风险</td><td class="green">部署后完全去中心化，任何人无法单方面干预</td></tr>
-          <tr><td>国库耗尽</td><td class="green">&lt;50 PAS 时跳过奖励不 revert</td></tr>
-          <tr><td>Council 成员替换</td><td class="green">Phase 1 前无 setMember()；Phase 1 后选举合约管理</td></tr>
+          <tr><th>Threat</th><th>Protection</th></tr>
+          <tr><td>Flash loan manipulation</td><td class="green">Lock-up 3–24 months</td></tr>
+          <tr><td>Sybil attack</td><td class="green">88 PAS threshold + 5% quorum</td></tr>
+          <tr><td>Single-person approval</td><td class="green">cap=2.00, max effective weight 1.80 &lt; T</td></tr>
+          <tr><td>Spam proposals</td><td class="green">72h cooldown after Rejected/Vetoed</td></tr>
+          <tr><td>Council abuse of power</td><td class="green">≥50 bytes on-chain reason required</td></tr>
+          <tr><td>Guardian NFT inflation</td><td class="green">No GUARDIAN_MINTER_ROLE</td></tr>
+          <tr><td>Upgrade abuse</td><td class="green">Timelock 48h + DAO vote</td></tr>
+          <tr><td>Centralized admin risk</td><td class="green">Fully decentralized post-deploy; no unilateral intervention</td></tr>
+          <tr><td>Treasury depletion</td><td class="green">Skips reward (no revert) if &lt;50 PAS</td></tr>
+          <tr><td>Council member replacement</td><td class="green">No setMember() before Phase 1; election contract governs after</td></tr>
         </table>
         <div style="margin-top:0.8rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
           <span class="tag tag-green">✅ UUPS + 48h Timelock</span>
-          <span class="tag tag-pink">✅ Archive Council 集体否决</span>
-          <span class="tag tag-amber">✅ 5% 参与率快照</span>
-          <span class="tag tag-purple">✅ 200 PAS 奖励硬上限</span>
+          <span class="tag tag-pink">✅ Archive Council Collective Veto</span>
+          <span class="tag tag-amber">✅ 5% Quorum Snapshot</span>
+          <span class="tag tag-purple">✅ 200 PAS Reward Hard Cap</span>
         </div>
       </div>
     </div>
@@ -975,15 +954,14 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
 </section>
 
 
-<!-- ════════════════ SLIDE 9: 合约部署状态 ════════════════ -->
+<!-- ════════════════ SLIDE 9: Contract Deployment Status ════════════════ -->
 <section class="slide" id="s9">
   <div class="slide-content fade-in">
 
-    <!-- Header -->
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.6rem;">
       <div>
-        <p style="color:var(--pink); letter-spacing:4px; font-size:0.75rem; font-weight:600; margin-bottom:0.5rem;">✦ 已部署 · PAS 测试网 ✦</p>
-        <h2 style="margin-bottom:0;">合约部署状态 — Chain ID 420420417</h2>
+        <p style="color:var(--pink); letter-spacing:4px; font-size:0.75rem; font-weight:600; margin-bottom:0.5rem;">✦ Deployed · PAS Testnet ✦</p>
+        <h2 style="margin-bottom:0;">Contract Deployment — Chain ID 420420417</h2>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
         <div style="background:rgba(63,224,160,0.1); border:1px solid rgba(63,224,160,0.35); border-radius:30px; padding:0.4rem 1.1rem; display:flex; align-items:center; gap:0.5rem;">
@@ -991,126 +969,105 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
           <span style="font-size:0.8rem; font-weight:700; color:var(--green);">LIVE · 2026-03-09 UTC</span>
         </div>
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
-          <span class="tag tag-green">✅ 64 测试通过</span>
+          <span class="tag tag-green">✅ 64 Tests Passing</span>
           <span class="tag tag-amber">💰 Treasury 5,000 PAS</span>
           <span class="tag tag-pink">🔑 SEED_CREATOR_ROLE Renounced</span>
         </div>
       </div>
     </div>
 
-    <!-- Contract table + stat column -->
     <div style="display:grid; grid-template-columns:1fr 300px; gap:1.4rem; align-items:start;">
 
-      <!-- Left: contracts table -->
       <div>
         <table style="font-size:0.82rem;">
           <tr>
-            <th style="width:36%;">合约</th>
-            <th>部署地址</th>
-            <th style="width:80px; text-align:center;">状态</th>
+            <th style="width:36%;">Contract</th>
+            <th>Deployed Address</th>
+            <th style="width:80px; text-align:center;">Status</th>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">PolkaInkRegistry</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">文档注册中心</div></td>
+            <td><strong style="color:var(--pink-light);">PolkaInkRegistry</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Document registry</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0xc3C208E3Eba8dC828e3426102AD678D0bFE15eFe" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xc3C208…15eFe</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">VersionStore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">calldata 版本存储</div></td>
+            <td><strong style="color:var(--pink-light);">VersionStore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">calldata version storage</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0xb77Eb7703537f8f119C6a9F58Fe2D33BfA383dCd" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xb77Eb7…83dCd</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">GovernanceCore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">提案·投票·奖励</div></td>
+            <td><strong style="color:var(--pink-light);">GovernanceCore</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Proposal · Vote · Reward</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x87Cb963B9A2e35DA5D8342Afa1Cd0D51b1F559aB" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x87Cb96…59aB</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">ArchiveCouncil</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">集体否决 5/7</div></td>
+            <td><strong style="color:var(--pink-light);">ArchiveCouncil</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Collective veto 5/7</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0xFC107cf84250C022eF13c6F8751AC5321bECD0fc" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0xFC107c…D0fc</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">StakingManager</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">88 PAS 质押锁仓</div></td>
+            <td><strong style="color:var(--pink-light);">StakingManager</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">88 PAS stake lock</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x286301d1585B40c5B88Ff0fbD86E7A70cE8a2443" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x286301…2443</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">NFTReward</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">3 种 Soulbound NFT</div></td>
+            <td><strong style="color:var(--pink-light);">NFTReward</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">3 Soulbound NFT types</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x145EA0d74D31dDFC7ce1F95903d8eb9B0d8D72B3" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x145EA0…72B3</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--pink-light);">Treasury</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">奖励池 · 开放捐款</div></td>
+            <td><strong style="color:var(--pink-light);">Treasury</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Reward pool · Open donations</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x4c0CdB7a94cD0aF91460186F72F86297a3Ac7285" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x4c0CdB…7285</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--green);">TimelockController</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">48h 延迟·安全锚</div></td>
+            <td><strong style="color:var(--green);">TimelockController</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">48h delay · Security anchor</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x33CC1AF7c7E88704c83bdED1270aa892813Fec61" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x33CC1A…ec61</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
           <tr>
-            <td><strong style="color:var(--green);">ProxyAdmin</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">UUPS 代理管理</div></td>
+            <td><strong style="color:var(--green);">ProxyAdmin</strong><div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">UUPS proxy management</div></td>
             <td><a href="https://polkadot.testnet.routescan.io/address/0x4EBb5472bd5fFC619cA880447920584977E5fD68" target="_blank" style="color:var(--purple); font-family:monospace; font-size:0.78rem; text-decoration:none; word-break:break-all;">0x4EBb54…fD68</a></td>
             <td style="text-align:center;"><span class="yes" style="font-size:0.8rem;">✅</span></td>
           </tr>
         </table>
       </div>
 
-      <!-- Right: stats + security callouts -->
       <div style="display:flex; flex-direction:column; gap:0.9rem;">
 
-        <!-- Key stats -->
         <div style="background:linear-gradient(135deg, rgba(230,0,122,0.12), rgba(100,0,200,0.08)); border:1px solid var(--border); border-radius:18px; padding:1.2rem; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
           <div style="text-align:center;">
             <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">9</div>
-            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">合约全部上链</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Contracts deployed</div>
           </div>
           <div style="text-align:center;">
             <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--green),#80ffcc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">64</div>
-            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">测试全部通过</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Tests passing</div>
           </div>
           <div style="text-align:center;">
             <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:900; background:linear-gradient(135deg,var(--amber),#ffe0a0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">5K</div>
-            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">PAS 国库已注资</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">PAS treasury funded</div>
           </div>
           <div style="text-align:center;">
             <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:900; background:linear-gradient(135deg,var(--purple),#ffffff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;">4</div>
-            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">种子文档已写入</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Seed docs written</div>
           </div>
         </div>
 
-        <!-- Security checklist -->
         <div style="background:var(--bg3); border:1px solid rgba(63,224,160,0.2); border-radius:16px; padding:1.1rem;">
-          <div style="font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:0.75rem;">◎ 安全清单</div>
+          <div style="font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:0.75rem;">◎ Security Checklist</div>
           <div style="display:flex; flex-direction:column; gap:0.5rem;">
-            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
-              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
-              <span style="color:var(--text);">SEED_CREATOR_ROLE 已 renounce</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
-              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
-              <span style="color:var(--text);">Guardian NFT 无增发角色</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
-              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
-              <span style="color:var(--text);">48h Timelock 升级延迟</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
-              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
-              <span style="color:var(--text);">OpenZeppelin UUPS Proxy</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
-              <span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span>
-              <span style="color:var(--text);">部署后零特权管理员</span>
-            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;"><span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span><span>SEED_CREATOR_ROLE renounced</span></div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;"><span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span><span>No Guardian NFT mint role</span></div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;"><span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span><span>48h Timelock upgrade delay</span></div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;"><span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span><span>OpenZeppelin UUPS Proxy</span></div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;"><span style="color:var(--green); font-size:1rem; flex-shrink:0;">✅</span><span>Zero privileged admin post-deploy</span></div>
           </div>
         </div>
 
-        <!-- Explorer link -->
         <a href="https://polkadot.testnet.routescan.io/" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:0.6rem; background:var(--pink-dim); border:1px solid var(--border); border-radius:14px; padding:0.8rem 1rem; text-decoration:none; transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='rgba(230,0,122,0.25)'">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--pink-light)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span style="font-size:0.8rem; font-weight:700; color:var(--pink-light);">RouteScan 区块浏览器</span>
+          <span style="font-size:0.8rem; font-weight:700; color:var(--pink-light);">RouteScan Block Explorer</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
 
@@ -1121,48 +1078,48 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
 </section>
 
 
-<!-- ════════════════ SLIDE 10: 成员资格 · 质押 · NFT ════════════════ -->
+<!-- ════════════════ SLIDE 10: Membership · Staking · NFT ════════════════ -->
 <section class="slide" id="s10">
   <div class="slide-content fade-in">
-    <h2>成员资格 · 质押 · NFT 体系</h2>
-    <p class="sub">三种 NFT，全部通过链上行为获得，Demo 阶段均为 Soulbound</p>
+    <h2>Membership · Staking · NFT System</h2>
+    <p class="sub">Three NFT types, all earned through on-chain behavior. All Soulbound during the Demo phase.</p>
     <div class="split">
       <div>
-        <h3>质押锁仓加成</h3>
+        <h3>Staking Lock-up Bonus</h3>
         <table>
-          <tr><th>锁仓时长</th><th>B_lock 加成</th><th>基础 Weight</th></tr>
-          <tr><td>3 个月</td><td class="pink">+0.1723</td><td>1.1723</td></tr>
-          <tr><td>6 个月</td><td class="pink">+0.2418</td><td>1.2418</td></tr>
-          <tr><td>12 个月</td><td class="pink">+0.3187</td><td>1.3187</td></tr>
-          <tr><td>24 个月</td><td class="pink">+0.4000</td><td>1.4000</td></tr>
+          <tr><th>Lock Duration</th><th>B_lock Bonus</th><th>Base Weight</th></tr>
+          <tr><td>3 months</td><td class="pink">+0.1723</td><td>1.1723</td></tr>
+          <tr><td>6 months</td><td class="pink">+0.2418</td><td>1.2418</td></tr>
+          <tr><td>12 months</td><td class="pink">+0.3187</td><td>1.3187</td></tr>
+          <tr><td>24 months</td><td class="pink">+0.4000</td><td>1.4000</td></tr>
         </table>
         <div class="card" style="margin-top:0.8rem; background:var(--pink-dim2);">
-          <div style="font-size:0.85rem; color:var(--muted);">提前解锁 earlyUnstake()：返还 79.2 PAS（90%），8.8 PAS → Treasury 奖励池</div>
+          <div style="font-size:0.85rem; color:var(--muted);">Early unstake via earlyUnstake(): returns 79.2 PAS (90%), 8.8 PAS → Treasury reward pool</div>
         </div>
       </div>
       <div>
-        <h3>三种 NFT 概览</h3>
+        <h3>Three NFT Types at a Glance</h3>
         <div style="display:flex; flex-direction:column; gap:0.7rem;">
           <div class="card card-accent">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
               <strong>🎫 Member NFT</strong>
-              <span class="tag tag-pink">质押入场</span>
+              <span class="tag tag-pink">Stake to Enter</span>
             </div>
-            <p style="font-size:0.88rem; margin:0;">质押 88 PAS 自动 mint。持有才能投票、提案、创建文档。1/地址，Soulbound。</p>
+            <p style="font-size:0.88rem; margin:0;">Auto-minted when staking 88 PAS. Required to vote, propose, and create documents. 1 per address. Soulbound.</p>
           </div>
           <div class="card card-green">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
               <strong>✍️ Creator NFT</strong>
-              <span class="tag tag-green">提案合并</span>
+              <span class="tag tag-green">Proposal Merged</span>
             </div>
-            <p style="font-size:0.88rem; margin:0;">VersionUpdate 提案执行合并后自动 mint，可无限叠加。B_hist 对数增长，上限 +0.40。</p>
+            <p style="font-size:0.88rem; margin:0;">Auto-minted when a VersionUpdate proposal is executed and merged. Stackable without limit. B_hist grows logarithmically, capped at +0.40.</p>
           </div>
           <div class="card card-purple">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
               <strong>🛡️ Guardian NFT</strong>
-              <span class="tag tag-purple">构造函数 mint</span>
+              <span class="tag tag-purple">Constructor Mint</span>
             </div>
-            <p style="font-size:0.88rem; margin:0;">部署时构造函数直接 mint 给 7 个创世 Council 成员，无 GUARDIAN_MINTER_ROLE，任何人事后无法增发。<strong class="pink">无投票权重加成。</strong></p>
+            <p style="font-size:0.88rem; margin:0;">Minted directly to 7 genesis Council members in the constructor. No GUARDIAN_MINTER_ROLE — no one can mint more after deployment. <strong class="pink">No voting weight bonus.</strong></p>
           </div>
         </div>
       </div>
@@ -1171,53 +1128,53 @@ Council → ArchiveCouncil.castVeto()  <span class="cm">[5/7 可否决]</span>
 </section>
 
 
-<!-- ════════════════ SLIDE 11: 治理机制 ════════════════ -->
+<!-- ════════════════ SLIDE 11: Governance Mechanism ════════════════ -->
 <section class="slide" id="s11">
   <div class="slide-content fade-in">
-    <h2>治理机制 — 投票权重 · 提案流程</h2>
+    <h2>Governance — Voting Weight & Proposal Flow</h2>
     <div class="split">
       <div>
-        <h3>投票权重公式</h3>
-        <div class="code-block">weight = min(1.0 + boost, <span class="cm">2.00</span>)   <span class="ck">← 硬上限 cap</span>
+        <h3>Voting Weight Formula</h3>
+        <div class="code-block">weight = min(1.0 + boost, <span class="cm">2.00</span>)   <span class="ck">← hard cap</span>
 boost  = B_hist + B_lock
 
 B_hist = 0.40 × ln(1 + creator_nft) / ln(21)
-         <span class="ck">上限 +0.40（≈ 20 枚 Creator NFT）</span>
+         <span class="ck">cap +0.40 (≈ 20 Creator NFTs)</span>
 
 B_lock = 0.40 × ln(1 + lock_months) / ln(25)
          <span class="ck">3mo: +0.1723 · 12mo: +0.3187 · 24mo: +0.4000</span>
 
-Guardian NFT：<span class="cm">无权重加成</span>
+Guardian NFT: <span class="cm">no weight bonus</span>
 
-单人最大实际 weight = 1.80 &lt; T = 2.0  <span class="ck">←永远无法单独通过</span></div>
-        <h3 style="margin-top:1rem;">典型用户权重</h3>
+Max single-person weight = 1.80 &lt; T = 2.0  <span class="ck">← can never pass alone</span></div>
+        <h3 style="margin-top:1rem;">Typical User Weights</h3>
         <table>
-          <tr><th>用户画像</th><th>Weight</th></tr>
-          <tr><td>新成员，3mo 锁仓</td><td class="pink">1.1723</td></tr>
-          <tr><td>5 篇通过，6mo 锁仓</td><td class="pink">1.4768</td></tr>
-          <tr><td>10 篇通过，12mo 锁仓</td><td class="pink">1.6337</td></tr>
-          <tr><td>20 篇通过，24mo 锁仓</td><td class="pink">1.800 ← 实际最大</td></tr>
+          <tr><th>User Profile</th><th>Weight</th></tr>
+          <tr><td>New member, 3mo lock</td><td class="pink">1.1723</td></tr>
+          <tr><td>5 approved docs, 6mo lock</td><td class="pink">1.4768</td></tr>
+          <tr><td>10 approved docs, 12mo lock</td><td class="pink">1.6337</td></tr>
+          <tr><td>20 approved docs, 24mo lock</td><td class="pink">1.800 ← max effective</td></tr>
         </table>
       </div>
       <div>
-        <h3>提案通过三重门槛</h3>
+        <h3>Triple Threshold to Pass a Proposal</h3>
         <div style="display:flex; flex-direction:column; gap:0.7rem; margin-bottom:1rem;">
           <div class="card card-accent">
             <strong>① score &gt; 2.0</strong>
-            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">score = Σ(choice × weight)，YES = +weight，NO = −weight，ABSTAIN = 0</p>
+            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">score = Σ(choice × weight) · YES = +weight · NO = −weight · ABSTAIN = 0</p>
           </div>
           <div class="card card-green">
-            <strong>② 参与率 ≥ 5%</strong>
-            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">= 实际参与总权重 / 提案创建时全网基础权重快照，分母不可操纵</p>
+            <strong>② Quorum ≥ 5%</strong>
+            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">= total participating weight / snapshot of global base weight at proposal creation — denominator cannot be manipulated</p>
           </div>
           <div class="card card-amber">
-            <strong>③ Archive Council 未完成 5/7 veto</strong>
-            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">24h 审查窗口内，达到 5/7 集体否决则进入 CouncilVetoed 状态，触发 72h 冷却期</p>
+            <strong>③ Archive Council did not complete 5/7 veto</strong>
+            <p style="font-size:0.88rem; margin-top:0.4rem; margin-bottom:0;">If 5/7 veto is reached within the 24h review window, proposal enters CouncilVetoed state and triggers a 72h cooldown</p>
           </div>
         </div>
-        <h3>冷却期规则（v3.4）</h3>
+        <h3>Cooldown Rules (v3.4)</h3>
         <div class="card" style="background:var(--pink-dim2);">
-          <p style="margin:0; font-size:0.9rem;"><span class="pink">Rejected</span> 或 <span class="pink">CouncilVetoed</span> → 提案人对同一文档 <strong>72h 冷却期</strong><br>主动 Cancelled → <strong>无冷却期</strong></p>
+          <p style="margin:0; font-size:0.9rem;"><span class="pink">Rejected</span> or <span class="pink">CouncilVetoed</span> → Proposer faces a <strong>72h cooldown</strong> on the same document<br>Voluntarily Cancelled → <strong>No cooldown</strong></p>
         </div>
       </div>
     </div>
@@ -1228,46 +1185,46 @@ Guardian NFT：<span class="cm">无权重加成</span>
 <!-- ════════════════ SLIDE 12: Archive Council ════════════════ -->
 <section class="slide" id="s12">
   <div class="slide-content fade-in">
-    <h2>Archive Council — 最后一道伦理防线</h2>
-    <p class="sub">不是内容的主导者，是极端情况下的集体刹车</p>
+    <h2>Archive Council — The Last Ethical Safeguard</h2>
+    <p class="sub">Not content arbiters — a collective brake for extreme situations</p>
     <div class="split">
       <div>
-        <h3>权限边界</h3>
+        <h3>Authority Boundaries</h3>
         <table>
-          <tr><th>可行使</th><th>不得行使</th></tr>
-          <tr><td class="green">可验证虚假历史</td><td class="no">内容写得不够好</td></tr>
-          <tr><td class="green">合约升级含隐藏后门</td><td class="no">社区有争议但合法</td></tr>
-          <tr><td class="green">明显侵权或违法</td><td class="no">政治立场分歧</td></tr>
-          <tr><td class="green">仇恨歧视性内容</td><td class="no">EmergencyConfirm 本身</td></tr>
+          <tr><th>May Exercise</th><th>May NOT Exercise</th></tr>
+          <tr><td class="green">Verifiably false history</td><td class="no">Content deemed low quality</td></tr>
+          <tr><td class="green">Contract upgrade with hidden backdoor</td><td class="no">Community disputes but lawful content</td></tr>
+          <tr><td class="green">Clear copyright or legal violation</td><td class="no">Political disagreement</td></tr>
+          <tr><td class="green">Hate speech or discriminatory content</td><td class="no">EmergencyConfirm itself</td></tr>
         </table>
-        <div class="quote" style="font-size:0.95rem; margin-top:0.8rem;">
-          每次否决必须选择以上原因之一，并附 ≥ 50 字节链上文字说明，<strong>永久记录，公开可查。</strong>
+        <div class="quote" style="font-size:0.92rem; margin-top:0.8rem;">
+          Every veto must select one of the above reasons and include ≥ 50 bytes of on-chain justification. <strong>Permanently recorded. Publicly auditable.</strong>
         </div>
-        <h3>在普通治理中的地位</h3>
-        <p style="font-size:0.88rem;">Guardian NFT <strong class="pink">不带来任何权重加成</strong>，Council 成员在普通投票中与任何成员完全平等。</p>
+        <h3>Role in Regular Governance</h3>
+        <p style="font-size:0.88rem;">Guardian NFT <strong class="pink">grants zero weight bonus</strong>. Council members vote on equal footing with all other members in ordinary governance.</p>
       </div>
       <div>
-        <h3>创世配置 → 选举制路径</h3>
+        <h3>Genesis Config → Election Path</h3>
         <div class="timeline">
           <div class="tl-item">
-            <div class="tl-phase">Demo 阶段（当前）</div>
-            <div class="tl-title">创世 7 成员配置</div>
-            <div class="tl-desc">构造函数写入 7 个地址，无 setMember()，Phase 1 前保持固定配置。vetoThreshold = 5/7</div>
+            <div class="tl-phase">Demo Phase (Current)</div>
+            <div class="tl-title">Genesis 7-Member Config</div>
+            <div class="tl-desc">7 addresses written in constructor. No setMember(). Fixed configuration until Phase 1. vetoThreshold = 5/7</div>
           </div>
           <div class="tl-item future">
             <div class="tl-phase">Phase 1</div>
-            <div class="tl-title">DAO 提案触发 → 选举制</div>
-            <div class="tl-desc">社区部署 CouncilElection 合约，调用 transferControlToElection()（不可逆）。vetoThreshold 自动降为 4/7。成员变更由选举合约管理。</div>
+            <div class="tl-title">DAO Proposal → Election System</div>
+            <div class="tl-desc">Community deploys CouncilElection contract, calls transferControlToElection() (irreversible). vetoThreshold auto-lowers to 4/7. Member changes managed by election contract.</div>
           </div>
           <div class="tl-item future">
             <div class="tl-phase">Phase 2+</div>
-            <div class="tl-title">完整自治</div>
-            <div class="tl-desc">6 个月任期轮换，开放提名，Guardian NFT 自动换届，75% DAO 超级多数可罢免（走 Timelock）。</div>
+            <div class="tl-title">Full Self-Governance</div>
+            <div class="tl-desc">6-month term rotation. Open nominations. Guardian NFT auto-rotates. 75% DAO supermajority can remove members (via Timelock).</div>
           </div>
         </div>
-        <h3 style="margin-top:0.5rem;">Council 固定津贴</h3>
+        <h3 style="margin-top:0.5rem;">Council Fixed Stipend</h3>
         <div class="card card-amber">
-          <p style="margin:0; font-size:0.88rem;">每 Epoch 5 PAS / 人 · 固定发放 · 无响应率要求 · 无参与条件<br>资金来源：Treasury rewardPool（35 PAS / Epoch 合计）</p>
+          <p style="margin:0; font-size:0.88rem;">5 PAS per person per Epoch · Fixed distribution · No response rate or participation conditions<br>Funded by: Treasury rewardPool (35 PAS total per Epoch)</p>
         </div>
       </div>
     </div>
@@ -1275,60 +1232,60 @@ Guardian NFT：<span class="cm">无权重加成</span>
 </section>
 
 
-<!-- ════════════════ SLIDE 13: 经济模型 ════════════════ -->
+<!-- ════════════════ SLIDE 13: Economic Model ════════════════ -->
 <section class="slide" id="s13">
   <div class="slide-content fade-in">
-    <h2>经济模型 v3.4 — 动态奖励 · Epoch 制度</h2>
-    <p class="sub">仅 VersionUpdate 提案触发奖励分配 · 立场解耦 · 防扭曲</p>
+    <h2>Economic Model v3.4 — Dynamic Rewards & Epoch System</h2>
+    <p class="sub">Only VersionUpdate proposals trigger reward distribution · Stance-decoupled · Anti-distortion</p>
     <div class="split" style="gap:1.5rem;">
       <div>
-        <h3>提案动态奖励</h3>
+        <h3>Dynamic Proposal Reward</h3>
         <div class="code-block">ProposalReward = min(
-  50 PAS + voterCount × 1 PAS,    <span class="ck">← 人数加成</span>
-  min(rewardPool × 10%, 200 PAS)  <span class="ck">← 动态上限</span>
+  50 PAS + voterCount × 1 PAS,    <span class="ck">← participation bonus</span>
+  min(rewardPool × 10%, 200 PAS)  <span class="ck">← dynamic ceiling</span>
 )
 
-<span class="cm">示例（rewardPool = 5,000 PAS）：</span>
-动态上限 = min(500, 200) = 200 PAS
-20 人参与  → 50+20 = 70 PAS
-150 人参与 → 50+150 = 200 PAS ← 封顶
+<span class="cm">Example (rewardPool = 5,000 PAS):</span>
+Dynamic ceiling = min(500, 200) = 200 PAS
+20 participants  → 50+20 = 70 PAS
+150 participants → 50+150 = 200 PAS ← capped
 
-若 rewardPool &lt; 50 PAS：
-  跳过奖励，提案照常 merge 🔄</div>
-        <h3 style="margin-top:1rem;">奖励分配（VersionUpdate 专属）</h3>
+If rewardPool &lt; 50 PAS:
+  Skip reward, proposal still merges 🔄</div>
+        <h3 style="margin-top:1rem;">Reward Distribution (VersionUpdate only)</h3>
         <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
           <div class="stat-box" style="flex:1; min-width:80px;">
             <div class="stat-num" style="font-size:2rem; background: linear-gradient(135deg, var(--pink), var(--pink-light)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">50%</div>
-            <div class="stat-label">提案人<br>executeProposal 立即转账</div>
+            <div class="stat-label">Proposer<br>Paid at executeProposal</div>
           </div>
           <div class="stat-box" style="flex:1; min-width:80px;">
             <div class="stat-num" style="font-size:2rem; background:linear-gradient(135deg, var(--green), #80ffcc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">30%</div>
-            <div class="stat-label">Epoch 投票者<br>按权重比例分配</div>
+            <div class="stat-label">Epoch Voters<br>Proportional by weight</div>
           </div>
           <div class="stat-box" style="flex:1; min-width:80px;">
             <div class="stat-num" style="font-size:2rem; background:linear-gradient(135deg, var(--amber), #ffe0a0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">20%</div>
-            <div class="stat-label">rewardPool<br>留存循环</div>
+            <div class="stat-label">rewardPool<br>Retained &amp; recycled</div>
           </div>
         </div>
       </div>
       <div>
-        <h3>Epoch 投票奖励（30 天周期）</h3>
+        <h3>Epoch Voter Rewards (30-day cycle)</h3>
         <div class="card card-green" style="margin-bottom:0.8rem;">
-          <p style="font-size:0.88rem; margin:0;"><strong>达标条件：</strong>本 Epoch 参与 ≥ 50% 有效提案投票<br><strong>奖励池：</strong>本 Epoch 所有 VersionUpdate 通过提案的 30% 之和<br><strong>分配：</strong>达标成员按各自权重比例<br><strong>投 YES / NO / ABSTAIN 均算参与</strong>，立场与奖励完全解耦</p>
+          <p style="font-size:0.88rem; margin:0;"><strong>Eligibility:</strong> voted in ≥ 50% of valid proposals this Epoch<br><strong>Reward pool:</strong> sum of 30% shares from all passed VersionUpdate proposals<br><strong>Distribution:</strong> eligible members weighted proportionally<br><strong>YES / NO / ABSTAIN all count</strong> — stance has zero effect on reward</p>
         </div>
-        <h3>Treasury 资金流</h3>
+        <h3>Treasury Fund Flow</h3>
         <table>
-          <tr><th>来源</th><th>用途</th></tr>
-          <tr><td>提前解锁罚金 8.8 PAS/次</td><td>VersionUpdate 提案人奖励 50%</td></tr>
-          <tr><td>MVP 初始注资 5,000 PAS</td><td>Epoch 投票者奖励 30%</td></tr>
-          <tr><td>社区捐款（开放，无限制）</td><td>rewardPool 留存 20%</td></tr>
-          <tr><td>Polkadot 生态 Grant</td><td>Council 固定津贴 35 PAS/Epoch</td></tr>
+          <tr><th>Source</th><th>Use</th></tr>
+          <tr><td>Early unstake penalty 8.8 PAS/time</td><td>VersionUpdate proposer reward 50%</td></tr>
+          <tr><td>MVP initial funding 5,000 PAS</td><td>Epoch voter reward 30%</td></tr>
+          <tr><td>Community donations (open, unlimited)</td><td>rewardPool retained 20%</td></tr>
+          <tr><td>Polkadot Ecosystem Grant</td><td>Council fixed stipend 35 PAS/Epoch</td></tr>
         </table>
         <div class="card" style="background:var(--pink-dim2); margin-top:0.6rem;">
-          <p style="margin:0; font-size:0.82rem;">UpgradeContract / ParameterChange 执行成功后 → <strong>退还 5 PAS 质押，不发奖励</strong></p>
+          <p style="margin:0; font-size:0.82rem;">UpgradeContract / ParameterChange executed successfully → <strong>Returns 5 PAS stake, no reward issued</strong></p>
         </div>
         <div class="card card-purple" style="margin-top:0.6rem;">
-          <p style="margin:0; font-size:0.82rem; color:var(--purple);">💡 <strong>可持续性说明：</strong>正式运行中，rewardPool 的长期健康依赖 <strong>Polkadot 生态 Grant</strong> 与<strong>社区捐赠</strong>（任何地址均可调用 depositRewardPool() 或直接转账）共同补充，形成开放循环。</p>
+          <p style="margin:0; font-size:0.82rem; color:var(--purple);">💡 <strong>Sustainability note:</strong> Long-term rewardPool health depends on <strong>Polkadot Ecosystem Grants</strong> and <strong>community donations</strong> (any address can call depositRewardPool() or send directly), forming an open funding cycle.</p>
         </div>
       </div>
     </div>
@@ -1336,120 +1293,120 @@ Guardian NFT：<span class="cm">无权重加成</span>
 </section>
 
 
-<!-- ════════════════ SLIDE 14: 文档与版本模型 ════════════════ -->
+<!-- ════════════════ SLIDE 14: Document & Version Model ════════════════ -->
 <section class="slide" id="s14">
   <div class="slide-content fade-in">
-    <h2>文档与版本模型 · 种子文档规划</h2>
-    <p class="sub">类 Git 线性历史 · 提案是 Pull Request · 合并即永久</p>
+    <h2>Document & Version Model · Seed Document Plan</h2>
+    <p class="sub">Git-like linear history · Proposals are Pull Requests · Merging is permanent</p>
     <div class="split">
       <div>
-        <h3>Git 类比</h3>
-        <div class="code-block">文档创建（v1，种子文档仅含标题）
-  ↓ proposeVersion → 社区投票
-v2 首次填充内容（merge）
-  ↓ proposeVersion → 社区投票
-v3 修正细节（merge）
-  ↓ 活跃 PR #45 待投票中... ⏳
+        <h3>Git Analogy</h3>
+        <div class="code-block">Document created (v1, seed — title only)
+  ↓ proposeVersion → community vote
+v2 First content added (merged)
+  ↓ proposeVersion → community vote
+v3 Details corrected (merged)
+  ↓ Active PR #45 pending vote... ⏳
 
-◎── v3 [merged] 2026-02-15  Score+3.44  参与率8%
-│   "增加 2025 Q1 事件"  by 0xABCD
+◎── v3 [merged] 2026-02-15  Score+3.44  quorum 8%
+│   "Add 2025 Q1 events"  by 0xABCD
 │
-◎── v2 [merged] 2025-12-01  Score+5.10  参与率14%
-│   "首次填充内容"  by 0x1234
+◎── v2 [merged] 2025-12-01  Score+5.10  quorum 14%
+│   "First content added"  by 0x1234
 │
 ◎── v1 [seed]   2025-11-01  by Admin
-    "文档创建（内容为空，待社区填充）"</div>
+    "Document created (empty, awaiting community)"</div>
         <div class="card card-accent" style="margin-top:0.8rem;">
-          <p style="font-size:0.88rem; margin:0;"><strong>Frozen 状态说明：</strong>Frozen 时仍可提案，但 executeProposal 执行 merge 时若仍 Frozen → revert，待解冻后可执行</p>
+          <p style="font-size:0.88rem; margin:0;"><strong>Frozen state note:</strong> Proposals can still be submitted when a document is Frozen, but executeProposal will revert if still Frozen at execution time — proceed after unfreezing</p>
         </div>
       </div>
       <div>
-        <h3>四个核心种子文档</h3>
+        <h3>Four Core Seed Documents</h3>
         <div style="display:flex; flex-direction:column; gap:0.7rem;">
           <div class="card card-accent">
-            <strong>🌐 Polkadot 生态大事记</strong>
-            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#history #timeline — 从创世至今重要事件，宏观主历史，适合新手入门</p>
+            <strong>🌐 Polkadot Ecosystem Chronicle</strong>
+            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#history #timeline — Key events from genesis to present. The macro main history. Great entry point for newcomers.</p>
           </div>
           <div class="card card-green">
-            <strong>🗳️ 治理提案大事记</strong>
-            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#governance #referenda — 重要公投记录，提案号、结果、影响，与链上治理深度结合</p>
+            <strong>🗳️ Governance Proposal Archive</strong>
+            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#governance #referenda — Records of major referenda: proposal IDs, outcomes, and impact. Deeply tied to on-chain governance.</p>
           </div>
           <div class="card card-amber">
-            <strong>⚙️ Runtime 升级日志</strong>
-            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#technical #runtime — 按版本记录 runtime 升级，技术演进追踪，对开发者友好</p>
+            <strong>⚙️ Runtime Upgrade Log</strong>
+            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#technical #runtime — Runtime upgrades tracked by version. Technical evolution for developers.</p>
           </div>
           <div class="card card-purple">
-            <strong>📈 生态项目里程碑</strong>
-            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#ecosystem #projects — 仅记录公开可验证信息，头部项目关键进展</p>
+            <strong>📈 Ecosystem Project Milestones</strong>
+            <p style="font-size:0.82rem; margin:0.3rem 0 0;">#ecosystem #projects — Only publicly verifiable information. Key milestones from leading projects.</p>
           </div>
         </div>
-        <p style="font-size:0.82rem; color:var(--muted); margin-top:0.8rem;">SEED_CREATOR_ROLE 在 4 个种子文档创建完毕后立即 renounce，此后任何人无法再调用此功能。</p>
+        <p style="font-size:0.82rem; color:var(--muted); margin-top:0.8rem;">SEED_CREATOR_ROLE is renounced immediately after the 4 seed documents are created. No one can invoke this function thereafter.</p>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 15: 路线图 ════════════════ -->
+<!-- ════════════════ SLIDE 15: Roadmap ════════════════ -->
 <section class="slide" id="s15">
   <div class="slide-content fade-in">
-    <h2>项目路线图 — 一步一步写入历史</h2>
+    <h2>Project Roadmap — Writing History, Step by Step</h2>
     <div class="split">
       <div>
         <div class="timeline">
           <div class="tl-item">
             <div class="tl-phase">Phase 0 · M1–M2 ✅</div>
-            <div class="tl-title">合约架构 · 测试网</div>
-            <div class="tl-desc">10 合约模块完成；Hardhat 环境；PAS 测试网部署验证；Archive Council 7 人创世配置；申请 Polkadot Treasury Grant</div>
+            <div class="tl-title">Contract Architecture · Testnet</div>
+            <div class="tl-desc">10 contract modules completed. Hardhat environment. PAS testnet deployment verified. Archive Council genesis 7-member config. Applied for Polkadot Treasury Grant.</div>
           </div>
           <div class="tl-item">
             <div class="tl-phase">Phase 1 · M3–M5</div>
-            <div class="tl-title">MVP 主网上线 · 浏览器</div>
-            <div class="tl-desc">核心合约主网部署；前端 Markdown 浏览器上线；calldata 上链验证；i18n 6 语言；社交分享分发机制</div>
+            <div class="tl-title">MVP Mainnet Launch · Browser</div>
+            <div class="tl-desc">Core contracts deployed to mainnet. Frontend Markdown browser live. calldata on-chain verification. i18n in 6 languages. Social sharing distribution mechanism.</div>
           </div>
           <div class="tl-item future">
             <div class="tl-phase">Phase 2 · M6–M8</div>
-            <div class="tl-title">完整 DAO · Council 选举制</div>
-            <div class="tl-desc">GovernanceCore 全功能上线；CouncilElection 合约部署；NFT 奖励体系激活；Bug Bounty 项目；邀请首批贡献者</div>
+            <div class="tl-title">Full DAO · Council Election System</div>
+            <div class="tl-desc">GovernanceCore fully launched. CouncilElection contract deployed. NFT reward system activated. Bug Bounty program. Invite first contributors.</div>
           </div>
           <div class="tl-item future">
             <div class="tl-phase">Phase 3 · M9–M12</div>
-            <div class="tl-title">开放 API · AI 摘要</div>
-            <div class="tl-desc">生态 API 开放；移动端 PWA 优化；AI 辅助摘要（链下运行，链上存档）；Polkassembly 数据互通</div>
+            <div class="tl-title">Open API · AI Summaries</div>
+            <div class="tl-desc">Ecosystem API opened. Mobile PWA optimization. AI-assisted summaries (off-chain inference, on-chain archive). Polkassembly data integration.</div>
           </div>
           <div class="tl-item future">
             <div class="tl-phase">Phase 4 · M13+</div>
-            <div class="tl-title">多链扩展 · DeFi Yield</div>
-            <div class="tl-desc">Kusama 历史支持；其他 Parachain；探索 PolkaVM 原生合约迁移；接入 DeFi yield 补充国库；Liquid Staking 探索</div>
+            <div class="tl-title">Multi-chain Expansion · DeFi Yield</div>
+            <div class="tl-desc">Kusama history support. Other parachains. Explore PolkaVM native contract migration. DeFi yield to supplement treasury. Liquid staking exploration.</div>
           </div>
           <div class="tl-item future">
-            <div class="tl-phase">Phase 5 · 长期</div>
-            <div class="tl-title">🪪 Proof of Personhood 集成</div>
-            <div class="tl-desc">接入 Polkadot 原生 PoP 系统，以链上唯一真人身份补充或替代质押准入门槛；结合零知识证明实现一人一基础权重，从根本上消除多账号女巫攻击，让治理更公平</div>
+            <div class="tl-phase">Phase 5 · Long-term</div>
+            <div class="tl-title">🪪 Proof of Personhood Integration</div>
+            <div class="tl-desc">Integrate Polkadot native PoP to supplement or replace stake-based entry with verified on-chain identity. Combine ZK proofs for one-person-one-weight, fundamentally eliminating multi-account Sybil attacks for fairer governance.</div>
           </div>
         </div>
       </div>
       <div>
-        <!-- Hall of Fame 特色展示 -->
+        <!-- Hall of Fame -->
         <div style="background: linear-gradient(135deg, rgba(230,0,122,0.12), rgba(221,179,255,0.08)); border: 1px solid rgba(230,0,122,0.4); border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
             <span style="font-size:1.8rem;">🏆</span>
             <div>
-              <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--pink);">年度名人堂 · Hall of Fame</div>
-              <div style="font-size:0.78rem; color:var(--muted);">协议稳定运行 · 社区规模达门槛后启动</div>
+              <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--pink);">Annual Hall of Fame</div>
+              <div style="font-size:0.78rem; color:var(--muted);">Launches once protocol is stable and community reaches scale threshold</div>
             </div>
           </div>
-          <p style="font-size:0.88rem; margin-bottom:0.8rem;">每年举办一届，选出年度最具影响力的 <strong>10 位 Polkadot 生态贡献者</strong>，当选记录<strong class="pink">永久写入链上历史档案</strong>。</p>
-          <div class="code-block" style="font-size:0.75rem;">提名费 + 投票费 + 预测市场手续费
+          <p style="font-size:0.88rem; margin-bottom:0.8rem;">Held annually. Selects the <strong>10 most impactful Polkadot ecosystem contributors</strong> of the year. Their records are <strong class="pink">permanently written into the on-chain history archive</strong>.</p>
+          <div class="code-block" style="font-size:0.75rem;">Nomination fees + voting fees + prediction market fees
   ↓
-65% → 名人堂内部分配（当选者/提名者/投票者）
-35% → 反哺 PolkaInk 主 Treasury rewardPool</div>
+65% → Hall of Fame internal distribution (winners / nominators / voters)
+35% → Feeds back into PolkaInk main Treasury rewardPool</div>
           <div class="divider"></div>
-          <p style="font-size:0.82rem; color:var(--muted); margin:0;">预计在第 3 届后实现协议收入覆盖主要运营成本，形成独立经济闭环。</p>
+          <p style="font-size:0.82rem; color:var(--muted); margin:0;">Expected to cover major operational costs with protocol revenue by the 3rd edition, forming a self-sustaining economic loop.</p>
         </div>
         <div class="card card-green">
-          <h3>长期愿景</h3>
-          <p style="font-size:0.88rem; margin:0;">成为 <strong>Web3 世界第一个完全链上、社区共识、DAO 治理</strong>的公共历史档案协议；像区块链本身一样，永久运行，无法关闭。</p>
+          <h3>Long-Term Vision</h3>
+          <p style="font-size:0.88rem; margin:0;">Become the <strong>world's first fully on-chain, community-consensus, DAO-governed</strong> public history archive protocol in Web3 — running permanently and unstoppably, like the blockchain itself.</p>
         </div>
       </div>
     </div>
@@ -1457,120 +1414,120 @@ v3 修正细节（merge）
 </section>
 
 
-<!-- ════════════════ SLIDE 16: 设计反思 ════════════════ -->
+<!-- ════════════════ SLIDE 16: Design Retrospective ════════════════ -->
 <section class="slide" id="s16">
   <div class="slide-content fade-in">
-    <h2>设计反思 — v1 → v2 → v3.4 的兴衰与重建</h2>
-    <p class="sub">每一次版本迭代，都是对过度设计的一次修剪</p>
+    <h2>Design Retrospective — Rise, Fall & Rebuild: v1 → v2 → v3.4</h2>
+    <p class="sub">Each version iteration was a pruning of over-engineering</p>
     <div class="cards cards-3">
       <!-- v1 -->
       <div class="card" style="border-top: 3px solid var(--amber);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
           <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--amber);">v1.0x</span>
-          <span class="tag tag-amber">2026-02 · 初稿</span>
+          <span class="tag tag-amber">2026-02 · First Draft</span>
         </div>
-        <h3 style="color:var(--amber);">过度工程化的起点</h3>
-        <p style="font-size:0.85rem;">引入 Archive Council 7 人委员会，但成员管理权在 Admin 手中，任何时候可替换，理论上的"去中心化守护"是伪命题。</p>
-        <p style="font-size:0.85rem;">DOT 持币 + NFT 双轨权重，OG Gold / Silver / Bronze 三级特权 NFT 由团队空投，实质上给了创始团队永久话语权优势。</p>
-        <p style="font-size:0.85rem;"><strong class="amber">问题：</strong>60% 赞成门槛 + 无质押门槛 + Subsquid 依赖 + IPFS 前端——复杂度极高，单点失败多，去中心化是口号。</p>
+        <h3 style="color:var(--amber);">The Over-Engineered Starting Point</h3>
+        <p style="font-size:0.85rem;">Introduced a 7-member Archive Council, but member management belonged to Admin — replaceable at any time. The "decentralized safeguard" was a false premise.</p>
+        <p style="font-size:0.85rem;">DOT holdings + NFT dual-track weight system. OG Gold/Silver/Bronze privilege NFTs airdropped by the team, effectively giving founders a permanent voice advantage.</p>
+        <p style="font-size:0.85rem;"><strong class="amber">Problem:</strong> 60% approval threshold + no stake requirement + Subsquid dependency + IPFS frontend — extremely high complexity, many single points of failure. Decentralization was a slogan.</p>
       </div>
       <!-- v2 -->
       <div class="card" style="border-top: 3px solid var(--pink);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
           <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--pink);">v2.0x</span>
-          <span class="tag tag-pink">2026-03 · 激进简化</span>
+          <span class="tag tag-pink">2026-03 · Radical Simplification</span>
         </div>
-        <h3>矫枉过正的震荡</h3>
-        <p style="font-size:0.85rem;">彻底移除 Archive Council，改为 OG Gold 单人 veto——"去精英化"的初衷，反而制造了更大的单点权力：一人 NO 就能杀死任何通过的提案。</p>
-        <p style="font-size:0.85rem;">引入 ReportManager 举报机制，初衷是社区自治内容争议。但举报可被武器化（批量建号举报）、与 calldata 永久存储的核心价值矛盾，且与 Council veto 职责重叠。</p>
-        <p style="font-size:0.85rem;"><strong class="pink">问题：</strong>6 种 NFT（OGBronze/Silver/Gold/Member/Creator/Author）体系膨胀，治理复杂度不降反升。没有 Council，谁来处理真正的极端内容风险？</p>
+        <h3>The Overcorrection</h3>
+        <p style="font-size:0.85rem;">Removed the Archive Council entirely. Replaced with OG Gold single-person veto — the intent to "remove elitism" ironically created a bigger single point of power: one NO could kill any approved proposal.</p>
+        <p style="font-size:0.85rem;">Introduced a ReportManager dispute mechanism intended for community self-governance. But reports could be weaponized (bulk accounts), contradicted calldata's permanent storage core value, and overlapped with Council veto responsibilities.</p>
+        <p style="font-size:0.85rem;"><strong class="pink">Problem:</strong> 6 NFT types (OGBronze/Silver/Gold/Member/Creator/Author) inflated governance complexity. Without a Council, who handles truly extreme content risks?</p>
       </div>
-      <!-- v3.x 反思 -->
+      <!-- v3.4 -->
       <div class="card" style="border-top: 3px solid var(--green);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
           <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--green);">v3.4</span>
-          <span class="tag tag-green">当前 · 有机平衡</span>
+          <span class="tag tag-green">Current · Organic Balance</span>
         </div>
-        <h3 style="color:var(--green);">克制与均衡的答案</h3>
-        <p style="font-size:0.85rem;">重新引入 Archive Council，但彻底剥夺 Admin 对成员的控制权——7 人地址写入构造函数，移除 setMember()，Phase 1 前无人可替换。</p>
-        <p style="font-size:0.85rem;">废除 OG NFT 和 Author NFT，精简为 3 种 NFT；废除举报机制（calldata 永久存在，举报改变不了历史，只有 Council 集体 veto 和社区重新写版本才是正确的争议处理路径）。</p>
-        <p style="font-size:0.85rem;"><strong class="green">收获：</strong>零特权管理员；单人最大实际权重 1.80 ＜ T=2.0 的铁律；Epoch 奖励与立场解耦——这不是取巧，是系统成熟的标志。</p>
+        <h3 style="color:var(--green);">The Answer: Restraint and Balance</h3>
+        <p style="font-size:0.85rem;">Re-introduced the Archive Council, but fully removed Admin's ability to control membership — 7 addresses written into the constructor, setMember() removed, no replacements possible before Phase 1.</p>
+        <p style="font-size:0.85rem;">Abolished OG NFTs and Author NFTs, streamlined to 3 NFT types. Abolished the report mechanism (calldata is permanent — reports can't change history; only Council collective veto and community re-versioning are the proper dispute paths).</p>
+        <p style="font-size:0.85rem;"><strong class="green">Key gains:</strong> Zero privileged admin. Iron rule: single-person max weight 1.80 ＜ T=2.0. Epoch rewards decoupled from voting stance — not a shortcut, but a mark of system maturity.</p>
       </div>
     </div>
-    <div class="quote" style="margin-top:1.2rem; font-size:0.95rem;">
-      "每次反思的核心问题不是'功能够不够多'，而是'权力能否被滥用'。<br>v1 的权力集中在 Admin，v2 的权力集中在 OG Gold，v3.4 的权力分散在数学和合约里。"
+    <div class="quote" style="margin-top:1.2rem; font-size:0.92rem;">
+      The core question of every retrospective was never "do we have enough features?" but "can power be abused?"<br>v1 concentrated power in Admin. v2 concentrated it in OG Gold. v3.4 distributes it across math and contracts.
     </div>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 17: 生态影响力 ════════════════ -->
+<!-- ════════════════ SLIDE 17: Ecosystem Impact ════════════════ -->
 <section class="slide" id="s17">
   <div class="slide-content fade-in">
-    <h2>PolkaInk 能为 Polkadot 带来什么？</h2>
-    <p class="sub">链上历史协议 × 质押治理 × NFT 激励 — 预估生态增量</p>
+    <h2>What Can PolkaInk Bring to Polkadot?</h2>
+    <p class="sub">On-chain history protocol × Staking governance × NFT incentives — Estimated ecosystem growth</p>
     <div class="cards cards-3" style="margin-bottom:1.5rem;">
-      <div class="stat-box"><div class="stat-num">+50,000</div><div class="stat-label">新增链上交互 / 年</div></div>
-      <div class="stat-box"><div class="stat-num" style="background:linear-gradient(135deg, var(--green), #80ffcc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">+5,000</div><div class="stat-label">新增活跃质押地址</div></div>
-      <div class="stat-box"><div class="stat-num" style="background:linear-gradient(135deg, var(--amber), #ffe0a0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">+20,000</div><div class="stat-label">生态关注者回归</div></div>
+      <div class="stat-box"><div class="stat-num">+50,000</div><div class="stat-label">New on-chain interactions / year</div></div>
+      <div class="stat-box"><div class="stat-num" style="background:linear-gradient(135deg, var(--green), #80ffcc); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">+5,000</div><div class="stat-label">New active staking addresses</div></div>
+      <div class="stat-box"><div class="stat-num" style="background:linear-gradient(135deg, var(--amber), #ffe0a0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">+20,000</div><div class="stat-label">Ecosystem followers re-engaged</div></div>
     </div>
     <div class="cards cards-4">
       <div class="card card-accent" style="text-align:center;">
         <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">300+</div>
-        <div style="font-size:0.85rem; color:var(--muted);">首年链上归档文档</div>
+        <div style="font-size:0.85rem; color:var(--muted);">On-chain archived docs in year one</div>
       </div>
       <div class="card card-green" style="text-align:center;">
-        <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">3 种</div>
-        <div style="font-size:0.85rem; color:var(--muted);">精简 NFT 激励体系</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">3 Types</div>
+        <div style="font-size:0.85rem; color:var(--muted);">Streamlined NFT incentive system</div>
       </div>
       <div class="card card-amber" style="text-align:center;">
-        <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">6 语言</div>
-        <div style="font-size:0.85rem; color:var(--muted);">多语言社区触达</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">6 Languages</div>
+        <div style="font-size:0.85rem; color:var(--muted);">Multilingual community reach</div>
       </div>
       <div class="card card-purple" style="text-align:center;">
         <div style="font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--purple);">100%</div>
-        <div style="font-size:0.85rem; color:var(--muted);">链上可验证 · 零中心化</div>
+        <div style="font-size:0.85rem; color:var(--muted);">On-chain verifiable · Zero centralization</div>
       </div>
     </div>
     <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
       <div style="background:var(--pink-dim); border:1px solid var(--border); border-radius:16px; padding:0.9rem 1.3rem; display:flex; align-items:center; gap:0.6rem;">
-        <span style="font-size:1.3rem;">🏗️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">基础设施建设</div><div style="color:var(--muted); font-size:0.78rem;">链上存储 · 永久归档</div></div>
+        <span style="font-size:1.3rem;">🏗️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">Infrastructure</div><div style="color:var(--muted); font-size:0.78rem;">On-chain storage · Permanent archive</div></div>
       </div>
       <div style="background:var(--pink-dim); border:1px solid var(--border); border-radius:16px; padding:0.9rem 1.3rem; display:flex; align-items:center; gap:0.6rem;">
-        <span style="font-size:1.3rem;">🗳️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">链上治理</div><div style="color:var(--muted); font-size:0.78rem;">质押准入 · 参与率门槛</div></div>
+        <span style="font-size:1.3rem;">🗳️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">On-chain Governance</div><div style="color:var(--muted); font-size:0.78rem;">Stake access · Quorum threshold</div></div>
       </div>
       <div style="background:var(--pink-dim); border:1px solid var(--border); border-radius:16px; padding:0.9rem 1.3rem; display:flex; align-items:center; gap:0.6rem;">
-        <span style="font-size:1.3rem;">🎨</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">NFT 生态</div><div style="color:var(--muted); font-size:0.78rem;">3 种链上 Soulbound NFT</div></div>
+        <span style="font-size:1.3rem;">🎨</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">NFT Ecosystem</div><div style="color:var(--muted); font-size:0.78rem;">3 on-chain Soulbound NFT types</div></div>
       </div>
       <div style="background:var(--pink-dim); border:1px solid var(--border); border-radius:16px; padding:0.9rem 1.3rem; display:flex; align-items:center; gap:0.6rem;">
-        <span style="font-size:1.3rem;">🛡️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">Archive Council</div><div style="color:var(--muted); font-size:0.78rem;">集体否决 · 透明链上理由</div></div>
+        <span style="font-size:1.3rem;">🛡️</span><div><div style="color:var(--pink-light); font-weight:700; font-size:0.9rem;">Archive Council</div><div style="color:var(--muted); font-size:0.78rem;">Collective veto · Transparent on-chain reasoning</div></div>
       </div>
     </div>
 
-    <!-- Agent Skill 专栏 -->
+    <!-- Agent Skill section -->
     <div style="margin-top:1.5rem; background:linear-gradient(135deg, rgba(221,179,255,0.10), rgba(230,0,122,0.06)); border:1px solid rgba(221,179,255,0.3); border-radius:18px; padding:1.2rem 1.5rem;">
       <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.8rem; flex-wrap:wrap;">
         <span style="font-size:1.4rem;">🤖</span>
-        <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--purple);">PolkaInk Agent Skill · 已开发</span>
-        <span class="tag tag-purple" style="font-size:0.72rem;">SKILL.md 格式</span>
-        <span class="tag tag-green" style="font-size:0.72rem;">Claude · Cursor · Copilot 兼容</span>
+        <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--purple);">PolkaInk Agent Skill · Available Now</span>
+        <span class="tag tag-purple" style="font-size:0.72rem;">SKILL.md Format</span>
+        <span class="tag tag-green" style="font-size:0.72rem;">Claude · Cursor · Copilot Compatible</span>
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0.8rem;">
         <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:0.75rem 1rem;">
-          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">📋 合约接口知识</div>
-          <div style="font-size:0.75rem; color:var(--muted);">10 合约 ABI、调用链路、权限模型，AI agent 可直接用于合约开发与审计辅助</div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">📋 Contract Interface Knowledge</div>
+          <div style="font-size:0.75rem; color:var(--muted);">10 contract ABIs, call chains, permission models — AI agents can use directly for contract development and audit assistance</div>
         </div>
         <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:0.75rem 1rem;">
-          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">⚖️ 治理规则内置</div>
-          <div style="font-size:0.75rem; color:var(--muted);">权重公式、提案生命周期、Council veto 规则，AI 可自动生成符合治理逻辑的代码与文档</div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">⚖️ Built-in Governance Rules</div>
+          <div style="font-size:0.75rem; color:var(--muted);">Weight formula, proposal lifecycle, Council veto rules — AI can auto-generate governance-compliant code and documentation</div>
         </div>
         <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:0.75rem 1rem;">
-          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">🎨 NFT 体系描述</div>
-          <div style="font-size:0.75rem; color:var(--muted);">Member / Creator / Guardian 铸造逻辑，帮助 AI 理解权益结构，加速前端与测试脚本开发</div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--purple); margin-bottom:0.3rem;">🎨 NFT System Description</div>
+          <div style="font-size:0.75rem; color:var(--muted);">Member / Creator / Guardian minting logic helps AI understand the rights structure, accelerating frontend and test script development</div>
         </div>
         <div style="background:rgba(0,0,0,0.25); border-radius:10px; padding:0.75rem 1rem;">
-          <div style="font-size:0.78rem; font-weight:700; color:var(--green); margin-bottom:0.3rem;">✅ 开放标准</div>
-          <div style="font-size:0.75rem; color:var(--muted);">任何开发者或 AI 工具均可加载，降低 PolkaInk 生态参与门槛，推动社区共建</div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--green); margin-bottom:0.3rem;">✅ Open Standard</div>
+          <div style="font-size:0.75rem; color:var(--muted);">Any developer or AI tool can load it — lowering the barrier to join the PolkaInk ecosystem and driving community co-building</div>
         </div>
       </div>
     </div>
@@ -1578,39 +1535,34 @@ v3 修正细节（merge）
 </section>
 
 
-<!-- ════════════════ SLIDE 18: 团队 ════════════════ -->
+<!-- ════════════════ SLIDE 18: Team ════════════════ -->
 <section class="slide" id="s18">
   <div class="slide-content fade-in" style="text-align:center;">
     <div style="margin-bottom:0.5rem;">
       <img src="https://arrowtower.netlify.app/ppt/polkaclaw.png" alt="PolkaClaw" style="height:60px; filter:drop-shadow(0 0 10px var(--pink));">
     </div>
-    <h2 style="justify-content:center;">拾起共识的人</h2>
+    <h2 style="justify-content:center;">The People Who Picked Up the Consensus</h2>
     <div class="team-row">
       <div class="team-card">
         <img src="https://arrowtower.netlify.app/ppt/alice.jpg" alt="Alice">
         <h3>Alice</h3>
-        <p style="font-size:0.9rem;">全栈工程师 / 产品设计 / 治理机制设计<br>热爱 Web3 叙事</p>
+        <p style="font-size:0.9rem;">Full-stack Engineer / Product Design / Governance Mechanism Design<br>Passionate about Web3 narratives</p>
       </div>
       <div class="team-card">
         <img src="https://arrowtower.netlify.app/ppt/jolin.jpg" alt="Jolin">
         <h3>Jolin</h3>
-        <p style="font-size:0.9rem;">智能合约开发 / 前端开发<br>深耕 Polkadot 生态</p>
-      </div>
-      <div class="team-card">
-        <img src="https://duk.tw/Ni8GQw.jpg" alt="Quentin">
-        <h3>Quentin</h3>
-        <p style="font-size:0.9rem;">QA 测试工程师 / DevOps / 基础设施自动化<br>守护每一条 pipeline</p>
+        <p style="font-size:0.9rem;">Smart Contract Development / Frontend Development<br>Deep in the Polkadot ecosystem</p>
       </div>
     </div>
-    <p style="margin-top:1.5rem; color:var(--muted);">团队：<strong>PolkaClaw</strong> · 让历史无法删除</p>
+    <p style="margin-top:1.5rem; color:var(--muted);">Team: <strong>PolkaClaw</strong> · Making history impossible to delete</p>
   </div>
 </section>
 
 
-<!-- ════════════════ SLIDE 19: 感谢 ════════════════ -->
+<!-- ════════════════ SLIDE 19: Thank You ════════════════ -->
 <section class="slide" id="s19">
   <div class="slide-content fade-in" style="text-align:center;">
-    <h2 style="justify-content:center; display:block; border-left:none; font-size:2.6rem;">感谢您 · Acknowledgements</h2>
+    <h2 style="justify-content:center; display:block; border-left:none; font-size:2.6rem;">Thank You · Acknowledgements</h2>
     <div style="display:flex; justify-content:center; gap:2.5rem; flex-wrap:wrap; margin:2.5rem 0;">
       <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(230,0,122,0.3); padding:1.2rem 2rem; border-radius:20px; box-shadow: 0 0 24px rgba(230,0,122,0.15);">
         <img src="https://arrowtower.netlify.app/ppt/polkadotlogo.png" alt="Polkadot" style="height:52px; filter:brightness(1.3) drop-shadow(0 0 8px var(--pink));">
@@ -1622,15 +1574,11 @@ v3 修正细节（merge）
         <img src="https://arrowtower.netlify.app/ppt/oneblock.jpg" alt="OneBlock" style="height:52px; border-radius:8px; filter:brightness(1.3);">
       </div>
     </div>
-    <p>感谢 Polkadot 生态支持 Web3 基础设施</p>
-    <p>感谢所有开发者和社区成员！</p>
+    <p>Thank you to the Polkadot ecosystem for supporting Web3 infrastructure.</p>
+    <p>Thank you to all developers and community members!</p>
     <div style="margin-top:2rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-      <a href="https://polkaink.netlify.app/" class="btn">🔗 体验测试网 Demo</a>
-      <a href="https://github.com/easyshellworld/polkaink" class="btn btn-outline" target="_blank" rel="noopener">⭐ Star on GitHub</a>
-    </div>
-    <div style="margin-top:1.5rem; background:rgba(255,255,255,0.04); border:1px solid rgba(230,0,122,0.2); border-radius:14px; padding:1rem 1.5rem; display:inline-block; text-align:left;">
-      <p style="margin:0.3rem 0; font-size:0.85rem; color:var(--muted);">📦 项目 GitHub：<strong style="color:#fff;">https://github.com/easyshellworld/polkaink</strong></p>
-      <p style="margin:0.3rem 0; font-size:0.85rem; color:var(--muted);">🌐 Demo 演示：<strong style="color:#fff;">https://polkaink.netlify.app/</strong></p>
+      <a href="#" class="btn">🔗 Try the Testnet Demo</a>
+      <a href="#" class="btn btn-outline">🗳️ Co-write History</a>
     </div>
     <p style="margin-top:2rem; color:var(--pink); font-family:'Syne',sans-serif; font-weight:700;">◎ PolkaInk · v3.4 · Write history on-chain. Memory that cannot be erased.</p>
   </div>
@@ -1670,7 +1618,6 @@ v3 修正细节（merge）
   function next() { if (current < total - 1) showSlide(++current); }
   function prev() { if (current > 0) showSlide(--current); }
 
-  // expose for cover button
   window._nextSlide = next;
 
   nextBtn.addEventListener('click', next);

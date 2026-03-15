@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 const navItems = [
   { path: '/library', key: 'nav.library', also: ['/document', '/propose'] },
   { path: '/governance', key: 'nav.governance', also: [] as string[] },
-  { path: '/create', key: 'nav.create', also: [] as string[] },
+  { path: '/faq', key: 'nav.faq', also: [] as string[] },
 ];
 
 export function MobileNav() {

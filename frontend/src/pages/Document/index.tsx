@@ -49,12 +49,47 @@ export default function DocumentPage() {
     [versionIds]
   );
   const currentVersionIdNumber = doc && Number(doc.currentVersionId) > 0 ? Number(doc.currentVersionId) : undefined;
+
+  const { data: versionDetails } = useQuery({
+    queryKey: ['documentVersionDetails', docId, normalizedIds.join(',')],
+    queryFn: async () => {
+      const raws = await Promise.all(
+        normalizedIds.map((vid) => readContract('VersionStore', 'getVersion', [BigInt(vid)]))
+      );
+      return raws as VersionData[];
+    },
+    enabled: normalizedIds.length > 0,
+    staleTime: 60_000,
+  });
+
   const visibleVersionIds = useMemo(() => {
     if (!currentVersionIdNumber) {
       return [];
     }
-    return normalizedIds.filter((id) => id <= currentVersionIdNumber);
-  }, [normalizedIds, currentVersionIdNumber]);
+    // If versionDetails not yet loaded, fall back to ID-based filter as a temporary stub
+    if (!versionDetails || versionDetails.length === 0) {
+      return normalizedIds.filter((id) => id <= currentVersionIdNumber);
+    }
+
+    // Build a map from versionId -> parentVersionId
+    const parentMap = new Map<number, number | null>(
+      versionDetails.map((v) => [
+        Number(v.versionId),
+        Number(v.parentVersionId) > 0 ? Number(v.parentVersionId) : null,
+      ])
+    );
+
+    // Walk up the parent chain from currentVersionId to collect all ancestor IDs
+    const executedPath = new Set<number>();
+    let cursor: number | null = currentVersionIdNumber;
+    while (cursor !== null) {
+      executedPath.add(cursor);
+      cursor = parentMap.get(cursor) ?? null;
+    }
+
+    // Only include version IDs that are on the executed ancestor path
+    return normalizedIds.filter((id) => executedPath.has(id));
+  }, [normalizedIds, currentVersionIdNumber, versionDetails]);
 
   useEffect(() => {
     if (!visibleVersionIds.length) {
@@ -68,18 +103,6 @@ export default function DocumentPage() {
       return current;
     });
   }, [visibleVersionIds, versionId]);
-
-  const { data: versionDetails } = useQuery({
-    queryKey: ['documentVersionDetails', docId, visibleVersionIds.join(',')],
-    queryFn: async () => {
-      const raws = await Promise.all(
-        visibleVersionIds.map((vid) => readContract('VersionStore', 'getVersion', [BigInt(vid)]))
-      );
-      return raws as VersionData[];
-    },
-    enabled: visibleVersionIds.length > 0,
-    staleTime: 60_000,
-  });
 
   const selectedVersionBigInt = selectedVersionId ? BigInt(selectedVersionId) : undefined;
   const { data: selectedMarkdown, isLoading: selectedMdLoading } = useVersionMarkdown(selectedVersionBigInt);
@@ -115,6 +138,7 @@ export default function DocumentPage() {
   const builtVersionNodes = useMemo(() => {
     if (!versionDetails) return [];
     return [...versionDetails]
+      .filter((v) => visibleVersionIds.includes(Number(v.versionId))) // 只显示已执行的版本
       .sort((a, b) => Number(b.versionId) - Number(a.versionId))
       .map((v) => ({
         id: Number(v.versionId),
@@ -125,7 +149,7 @@ export default function DocumentPage() {
         proposalId: Number(v.proposalId) > 0 ? Number(v.proposalId) : undefined,
         contentHash: v.contentHash,
       }));
-  }, [versionDetails, doc?.currentVersionId]);
+  }, [versionDetails, visibleVersionIds, doc?.currentVersionId]);
 
   const renderMarkdown = selectedMarkdown ?? fallbackMarkdown;
 
