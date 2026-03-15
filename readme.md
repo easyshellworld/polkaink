@@ -44,7 +44,7 @@ Every word committed through PolkaInk is as permanent as the block that holds it
 |---|---|
 | 🌐 **Live Demo** | [polkaink.netlify.app](https://polkaink.netlify.app/) |
 | 📊 **Pitch Deck** | [polkaink.netlify.app/ppt.html](https://polkaink.netlify.app/ppt.html) |
-| 🎬 **Demo Video** | [YouTube — Coming Soon](https://www.youtube.com/watch?v=polkaink-demo-placeholder) |
+| 🎬 **Demo Video** | [YouTube](https://youtu.be/Ta2DKs1SdYE) |
 | 📐 **Design Document** | [polkaink\_dev\_doc\_v3\_4.md](docs/polkaink_dev_doc_v3_4.md) |
 
 ---
