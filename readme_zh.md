@@ -44,7 +44,7 @@
 |---|---|
 | 🌐 **在线 Demo** | [polkaink.netlify.app](https://polkaink.netlify.app/) |
 | 📊 **项目 PPT** | [polkaink.netlify.app/ppt.html](https://polkaink.netlify.app/ppt.html) |
-| 🎬 **演示视频** | [YouTube — 即将上线](https://www.youtube.com/watch?v=polkaink-demo-placeholder) |
+| 🎬 **演示视频** | [YouTube ](https://youtu.be/Ta2DKs1SdYE) |
 | 📐 **项目设计书** | [polkaink\_dev\_doc\_v3\_4.md](docs/polkaink_dev_doc_v3_4.md) |
 
 ---
